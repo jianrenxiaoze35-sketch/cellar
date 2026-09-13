@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f5f1e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17130f" media="(prefers-color-scheme: dark)">
+<title>Cellar</title>
+<style>
+:root{
+  --bg:#f5f1e8; --card:#fffdf8; --ink:#2b2219; --mute:#7b6d5d; --line:#e4dac9; --soft:#efe8da;
+  --accent:#a8611a; --accent-ink:#fff; --visit:#fbefdc; --visit-line:#d99a4e;
+  --haccp:#2f6f5e; --kiroku:#3c5f8f; --other:#7b6d5d;
+  --good:#3f8a4f; --norm:#a8842a; --bad:#b5473a; --err:#b5473a;
+  --bar:#a8611a; --bar2:#3c5f8f;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#17130f; --card:#211b16; --ink:#efe6d8; --mute:#a5978a; --line:#3a3028; --soft:#2a221c;
+    --accent:#e3a257; --accent-ink:#1b140e; --visit:#33261a; --visit-line:#c98a3e;
+    --haccp:#6fbfa6; --kiroku:#86a8dc; --other:#a5978a;
+    --good:#7cc68b; --norm:#d9b45a; --bad:#e07b6e; --err:#e07b6e;
+    --bar:#d9954a; --bar2:#7f9fd2;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 "Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  font-variant-numeric:tabular-nums}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+
+/* ヘッダーとタブ */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  padding:10px 16px 0;padding-top:max(10px,env(safe-area-inset-top))}
+.top-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;font-size:22px;
+  letter-spacing:.04em;font-weight:600;margin-right:auto}
+.brand small{font:11px/1 system-ui,sans-serif;color:var(--mute);margin-left:6px;letter-spacing:0;vertical-align:middle}
+.mockbadge{display:none;font-size:11px;padding:2px 7px;border-radius:99px;background:var(--accent);color:var(--accent-ink)}
+body.is-mock .mockbadge{display:inline-block}
+.tabs{display:flex;gap:2px;width:100%;max-width:980px;margin:8px auto 0}
+.tab{flex:1;border:0;background:none;padding:8px 4px 10px;border-bottom:2px solid transparent;cursor:pointer;
+  color:var(--mute);font-weight:600}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:disabled{cursor:default;opacity:.45}
+.tab small{display:block;font-size:10px;font-weight:400;line-height:1.1}
+
+main{max-width:980px;margin:0 auto;padding:12px 16px 40px}
+#v-today{max-width:760px;margin:0 auto}
+body.locked main .view{display:none}
+
+/* 見出し */
+.dayhead{display:flex;align-items:baseline;gap:10px;margin:6px 2px 12px;flex-wrap:wrap}
+.dayhead h1{font-size:26px;margin:0;font-weight:700;letter-spacing:.01em}
+.dayhead .sub{color:var(--mute);font-size:13px;margin-right:auto}
+
+/* ブロック */
+.blk{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:0 0 12px}
+.blk>h2{font-size:14px;margin:0 0 6px;display:flex;align-items:baseline;gap:8px;color:var(--mute);font-weight:700;letter-spacing:.04em}
+.blk>h2 .cnt{font-size:13px;color:var(--ink)}
+.blk>h2 .aside{margin-left:auto;font-weight:400;font-size:12px}
+.state{color:var(--mute);font-size:13px;margin:6px 0}
+.state.err{color:var(--err);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* 行 */
+.row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--soft)}
+.row:first-child{border-top:0}
+.row .main{flex:1;min-width:0}
+.ttl{text-decoration:none;word-break:break-word}
+a.ttl:hover{text-decoration:underline}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;font-size:12px;color:var(--mute)}
+.tag{font-size:11px;padding:1px 7px;border-radius:99px;background:var(--soft);color:var(--mute);white-space:nowrap}
+.tag.src{background:transparent;border:1px solid var(--line)}
+.time{flex:0 0 3.6em;font-size:13px;color:var(--mute);padding-top:1px;white-space:nowrap}
+.row.done .ttl{text-decoration:line-through;color:var(--mute)}
+.row.busy{opacity:.55;pointer-events:none}
+.row.visit{background:var(--visit);border-left:3px solid var(--visit-line);border-radius:8px;
+  padding-left:9px;padding-right:8px;margin:4px -4px;border-top-color:transparent}
+.visitline{font-size:13px;margin-top:3px}
+
+.chk{flex:0 0 22px;width:22px;height:22px;margin-top:1px;border:2px solid var(--mute);border-radius:6px;background:none;cursor:pointer;padding:0}
+.chk:hover{border-color:var(--accent)}
+.row.done .chk{background:var(--accent);border-color:var(--accent)}
+.acts{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.mini{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px 9px;font-size:12px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block}
+.mini:hover{border-color:var(--accent)}
+.mini[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pick{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:2px 4px;font-size:12px;width:8.6em}
+.due{white-space:nowrap}
+.late{color:var(--err)}
+
+/* 滞留 */
+.group{margin:4px 0 10px}
+.group h3{margin:10px 0 2px;font-size:13px;display:flex;gap:8px;align-items:baseline}
+.group .kname{font-weight:700}
+.group .kcount{color:var(--ink)}
+.group .kold{color:var(--mute);font-weight:400;font-size:12px}
+.k-haccp .kname{color:var(--haccp)} .k-kiroku .kname{color:var(--kiroku)} .k-other .kname{color:var(--other)}
+.k-haccp{border-left:3px solid var(--haccp);padding-left:10px}
+.k-kiroku{border-left:3px solid var(--kiroku);padding-left:10px}
+.k-other{border-left:3px solid var(--line);padding-left:10px}
+
+.soonday{font-size:12px;color:var(--mute);margin:10px 0 0;font-weight:700}
+.soonday:first-child{margin-top:2px}
+
+/* 便 */
+.row.log{display:block}
+.loghead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.loghead .when{font-size:12px;color:var(--mute)}
+.mood{font-size:11px;padding:1px 7px;border-radius:99px;color:#fff;white-space:nowrap}
+.m-good{background:var(--good)} .m-norm{background:var(--norm)} .m-bad{background:var(--bad)}
+.logtext{margin:4px 0 0;white-space:pre-line;font-size:13.5px}
+.logtext.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.row.bin .ttl{font-weight:700}
+.link{border:0;background:none;padding:0;color:var(--accent);cursor:pointer;font-size:12px}
+
+/* 新規登録 */
+.newrow{display:flex;gap:8px;flex-wrap:wrap}
+.newrow input[type=text]{flex:1 1 220px;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px}
+.newbtns{display:flex;gap:6px;align-items:center}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600}
+.btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* 案件・蓄積 */
+.search{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 12px;font-size:15px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
+.toolbar .search{flex:1 1 260px;width:auto}
+.stamp{font-size:12px;color:var(--mute)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.card h3{margin:0 0 4px;font-size:16px}
+.card .sub{font-size:12px;color:var(--mute);margin:0 0 6px}
+.card h4{margin:10px 0 2px;font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.03em}
+.card ul{list-style:none;margin:0;padding:0}
+.card li{padding:3px 0;font-size:13.5px;display:flex;gap:6px;align-items:baseline}
+.card li .d{font-size:12px;color:var(--mute);white-space:nowrap}
+.kb{font-size:10.5px;padding:0 6px;border-radius:5px;border:1px solid var(--line);color:var(--mute);white-space:nowrap;line-height:1.7}
+.more{font-size:12px;color:var(--mute)}
+.app{border-top:1px solid var(--soft);padding:9px 0}
+.app:first-child{border-top:0}
+.apphead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.appname{border:0;background:none;padding:0;font-weight:700;cursor:pointer;text-align:left}
+.appname:hover{text-decoration:underline}
+.st{font-size:11px;padding:1px 7px;border-radius:99px;white-space:nowrap;border:1px solid var(--line)}
+.st-安定{color:var(--good);border-color:var(--good)} .st-改修中{color:var(--norm);border-color:var(--norm)} .st-停止{color:var(--mute)}
+.applinks{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.appsum{font-size:13px;color:var(--mute);margin-top:2px}
+.appdetail{margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:8px;font-size:13px}
+.appdetail dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;margin:0}
+.appdetail dt{color:var(--mute)} .appdetail dd{margin:0;word-break:break-all}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 10px}
+.res{padding:9px 0;border-top:1px solid var(--soft);display:flex;gap:8px;align-items:baseline}
+.res:first-child{border-top:0}
+.res .main{min-width:0;flex:1}
+.res .sum{font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+details.view-note{margin:0 0 12px}
+details.view-note summary{cursor:pointer;color:var(--mute);font-size:13px;font-weight:700}
+.viewlist{margin:6px 0 0;padding-left:18px;font-size:13.5px}
+
+/* 週 */
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .ax{fill:var(--mute);font-size:11px}
+.chart .base{stroke:var(--line);stroke-width:1}
+.chart .grid{stroke:var(--soft);stroke-width:1}
+.chart .hit{fill:transparent}
+.chart .hit:hover+.bar,.chart .bar:hover{opacity:.8}
+.chart .val{fill:var(--ink);font-size:11px;font-weight:600}
+.moods{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.moodday{text-align:center;font-size:11px;color:var(--mute);display:flex;flex-direction:column;gap:3px;align-items:center}
+.moodday .mood{display:inline-block}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{border-bottom:1px solid var(--soft);padding:5px 6px;text-align:left}
+.tbl th{color:var(--mute);font-weight:600}
+.tbl td.n{text-align:right}
+.tblwrap{overflow-x:auto}
+
+/* 合言葉 */
+.gate{max-width:360px;margin:12vh auto 0;text-align:center}
+.gate h1{font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:34px;margin:0 0 6px;letter-spacing:.05em}
+.gate p{color:var(--mute);font-size:14px}
+.gate form{display:flex;gap:8px;margin-top:18px}
+.gate input{flex:1;min-width:0;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 12px}
+.gate .err{color:var(--err);min-height:1.5em}
+
+.foot{max-width:980px;margin:0 auto;padding:0 16px 32px;color:var(--mute);font-size:12px;display:flex;gap:10px;flex-wrap:wrap}
+
+#toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:13px;max-width:calc(100% - 32px);
+  box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+#toast.show{opacity:1}
+#toast.err{background:var(--err);color:#fff}
+
+@media (max-width:480px){
+  main{padding:10px 10px 32px}
+  .blk{padding:10px 11px}
+  .dayhead h1{font-size:23px}
+  .row.task{flex-wrap:wrap}
+  .row.task .acts{width:100%;padding-left:32px}
+  .applinks{margin-left:0;width:100%}
+  .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Cellar<small>蔵の自分用貯蔵庫</small></div>
+    <span class="mockbadge">MOCK</span>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="ビュー">
+    <button class="tab" role="tab" data-view="today" aria-controls="v-today">今日</button>
+    <button class="tab" role="tab" data-view="project" aria-controls="v-project">案件</button>
+    <button class="tab" role="tab" data-view="stock" aria-controls="v-stock">蓄積</button>
+    <button class="tab" role="tab" data-view="week" aria-controls="v-week">週</button>
+  </nav>
+</header>
+
+<main>
+  <section id="gate" class="gate" hidden>
+    <h1>Cellar</h1>
+    <p>合言葉を入れてください。この端末に覚えておきます。</p>
+    <form id="gateForm" autocomplete="off">
+      <input id="gateInput" type="password" aria-label="合言葉" placeholder="合言葉" required>
+      <button class="btn" type="submit">開ける</button>
+    </form>
+    <p id="gateMsg" class="err" role="alert"></p>
+  </section>
+
+  <!-- 今日 -->
+  <section id="v-today" class="view" role="tabpanel" aria-label="今日">
+    <div class="dayhead">
+      <h1 id="dayTitle">—</h1>
+      <span class="sub" id="daySub"></span>
+      <button class="mini" id="reload" type="button">更新</button>
+    </div>
+    <section class="blk" id="b-events"><h2>予定 <span class="cnt"></span></h2><div class="body"></div></section>
+    <section class="blk" id="b-tasks"><h2>タスク <span class="cnt"></span></h2><div class="body"></div></section>
+    <section class="blk" id="b-overdue"><h2>滞留 <span class="cnt"></span><span class="aside" id="overOldest"></span></h2><div class="body"></div></section>
+    <section class="blk" id="b-soon"><h2>近日の全体スケジュール <span class="aside">前日〜3日後</span></h2><div class="body"></div></section>
+    <section class="blk" id="b-bin"><h2>直近の便</h2><div class="body"></div></section>
+    <section class="blk" id="b-new">
+      <h2>新規登録</h2>
+      <div class="newrow">
+        <input type="text" id="newTitle" maxlength="200" placeholder="タスク名" aria-label="新しいタスクのタイトル" enterkeyhint="done">
+        <div class="newbtns">
+          <button class="btn" type="button" id="newToday">今日</button>
+          <button class="btn ghost" type="button" id="newTomorrow">明日</button>
+          <input class="pick" type="date" id="newDate" aria-label="日付を指定して登録">
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- 案件 -->
+  <section id="v-project" class="view" role="tabpanel" aria-label="案件" hidden>
+    <div class="toolbar">
+      <input class="search" id="pFilter" type="search" placeholder="案件名・アプリ名で絞る" aria-label="案件名・アプリ名で絞る">
+      <span class="stamp" id="pStamp"></span>
+      <button class="mini" type="button" id="pReload">更新</button>
+    </div>
+    <div id="pBody"><p class="state">読み込み中…</p></div>
+  </section>
+
+  <!-- 蓄積 -->
+  <section id="v-stock" class="view" role="tabpanel" aria-label="蓄積" hidden>
+    <details class="view-note" id="sView"><summary>現在の見立て</summary><div class="body"></div></details>
+    <div class="toolbar">
+      <input class="search" id="sQuery" type="search" placeholder="原則・開発ログ・資料・Notion DB を探す" aria-label="蓄積を検索">
+      <span class="stamp" id="sStamp"></span>
+    </div>
+    <div class="chips" id="sChips" role="group" aria-label="種別で絞る"></div>
+    <section class="blk"><h2><span id="sCount"></span><span class="aside" id="sNote"></span></h2><div class="body" id="sBody"><p class="state">読み込み中…</p></div></section>
+  </section>
+
+  <!-- 週 -->
+  <section id="v-week" class="view" role="tabpanel" aria-label="週" hidden>
+    <div class="dayhead">
+      <h1 id="wTitle">—</h1>
+      <span class="sub" id="wSub"></span>
+      <span class="chips" style="margin:0">
+        <button class="mini" type="button" data-woff="0" aria-pressed="true">今週</button>
+        <button class="mini" type="button" data-woff="-1" aria-pressed="false">先週</button>
+      </span>
+    </div>
+    <div id="wBody"><p class="state">読み込み中…</p></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span id="footInfo"></span>
+  <button class="link" type="button" id="forget">合言葉を消す</button>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ───────── 3経路通信 ───────── */
+var params = new URLSearchParams(location.search);
+var MOCK = params.get('mock') === '1';
+var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
+var GAS_URL = '';  // GitHub Pages で使うときは cellar-proxy の /exec URL を入れる
+var READY = { today: true, project: true, stock: true, week: true };
+var WD = ['日', '月', '火', '水', '木', '金', '土'];
+var VAULT_NAME = 'Obsidian Vault';
+
+// 大型案件（§8.3）。タスク名・ノートとの突き合わせに使う語。育てるときはここを直す
+var PROJECTS = [
+  { name: 'HACCP', words: ['HACCP', 'JFS', 'CCP', 'FS-', '衛生', '監査'] },
+  { name: '乾燥機事業', words: ['乾燥機'] },
+  { name: '物販新ブランド作成', words: ['物販', '新ブランド'] },
+  { name: '冬の醸造限定品', words: ['限定醸造', '限定品', '冬の醸造', 'メルツェン', 'ヴァイツェン', 'FUYUGOMORI', 'ŌSHIBARE', 'OSHIBARE', 'マシケドロップス'] },
+  { name: 'マニュアル作成', words: ['マニュアル'] }
+];
+
+function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
+function save(k, v) { try { if (v == null) localStorage.removeItem('cellar.' + k); else localStorage.setItem('cellar.' + k, v); } catch (e) {} }
+
+var token = load('token') || '';
+
+function call(action, args) {
+  var payload = Object.assign({ action: action, token: token }, args || {});
+  var p = MOCK ? mockCall(payload) : IS_GAS ? gasRun(payload) : jsonp(payload);
+  return p.then(function (res) {
+    if (!res || typeof res !== 'object') throw new Error('応答の形が違います');
+    if (!res.ok) {
+      if (res.error === 'unauthorized') { token = ''; save('token', null); showGate('合言葉が違います'); }
+      var e = new Error(res.error || '失敗しました'); e.code = res.error; throw e;
+    }
+    return res.data;
+  });
+}
+
+function gasRun(payload) {
+  return new Promise(function (resolve, reject) {
+    google.script.run
+      .withSuccessHandler(function (s) { try { resolve(JSON.parse(s)); } catch (e) { reject(e); } })
+      .withFailureHandler(function (e) { reject(new Error(String((e && e.message) || e))); })
+      .api(JSON.stringify(payload));
+  });
+}
+
+var jsonpSeq = 0;
+function jsonp(payload) {
+  return new Promise(function (resolve, reject) {
+    if (!GAS_URL) { reject(new Error('GAS_URL が未設定です（index.html の GAS_URL に /exec の URL を入れる）')); return; }
+    var cb = '__cellar' + (++jsonpSeq) + '_' + Date.now().toString(36);
+    var qs = Object.keys(payload).filter(function (k) { return payload[k] != null && payload[k] !== ''; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); }).join('&');
+    var s = document.createElement('script');
+    var timer = setTimeout(function () { done(); reject(new Error('応答がありません（60秒）')); }, 60000);
+    function done() { clearTimeout(timer); window[cb] = function () {}; if (s.parentNode) s.parentNode.removeChild(s); }
+    window[cb] = function (res) { done(); resolve(res); };
+    s.onerror = function () { done(); reject(new Error('GAS に届きませんでした')); };
+    s.src = GAS_URL + (GAS_URL.indexOf('?') < 0 ? '?' : '&') + qs + '&callback=' + cb;
+    document.head.appendChild(s);
+  });
+}
+
+/* ───────── 日付 ───────── */
+function todayJst() { return new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); }
+function ymdParts(s) { var p = s.split('-'); return [+p[0], +p[1], +p[2]]; }
+function addDays(s, n) {
+  var p = ymdParts(s), d = new Date(Date.UTC(p[0], p[1] - 1, p[2] + n));
+  return d.toISOString().slice(0, 10);
+}
+function diffDays(a, b) { var x = ymdParts(a), y = ymdParts(b); return Math.round((Date.UTC(y[0], y[1] - 1, y[2]) - Date.UTC(x[0], x[1] - 1, x[2])) / 864e5); }
+function wd(s) { var p = ymdParts(s); return WD[new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay()]; }
+function fmtMD(s) {
+  if (!s) return '';
+  var p = ymdParts(s), cur = +todayJst().slice(0, 4);
+  return (p[0] !== cur ? p[0] + '/' : '') + p[1] + '/' + p[2];
+}
+function fmtDay(s) { return fmtMD(s) + ' (' + wd(s) + ')'; }
+function fmtAt(s) { return s ? fmtMD(s.slice(0, 10)) + ' ' + s.slice(11, 16) : ''; }
+function covers(d, day) { return !!d && d.start <= day && (d.end || d.start) >= day; }
+function baseDay() { return (S.today && S.today.date) || (S.overdue && S.overdue.date) || todayJst(); }
+function mondayOf(s) { var p = ymdParts(s), dow = new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay(); return addDays(s, -((dow + 6) % 7)); }
+
+/* ───────── DOM ───────── */
+function $(s, r) { return (r || document).querySelector(s); }
+function h(tag, props, kids) {
+  var e = document.createElement(tag);
+  if (props) Object.keys(props).forEach(function (k) {
+    var v = props[k];
+    if (v == null || v === false) return;
+    if (k === 'class') e.className = v;
+    else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : v);
+  });
+  (kids || []).forEach(function (c) {
+    if (c == null || c === false) return;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return e;
+}
+function fill(el, nodes) { while (el.firstChild) el.removeChild(el.firstChild); nodes.forEach(function (n) { if (n) el.appendChild(n); }); }
+function empty(t) { return h('p', { class: 'state' }, [t]); }
+function errBox(e, retry) {
+  return h('div', { class: 'state err' }, ['読めませんでした：' + (e && e.message || e),
+    retry ? h('button', { class: 'mini', type: 'button', onclick: retry }, ['もう一度']) : null]);
+}
+function tag(t, cls) { return h('span', { class: 'tag' + (cls ? ' ' + cls : '') }, [t]); }
+function safeUrl(u) { return /^https:\/\//.test(u || '') ? u : ''; }
+function titleLink(r) {
+  return safeUrl(r.url)
+    ? h('a', { class: 'ttl', href: r.url, target: '_blank', rel: 'noopener' }, [r.title || '（無題）'])
+    : h('span', { class: 'ttl' }, [r.title || '（無題）']);
+}
+function obsidianUrl(path) {
+  var vault = (S.index && S.index.vault) || VAULT_NAME;
+  return 'obsidian://open?vault=' + encodeURIComponent(vault) + '&file=' + encodeURIComponent(String(path).replace(/\.md$/, ''));
+}
+function norm(s) { return String(s == null ? '' : s).normalize('NFKC').toLowerCase(); }
+
+var B = {
+  events: $('#b-events .body'), tasks: $('#b-tasks .body'), overdue: $('#b-overdue .body'),
+  soon: $('#b-soon .body'), bin: $('#b-bin .body')
+};
+function cnt(k, n) { var c = $('#b-' + k + ' .cnt'); if (c) c.textContent = n == null ? '' : n + '件'; }
+function setLoading(keys) { keys.forEach(function (k) { fill(B[k], [empty('読み込み中…')]); cnt(k, null); }); }
+function showErr(keys, e) { keys.forEach(function (k) { fill(B[k], [errBox(e, function () { loadAll(); })]); cnt(k, null); }); }
+
+var toastTimer;
+function toast(msg, isErr) {
+  var t = $('#toast');
+  t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.className = ''; }, isErr ? 6000 : 3200);
+}
+
+/* ───────── 状態と読み込み ───────── */
+var S = { today: null, overdue: null, index: null, tasks: null, dbmap: null, week: {}, woff: 0 };
+var inflight = {};
+// 同じデータは1回だけ取りに行く（force で取り直し）
+function ensure(key, action, args, force) {
+  if (force) delete inflight[key];
+  if (!inflight[key]) {
+    inflight[key] = call(action, args).then(function (d) { S[key] = d; return d; },
+      function (e) { delete inflight[key]; throw e; });
+  }
+  return inflight[key];
+}
+var TODAY_KEYS = ['events', 'tasks', 'soon', 'bin'];
+
+function loadAll(quiet) {
+  if (!quiet) { setLoading(TODAY_KEYS); setLoading(['overdue']); }
+  var a = call('today').then(function (d) { S.today = d; renderToday(); },
+    function (e) { if (e.code !== 'unauthorized') showErr(TODAY_KEYS, e); });
+  var b = call('overdue').then(function (d) { S.overdue = d; renderOverdue(); },
+    function (e) { if (e.code !== 'unauthorized') showErr(['overdue'], e); });
+  return Promise.all([a, b]).then(stampFoot);
+}
+function stampFoot() {
+  var now = new Date(Date.now() + 9 * 3600e3).toISOString().slice(11, 16);
+  $('#footInfo').textContent = routeName() + ' · 更新 ' + now;
+}
+function routeName() { return MOCK ? 'モック（Notionに触れていません）' : IS_GAS ? 'GAS配信' : 'GitHub Pages'; }
+
+/* ───────── 今日ビュー ───────── */
+function timeLabel(r, day) {
+  var d = r.date;
+  if (!d) return '';
+  if (d.end && d.end !== d.start) return d.start < day ? '〜' + fmtMD(d.end) : (d.time || fmtMD(d.start) + '〜');
+  if (!d.time) return '終日';
+  return d.time;
+}
+function sortKey(r, day) {
+  var d = r.date;
+  var allday = !d.time || d.start < day;
+  return (allday ? '0' : '1') + (allday ? '' : d.time) + ' ' + r.title;
+}
+
+function renderToday() {
+  var d = S.today; if (!d) return;
+  var day = d.date;
+  $('#dayTitle').textContent = fmtDay(day);
+  var todayOverall = d.overall.filter(function (r) { return covers(r.date, day); });
+  var soon = d.overall.filter(function (r) { return !covers(r.date, day); });
+  var evs = d.events.map(function (r) { return Object.assign({ src: 'self' }, r); })
+    .concat(todayOverall.map(function (r) { return Object.assign({ src: 'overall' }, r); }));
+  evs.sort(function (a, b) { var x = sortKey(a, day), y = sortKey(b, day); return x < y ? -1 : x > y ? 1 : 0; });
+
+  $('#daySub').textContent = '今日は予定' + evs.length + '・タスク' + d.tasks.length;
+  fill(B.events, evs.length ? evs.map(function (r) { return eventRow(r, day); }) : [empty('今日の予定はありません')]);
+  cnt('events', evs.length);
+  fill(B.tasks, d.tasks.length ? d.tasks.map(function (r) { return taskRow(r, false); }) : [empty('今日期日のタスクはありません')]);
+  cnt('tasks', d.tasks.length);
+  renderSoon(soon);
+  renderBin(d);
+}
+
+function visitLine(r) {
+  var n = r.reserved != null ? r.reserved + '名予約' : r.visitors != null ? r.visitors + '名' : '';
+  var parts = [r.visitor, r.company, r.purpose, n, r.status].filter(Boolean);
+  return parts.length ? h('div', { class: 'visitline' }, [parts.join(' · ')]) : null;
+}
+
+function eventRow(r, day) {
+  var tags = [];
+  if (r.src === 'self') { if (r.sel) tags.push(tag(r.sel)); }
+  else {
+    tags.push(tag('全体', 'src'));
+    if (r.cat) tags.push(tag(r.cat));
+    if (r.dept) tags.push(tag(r.dept));
+  }
+  return h('div', { class: 'row ev' + (r.visit ? ' visit' : '') + (r.done ? ' done' : ''), 'data-id': r.id, 'data-src': r.src }, [
+    h('span', { class: 'time' }, [timeLabel(r, day)]),
+    h('div', { class: 'main' }, [titleLink(r), h('div', { class: 'meta' }, tags), r.visit ? visitLine(r) : null])
+  ]);
+}
+
+function taskRow(r, isOver) {
+  var row = h('div', { class: 'row task', 'data-id': r.id });
+  var meta = [];
+  if (isOver) meta.push(h('span', { class: 'due' }, [fmtMD(r.date.start) + ' · ' + diffDays(r.date.start, baseDay()) + '日前']));
+  else if (r.date && r.date.time) meta.push(h('span', { class: 'due' }, [r.date.time + (r.date.endTime && r.date.end === r.date.start ? '–' + r.date.endTime : '')]));
+  var acts = [h('button', { class: 'mini', type: 'button', 'data-act': 'tomorrow',
+    onclick: function () { doMove(row, r, addDays(baseDay(), 1)); } }, ['明日へ'])];
+  if (isOver) acts.push(h('input', { class: 'pick', type: 'date', 'aria-label': '日付を指定：' + r.title, min: baseDay(),
+    onchange: function (e) { if (e.target.value) doMove(row, r, e.target.value); } }));
+  row.appendChild(h('button', { class: 'chk', type: 'button', 'data-act': 'complete', 'aria-label': '完了にする：' + r.title, title: '完了',
+    onclick: function () { doComplete(row, r); } }));
+  row.appendChild(h('div', { class: 'main' }, [titleLink(r), meta.length ? h('div', { class: 'meta' }, meta) : null]));
+  row.appendChild(h('div', { class: 'acts' }, acts));
+  return row;
+}
+
+function kindKey(k) { return k === 'HACCP系' ? 'haccp' : k === '記録系' ? 'kiroku' : 'other'; }
+
+function renderOverdue() {
+  var d = S.overdue; if (!d) return;
+  var rows = d.rows;
+  cnt('overdue', rows.length);
+  var oldest = rows.reduce(function (m, r) { return !m || r.date.start < m ? r.date.start : m; }, '');
+  $('#overOldest').textContent = oldest ? 'いちばん古い ' + fmtMD(oldest) : '';
+  if (!rows.length) { fill(B.overdue, [empty('滞留はありません')]); return; }
+  var nodes = [];
+  d.kinds.forEach(function (k) {
+    var g = rows.filter(function (r) { return r.kind === k; });
+    if (!g.length) return;
+    var old = g.reduce(function (m, r) { return !m || r.date.start < m ? r.date.start : m; }, '');
+    nodes.push(h('div', { class: 'group k-' + kindKey(k), 'data-kind': k }, [
+      h('h3', null, [h('span', { class: 'kname' }, [k]), h('span', { class: 'kcount' }, [g.length + '件']),
+        h('span', { class: 'kold' }, ['いちばん古い ' + fmtMD(old)])])
+    ].concat(g.map(function (r) { return taskRow(r, true); }))));
+  });
+  fill(B.overdue, nodes);
+}
+
+function renderSoon(rows) {
+  if (!rows.length) { fill(B.soon, [empty('前日〜3日後に該当はありません')]); return; }
+  var nodes = [], last = '';
+  rows.forEach(function (r) {
+    if (r.date.start !== last) { last = r.date.start; nodes.push(h('div', { class: 'soonday' }, [fmtDay(last)])); }
+    nodes.push(eventRow(Object.assign({ src: 'overall' }, r), r.date.start));
+  });
+  fill(B.soon, nodes);
+}
+
+function moodKey(m) { return m === 'good' ? 'good' : m === 'しんどい' ? 'bad' : 'norm'; }
+function renderBin(d) {
+  var list = d.logs.slice();
+  if (d.bin) {
+    list = list.filter(function (r) { return r.id !== d.bin.id; });
+    list.unshift(d.bin);
+    list = list.slice(0, 3);
+  }
+  if (!list.length) { fill(B.bin, [empty('秘書ログに記録がありません')]); return; }
+  fill(B.bin, list.map(function (r) {
+    var text = String(r.text || '').replace(/<br\s*\/?>/gi, '\n').trim();
+    var p = text ? h('p', { class: 'logtext' + (text.length > 140 ? ' clamp' : '') }, [text]) : h('p', { class: 'state' }, ['（記録の本文なし）']);
+    var more = text.length > 140 ? h('button', { class: 'link', type: 'button', onclick: function (e) {
+      var open = p.classList.toggle('clamp'); e.target.textContent = open ? '全文' : 'たたむ';
+    } }, ['全文']) : null;
+    return h('div', { class: 'row log' + (r.bin ? ' bin' : ''), 'data-id': r.id }, [
+      h('div', { class: 'loghead' }, [titleLink(r), h('span', { class: 'when' }, [fmtAt(r.at)]),
+        r.cat ? tag(r.cat) : null, r.mood ? h('span', { class: 'mood m-' + moodKey(r.mood) }, [r.mood]) : null]),
+      p, more
+    ]);
+  }));
+}
+
+/* ───────── 書き込み ───────── */
+function dropLocal(id) {
+  if (S.today) S.today.tasks = S.today.tasks.filter(function (r) { return r.id !== id; });
+  if (S.overdue) S.overdue.rows = S.overdue.rows.filter(function (r) { return r.id !== id; });
+  renderToday(); renderOverdue();
+}
+function afterWrite() { delete inflight.tasks; S.week = {}; Object.keys(inflight).forEach(function (k) { if (k.indexOf('week') === 0) delete inflight[k]; }); }
+
+function doComplete(row, r) {
+  row.classList.add('done', 'busy');
+  call('complete', { id: r.id }).then(function () {
+    toast('完了：' + r.title); afterWrite();
+    setTimeout(function () { dropLocal(r.id); loadAll(true); }, 350);
+  }, function (e) {
+    row.classList.remove('done', 'busy');
+    toast('完了にできませんでした：' + e.message, true);
+  });
+}
+
+function doMove(row, r, date) {
+  row.classList.add('busy');
+  call('move', { id: r.id, date: date }).then(function () {
+    toast(fmtDay(date) + ' へ移しました：' + r.title); afterWrite();
+    dropLocal(r.id); loadAll(true);
+  }, function (e) {
+    row.classList.remove('busy');
+    toast('日付を変えられませんでした：' + e.message, true);
+  });
+}
+
+function rid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+var creating = false;
+function doCreate(date) {
+  var input = $('#newTitle'), title = input.value.trim();
+  if (!title) { input.focus(); toast('タイトルを入れてください', true); return; }
+  if (creating || !date) return;
+  creating = true; setNewDisabled(true);
+  call('create', { title: title, date: date, rid: rid() }).then(function () {
+    input.value = ''; $('#newDate').value = ''; afterWrite();
+    toast('登録しました：' + fmtDay(date) + '「' + title + '」');
+    loadAll(true);
+  }, function (e) {
+    toast('登録できませんでした：' + e.message, true);
+  }).then(function () { creating = false; setNewDisabled(false); });
+}
+function setNewDisabled(v) { ['#newToday', '#newTomorrow', '#newDate'].forEach(function (s) { $(s).disabled = v; }); }
+
+/* ───────── 案件ビュー（§8.3） ───────── */
+var KIND_LABEL = { moc: 'MOC', project: 'プロジェクト', area: 'エリア', app: 'アプリ', devlog: '開発ログ', resource: '資料',
+  note: '原則', meeting: '議事録', profile: '見立て', docs: '資料', notion: 'Notion', link: 'リンク' };
+var STATUS_ORDER = { '安定': 0, '改修中': 1, '停止': 2 };
+
+function fmVal(v) {
+  if (v == null) return '';
+  if (Array.isArray(v)) return v.map(fmVal).join(' / ');
+  if (typeof v === 'object') return Object.keys(v).map(function (k) { return v[k]; }).filter(Boolean).join(' ');
+  return String(v);
+}
+function noteHay(n) {
+  return norm([n.title, n.summary, (n.tags || []).join(' '), (n.headings || []).join(' '), (n.links || []).join(' '),
+    n.frontmatter ? fmVal(n.frontmatter['関連案件']) + ' ' + fmVal(n.frontmatter['案件']) : ''].join(' '));
+}
+function projectHit(p, hay) {
+  return [p.name].concat(p.words).some(function (w) { return hay.indexOf(norm(w)) >= 0; });
+}
+function noteLink(n) {
+  return h('a', { class: 'ttl', href: obsidianUrl(n.path) }, [n.title]);
+}
+function stampIndex(el) {
+  var g = S.index && S.index.generated;
+  el.textContent = S.index && S.index.missing ? '索引がまだ届いていません（18:07 の記録のあとに入ります）'
+    : g ? '索引 ' + fmtMD(g.slice(0, 10)) + ' ' + g.slice(11, 16) : '';
+}
+
+function loadProject(force) {
+  var body = $('#pBody');
+  if (force || !S.index || !S.tasks) fill(body, [empty('読み込み中…')]);
+  return Promise.all([ensure('index', 'index', null, force), ensure('tasks', 'tasks', null, force)])
+    .then(renderProject, function (e) { if (e.code !== 'unauthorized') fill(body, [errBox(e, function () { loadProject(true); })]); });
+}
+
+function renderProject() {
+  if (!S.index || !S.tasks) return;
+  stampIndex($('#pStamp'));
+  var q = norm($('#pFilter').value.trim());
+  var notes = S.index.notes || [];
+  var day = S.tasks.date || todayJst();
+
+  var cards = PROJECTS.map(function (p) {
+    var hits = notes.filter(function (n) { return n.kind !== 'app' && projectHit(p, noteHay(n)); })
+      .sort(function (a, b) { return a.mtime < b.mtime ? 1 : -1; });
+    var tasks = S.tasks.rows.filter(function (t) { return projectHit(p, norm(t.title)); });
+    var apps = notes.filter(function (n) { return n.kind === 'app' && n.frontmatter && norm(fmVal(n.frontmatter['関連案件'])).indexOf(norm(p.name)) >= 0; });
+    var hay = norm(p.name + ' ' + p.words.join(' ') + ' ' + hits.map(function (n) { return n.title; }).join(' ') +
+      ' ' + tasks.map(function (t) { return t.title; }).join(' ') + ' ' + apps.map(function (n) { return n.title; }).join(' '));
+    if (q && hay.indexOf(q) < 0) return null;
+    return projectCard(p, hits, tasks, apps, day);
+  }).filter(Boolean);
+
+  var apps = notes.filter(function (n) { return n.kind === 'app'; })
+    .filter(function (n) { return !q || norm(n.title + ' ' + n.summary + ' ' + fmVal(n.frontmatter)).indexOf(q) >= 0; })
+    .sort(function (a, b) {
+      var x = STATUS_ORDER[fmVal((a.frontmatter || {}).status)], y = STATUS_ORDER[fmVal((b.frontmatter || {}).status)];
+      x = x == null ? 3 : x; y = y == null ? 3 : y;
+      return x - y || (a.title < b.title ? -1 : 1);
+    });
+
+  fill($('#pBody'), [
+    h('div', { class: 'cards', id: 'pCards' }, cards.length ? cards : [empty('当てはまる案件がありません')]),
+    h('section', { class: 'blk', id: 'pApps' }, [
+      h('h2', null, ['アプリ ', h('span', { class: 'cnt' }, [apps.length + '件']),
+        h('span', { class: 'aside' }, ['30_Areas の type: app ノートから'])]),
+      h('div', { class: 'body' }, apps.length ? apps.map(appRow)
+        : [empty(S.index.missing ? '索引がまだありません' : q ? '当てはまるアプリがありません' : 'アプリのノートがまだありません（30_Areas に type: app で作る）')])
+    ])
+  ]);
+}
+
+function projectCard(p, hits, tasks, apps, day) {
+  var projNotes = hits.filter(function (n) { return n.kind === 'project'; });
+  var others = hits.filter(function (n) { return n.kind !== 'project'; });
+  var li = function (kids) { return h('li', null, kids); };
+  var list = function (items, max, render) {
+    var shown = items.slice(0, max).map(render);
+    if (items.length > max) shown.push(h('li', { class: 'more' }, ['ほか ' + (items.length - max) + '件']));
+    return h('ul', null, shown);
+  };
+  var sub = projNotes.length ? projNotes.map(function (n) {
+    var fm = n.frontmatter || {};
+    return [fm['オーナー'] ? '担当 ' + fmVal(fm['オーナー']) : '', fm['期限'] ? '期限 ' + fmVal(fm['期限']) : ''].filter(Boolean).join(' · ');
+  }).filter(Boolean).join(' / ') : '';
+  return h('div', { class: 'card', 'data-project': p.name }, [
+    h('h3', null, [p.name]),
+    sub ? h('p', { class: 'sub' }, [sub]) : null,
+    h('h4', null, ['Notion タスク（未完了） ' + tasks.length + '件']),
+    tasks.length ? list(tasks, 5, function (t) {
+      var late = t.date && t.date.start < day;
+      return li([h('span', { class: 'd' + (late ? ' late' : '') }, [t.date ? fmtMD(t.date.start) : '日付なし']), titleLink(t)]);
+    }) : empty('なし'),
+    projNotes.length ? h('h4', null, ['プロジェクト']) : null,
+    projNotes.length ? list(projNotes, 3, function (n) { return li([noteLink(n), n.tasks_open ? h('span', { class: 'd' }, ['未完了 ' + n.tasks_open]) : null]); }) : null,
+    h('h4', null, ['Obsidian ' + others.length + '件']),
+    others.length ? list(others, 6, function (n) {
+      return li([h('span', { class: 'kb' }, [KIND_LABEL[n.kind] || n.kind]), noteLink(n), h('span', { class: 'd' }, [fmtMD(n.mtime)])]);
+    }) : empty('なし'),
+    apps.length ? h('h4', null, ['アプリ']) : null,
+    apps.length ? list(apps, 6, function (n) { return li([noteLink(n)]); }) : null
+  ]);
+}
+
+function appRow(n) {
+  var fm = n.frontmatter || {};
+  var dbs = Array.isArray(fm.notion_db) ? fm.notion_db.filter(function (d) { return d && (d['名前'] || d.id); }) : [];
+  var links = [
+    safeUrl(fm['入口URL']) ? h('a', { class: 'mini', href: fm['入口URL'], target: '_blank', rel: 'noopener' }, ['開く']) : null,
+    safeUrl(fm.GAS) ? h('a', { class: 'mini', href: fm.GAS, target: '_blank', rel: 'noopener' }, ['GAS']) : null,
+    h('a', { class: 'mini', href: obsidianUrl(n.path) }, ['ノート'])
+  ];
+  var detail = h('div', { class: 'appdetail', hidden: true }, [
+    n.summary ? h('p', { style: 'margin:0 0 6px' }, [n.summary]) : null,
+    h('dl', null, Object.keys(fm).filter(function (k) { return k !== 'tags' && fmVal(fm[k]); }).reduce(function (acc, k) {
+      var v = k === 'notion_db' ? dbs.map(function (d) { return (d['名前'] || '') + (d.id ? '（' + d.id + '）' : ''); }).join(' / ') : fmVal(fm[k]);
+      acc.push(h('dt', null, [k]), h('dd', null, [v]));
+      return acc;
+    }, []))
+  ]);
+  var nameBtn = h('button', { class: 'appname', type: 'button', 'aria-expanded': 'false',
+    onclick: function () { var open = detail.hidden; detail.hidden = !open; nameBtn.setAttribute('aria-expanded', String(open)); } }, [n.title]);
+  var st = fmVal(fm.status);
+  return h('div', { class: 'app', 'data-app': n.title }, [
+    h('div', { class: 'apphead' }, [nameBtn, st ? h('span', { class: 'st st-' + st }, [st]) : null,
+      fm['利用者'] ? tag(fmVal(fm['利用者'])) : null, h('span', { class: 'applinks' }, links)]),
+    dbs.length ? h('div', { class: 'appsum' }, ['Notion: ' + dbs.map(function (d) { return d['名前'] || d.id; }).join('・')]) : null,
+    detail
+  ]);
+}
+
+/* ───────── 蓄積ビュー（§8.4） ───────── */
+var CHIPS = [
+  { key: 'all', label: 'すべて' }, { key: 'note', label: '原則' }, { key: 'devlog', label: '開発ログ' },
+  { key: 'project', label: 'プロジェクト' }, { key: 'meeting', label: '議事録' }, { key: 'resource', label: '資料' },
+  { key: 'app', label: 'アプリ' }, { key: 'notion', label: 'Notion DB' }
+];
+var CHIP_OF = { note: 'note', devlog: 'devlog', project: 'project', meeting: 'meeting', resource: 'resource', moc: 'resource',
+  docs: 'resource', profile: 'resource', app: 'app', area: 'app', notion: 'notion', link: 'notion' };
+var stockChip = 'all', stockItems = null, dbmapError = null;
+
+function loadStock(force) {
+  if (force || !S.index) fill($('#sBody'), [empty('読み込み中…')]);
+  var idx = ensure('index', 'index', null, force);
+  var map = ensure('dbmap', 'dbmap', null, force).then(function () { dbmapError = null; }, function (e) { dbmapError = e; });
+  return idx.then(function () { return map; }).then(function () { stockItems = null; renderStock(); },
+    function (e) { if (e.code !== 'unauthorized') fill($('#sBody'), [errBox(e, function () { loadStock(true); })]); });
+}
+
+function buildStockItems() {
+  var items = [];
+  var byPath = {};
+  (S.index.notes || []).forEach(function (n) {
+    var it = { kind: n.kind, chip: CHIP_OF[n.kind] || 'note', title: n.title, sum: n.summary, meta: n.path.split('/').slice(0, -1).join('/'),
+      date: n.mtime, href: obsidianUrl(n.path), hay: noteHay(n) };
+    items.push(it); byPath[n.path] = it;
+  });
+  // 資料MOC の分類は、同じノートが索引にあればそこへ中身を足す（二重に並べない）
+  (S.index.docs_moc || []).forEach(function (d) {
+    var hay = norm(d.category + ' ' + d.title + ' ' + d.summary + ' 書類 PC');
+    var it = byPath[d.note];
+    if (it) { it.hay += ' ' + hay; it.sum = d.summary || it.sum; it.meta = '酒造資料 · PC書類の分類'; return; }
+    items.push({ kind: 'docs', chip: 'resource', title: d.title, sum: d.summary, meta: '酒造資料 MOC · PC書類の分類', date: '',
+      href: obsidianUrl(d.note), hay: hay });
+  });
+  ((S.dbmap && S.dbmap.items) || []).forEach(function (m) {
+    items.push({ kind: m.kind === 'notion' ? 'notion' : 'link', chip: 'notion', title: m.name, sum: m.desc, meta: m.section, date: '',
+      href: safeUrl(m.url), external: true, hay: norm(m.name + ' ' + m.desc + ' ' + m.section) });
+  });
+  return items;
+}
+
+function renderStockView() {
+  var p = S.index && S.index.profile;
+  var list = p && p.current_view && p.current_view.length
+    ? h('ul', { class: 'viewlist' }, p.current_view.map(function (v) { return h('li', null, [v]); }))
+    : empty('索引に「現在の見立て」がありません');
+  fill($('#sView .body'), [list]);
+}
+
+function renderStock() {
+  if (!S.index) return;
+  if (!stockItems) { stockItems = buildStockItems(); renderStockView(); stampIndex($('#sStamp')); }
+  fill($('#sChips'), CHIPS.map(function (c) {
+    var n = c.key === 'all' ? stockItems.length : stockItems.filter(function (i) { return i.chip === c.key; }).length;
+    return h('button', { class: 'mini', type: 'button', 'aria-pressed': String(stockChip === c.key), 'data-chip': c.key,
+      onclick: function () { stockChip = c.key; renderStock(); } }, [c.label + ' ' + n]);
+  }));
+  var words = norm($('#sQuery').value).split(/\s+/).filter(Boolean);
+  var hits = stockItems.filter(function (i) {
+    return (stockChip === 'all' || i.chip === stockChip) && words.every(function (w) { return i.hay.indexOf(w) >= 0; });
+  });
+  if (!words.length) hits = hits.slice().sort(function (a, b) { return (a.date || '') < (b.date || '') ? 1 : -1; });
+  var MAX = 80;
+  $('#sCount').textContent = (words.length ? '当たり ' : '新しい順 ') + hits.length + '件';
+  $('#sNote').textContent = dbmapError ? 'Notion アクセスマップを読めませんでした：' + dbmapError.message : '';
+  fill($('#sBody'), hits.length ? hits.slice(0, MAX).map(function (i) {
+    var a = i.href ? h('a', { class: 'ttl', href: i.href, target: i.external ? '_blank' : null, rel: i.external ? 'noopener' : null }, [i.title])
+      : h('span', { class: 'ttl' }, [i.title]);
+    return h('div', { class: 'res', 'data-kind': i.kind }, [
+      h('span', { class: 'kb' }, [KIND_LABEL[i.kind] || i.kind]),
+      h('div', { class: 'main' }, [a, i.sum ? h('div', { class: 'sum' }, [i.sum]) : null,
+        h('div', { class: 'meta' }, [i.meta || '', i.date ? fmtMD(i.date) : ''].filter(Boolean).map(function (t) { return h('span', null, [t]); }))])
+    ]);
+  }).concat(hits.length > MAX ? [h('p', { class: 'more' }, ['ほか ' + (hits.length - MAX) + '件（語を足して絞る）'])] : [])
+    : [empty(words.length ? '見つかりません' : '索引が空です')]);
+}
+
+/* ───────── 週ビュー（§8.5） ───────── */
+function weekRange(off) { var f = addDays(mondayOf(todayJst()), 7 * off); return { from: f, to: addDays(f, 6) }; }
+
+function loadWeek(force) {
+  var r = weekRange(S.woff), key = 'week:' + r.from;
+  $('#wTitle').textContent = fmtMD(r.from) + '〜' + fmtMD(r.to);
+  if (force || !S.week[r.from]) fill($('#wBody'), [empty('読み込み中…')]);
+  if (force) delete inflight[key];
+  if (!inflight[key]) {
+    inflight[key] = call('week', r).then(function (d) { S.week[r.from] = d; return d; }, function (e) { delete inflight[key]; throw e; });
+  }
+  var idx = ensure('index', 'index').catch(function () { return null; });  // 見立ては無くても週は出す
+  return Promise.all([inflight[key], idx]).then(function () { if (weekRange(S.woff).from === r.from) renderWeek(S.week[r.from]); },
+    function (e) { if (e.code !== 'unauthorized') fill($('#wBody'), [errBox(e, function () { loadWeek(true); })]); });
+}
+
+var SVGNS = 'http://www.w3.org/2000/svg';
+function sv(tag, attrs, kids) {
+  var e = document.createElementNS(SVGNS, tag);
+  Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+  (kids || []).forEach(function (c) { e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return e;
+}
+// 1系列の棒（日別）。上端だけ4pxの角丸・棒の間は2px以上・ホバーで値
+function barChart(days, key, color, unit, label) {
+  var W = 320, H = 150, padL = 4, padB = 22, padT = 16;
+  var max = Math.max.apply(null, days.map(function (d) { return d[key]; }).concat([1]));
+  var slot = (W - padL * 2) / days.length, bw = Math.min(28, slot - 8);
+  var y = function (v) { return padT + (H - padT - padB) * (1 - v / max); };
+  var g = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': label });
+  g.appendChild(sv('line', { class: 'grid', x1: padL, x2: W - padL, y1: y(max), y2: y(max) }));
+  g.appendChild(sv('text', { class: 'ax', x: W - padL, y: y(max) - 4, 'text-anchor': 'end' }, ['最大 ' + max + unit]));
+  days.forEach(function (d, i) {
+    var v = d[key], cx = padL + slot * i + slot / 2, top = y(v), base = H - padB, x0 = cx - bw / 2;
+    var tip = fmtDay(d.date) + '：' + v + unit;
+    var grp = sv('g', { 'data-date': d.date, 'data-value': v });
+    grp.appendChild(sv('title', null, [tip]));
+    grp.appendChild(sv('rect', { class: 'hit', x: padL + slot * i, y: padT, width: slot, height: H - padT - padB + 4 }));
+    if (v > 0) {
+      var r = Math.min(4, bw / 2, base - top);
+      grp.appendChild(sv('path', { class: 'bar', fill: color,
+        d: 'M' + x0 + ',' + base + 'V' + (top + r) + 'Q' + x0 + ',' + top + ' ' + (x0 + r) + ',' + top +
+           'H' + (x0 + bw - r) + 'Q' + (x0 + bw) + ',' + top + ' ' + (x0 + bw) + ',' + (top + r) + 'V' + base + 'Z' }));
+    }
+    grp.appendChild(sv('text', { class: 'ax', x: cx, y: H - 6, 'text-anchor': 'middle' }, [wd(d.date) + ' ' + ymdParts(d.date)[2]]));
+    g.appendChild(grp);
+  });
+  g.appendChild(sv('line', { class: 'base', x1: padL, x2: W - padL, y1: H - padB, y2: H - padB }));
+  return g;
+}
+
+function renderWeek(d) {
+  if (!d) return;
+  var days = d.days;
+  var done = days.reduce(function (s, x) { return s + x.done; }, 0);
+  var lastBacklog = days[days.length - 1].backlog;
+  $('#wSub').textContent = '完了 ' + done + '件 · 積み残し（' + fmtMD(d.to) + ' 時点・いま未完了） ' + lastBacklog + '件';
+
+  var moods = h('div', { class: 'moods' }, days.map(function (x) {
+    var ms = x.moods.length ? x.moods.map(function (m) { return h('span', { class: 'mood m-' + moodKey(m) }, [m]); }) : [h('span', null, ['—'])];
+    return h('div', { class: 'moodday', 'data-date': x.date }, [h('span', null, [wd(x.date) + ' ' + ymdParts(x.date)[2]])]
+      .concat(ms).concat(x.meal ? [h('span', { title: '食事の記録あり' }, ['🍚 食事'])] : []));
+  }));
+
+  var table = h('details', null, [h('summary', { class: 'stamp', style: 'cursor:pointer' }, ['表で見る']),
+    h('div', { class: 'tblwrap' }, [h('table', { class: 'tbl' }, [
+      h('thead', null, [h('tr', null, ['日付', '完了', '未完了', '積み残し', '調子', '食事'].map(function (t) { return h('th', null, [t]); }))]),
+      h('tbody', null, days.map(function (x) {
+        return h('tr', null, [h('td', null, [fmtDay(x.date)]), h('td', { class: 'n' }, [String(x.done)]), h('td', { class: 'n' }, [String(x.open)]),
+          h('td', { class: 'n' }, [String(x.backlog)]), h('td', null, [x.moods.join('・') || '—']), h('td', null, [x.meal ? 'あり' : '—'])]);
+      }))
+    ])])]);
+
+  var prof = S.index && S.index.profile;
+  var view = prof && prof.current_view && prof.current_view.length
+    ? h('ul', { class: 'viewlist' }, prof.current_view.map(function (v) { return h('li', null, [v]); })) : empty('索引に「現在の見立て」がありません');
+  var pats = prof && prof.patterns && prof.patterns.length ? h('div', { class: 'tblwrap' }, [h('table', { class: 'tbl' }, [
+    h('thead', null, [h('tr', null, ['パターン', '初出', '直近', '回数'].map(function (t) { return h('th', null, [t]); }))]),
+    h('tbody', null, prof.patterns.map(function (p) {
+      return h('tr', null, [h('td', null, [p.pattern]), h('td', null, [p.first]), h('td', null, [p.last]), h('td', { class: 'n' }, [p.count == null ? '' : String(p.count)])]);
+    }))])]) : empty('パターンはまだありません');
+
+  var peaks = d.peaks.length ? d.peaks.map(function (r) {
+    return h('div', { class: 'row' }, [h('span', { class: 'time' }, [fmtMD(r.date.start)]),
+      h('div', { class: 'main' }, [titleLink(r), h('div', { class: 'meta' }, [tag(r.sel), r.date.time ? h('span', null, [r.date.time]) : null])])]);
+  }) : [empty('来週の会議・来客・出張はありません')];
+
+  fill($('#wBody'), [
+    h('div', { class: 'charts' }, [
+      h('section', { class: 'blk chart', id: 'wDone' }, [h('h2', null, ['完了（その日付のタスク）']), barChart(days, 'done', 'var(--bar)', '件', '日別の完了件数')]),
+      h('section', { class: 'blk chart', id: 'wBacklog' }, [h('h2', null, ['積み残し（いま未完了・日付がその日以前）']), barChart(days, 'backlog', 'var(--bar2)', '件', '日別の積み残し件数')])
+    ]),
+    h('section', { class: 'blk', id: 'wMood' }, [h('h2', null, ['調子と食事（秘書ログ）']), moods, table]),
+    h('section', { class: 'blk', id: 'wPeaks' }, [h('h2', null, ['来週の山場 ', h('span', { class: 'aside' }, [fmtMD(d.next.from) + '〜' + fmtMD(d.next.to)])]), h('div', { class: 'body' }, peaks)]),
+    h('section', { class: 'blk', id: 'wView' }, [h('h2', null, ['現在の見立て']), view, h('h2', { style: 'margin-top:12px' }, ['パターン']), pats])
+  ]);
+}
+
+/* ───────── タブ・合言葉 ───────── */
+var VIEWS = ['today', 'project', 'stock', 'week'];
+var LOADERS = { today: function () { return loadAll(); }, project: loadProject, stock: loadStock, week: loadWeek };
+var shown = {};
+function show(v) {
+  VIEWS.forEach(function (x) {
+    $('#v-' + x).hidden = x !== v;
+    $('.tab[data-view="' + x + '"]').setAttribute('aria-selected', String(x === v));
+  });
+  if (token && !shown[v]) { shown[v] = true; LOADERS[v](); }
+  current = v;
+}
+var current = 'today';
+// PC では案件、スマホ幅では今日（§8.1）
+function defaultView() {
+  var wide = window.matchMedia && window.matchMedia('(min-width: 900px)').matches;
+  return wide && READY.project ? 'project' : 'today';
+}
+
+function showGate(msg) {
+  document.body.classList.add('locked');
+  $('#gate').hidden = false;
+  $('#gateMsg').textContent = msg || '';
+  shown = {};
+  setTimeout(function () { $('#gateInput').focus(); }, 0);
+}
+function hideGate() { document.body.classList.remove('locked'); $('#gate').hidden = true; }
+
+function bindUI() {
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    var v = b.getAttribute('data-view');
+    if (!READY[v]) { b.disabled = true; b.appendChild(h('small', null, ['準備中'])); }
+    b.addEventListener('click', function () { if (READY[v]) show(v); });
+  });
+  $('#gateForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('#gateInput').value.trim();
+    if (!v) return;
+    token = v; save('token', v); $('#gateInput').value = '';
+    hideGate(); inflight = {}; shown = {}; show(current);
+    if (current !== 'today') loadAll();  // 今日は裏でも読んでおく（書き込み後の再読込のため）
+    shown.today = true;
+  });
+  $('#forget').addEventListener('click', function () { token = ''; save('token', null); showGate('合言葉を消しました'); });
+  $('#reload').addEventListener('click', function () { loadAll(); });
+  $('#newToday').addEventListener('click', function () { doCreate(baseDay()); });
+  $('#newTomorrow').addEventListener('click', function () { doCreate(addDays(baseDay(), 1)); });
+  $('#newDate').addEventListener('change', function (e) { if (e.target.value) doCreate(e.target.value); });
+  $('#newTitle').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) doCreate(baseDay()); });
+  $('#pFilter').addEventListener('input', renderProject);
+  $('#pReload').addEventListener('click', function () { loadProject(true); });
+  $('#sQuery').addEventListener('input', renderStock);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-woff]'), function (b) {
+    b.addEventListener('click', function () {
+      S.woff = +b.getAttribute('data-woff');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-woff]'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      loadWeek();
+    });
+  });
+}
+
+/* ───────── モック（?mock=1。Notion に触れず、サーバと同じ形の応答を返す） ───────── */
+// サーバ（Code.gs）の today_ / overdue_ / tasks_ / week_ / index_ / dbmap_ / complete_ / move_ / create_ と同じ形。
+// action を足したらここにも足す。公開ページに載るので、人名・社名は架空にしておく
+var MOCK_FAIL = params.get('fail') || '';  // ?mock=1&fail=today で失敗表示を確かめる
+var MOCK_KIND_WORDS = [  // Code.gs の KIND_WORDS の写し
+  { kind: 'HACCP系', words: ['HACCP', 'FS-', '衛生', 'CCP', 'JFS', '監査', '温度記録', '冷却記録'] },
+  { kind: '記録系', words: ['記録', '管理表', '入力', '棚卸', '在庫', 'マニュアル', 'ネタ帳', '整理', 'CSV'] }
+];
+var mockDB = null;
+
+function mockKindOf(title) {
+  var half = function (s) { return String(s).replace(/[！-～]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }); };
+  var t = half(title).toUpperCase();
+  for (var i = 0; i < MOCK_KIND_WORDS.length; i++) {
+    if (MOCK_KIND_WORDS[i].words.some(function (w) { return t.indexOf(half(w).toUpperCase()) >= 0; })) return MOCK_KIND_WORDS[i].kind;
+  }
+  return 'その他';
+}
+
+function mockInit() {
+  var T = todayJst(), d = function (n) { return addDays(T, n); }, n = 0;
+  function id() { return 'mock-' + (++n); }
+  function dt(start, time, end, endTime) { return { start: start, time: time || '', end: end || '', endTime: endTime || '' }; }
+  function s(title, sel, date, done) { return { id: id(), url: 'https://www.notion.so/mock', title: title, sel: sel, done: !!done, date: date }; }
+  function ov(o) { return Object.assign({ id: id(), url: '', cat: '', dept: '', done: false, visitor: '', company: '', purpose: '', status: '', reserved: null, visitors: null, mine: false, visit: false }, o); }
+  function note(path, kind, summary, extra) {
+    var title = path.split('/').pop().replace(/\.md$/, '');
+    return Object.assign({ path: path, title: title, kind: kind, type: kind, status: '', tags: [], summary: summary, headings: [], links: [], tasks_open: 0, mtime: d(-1) }, extra || {});
+  }
+  function app(name, status, users, url, extra) {
+    return note('30_Areas/' + name + '.md', 'app', name + 'のノート（モック）', { frontmatter: Object.assign({ type: 'app', status: status, 利用者: users,
+      入口URL: url, GAS: 'https://script.google.com/home/projects/MOCK/edit', デプロイID: 'AKfycbMOCK', notion_db: [{ 名前: 'サンプルDB', id: '0000', 種別: 'data_source' }] }, extra || {}) });
+  }
+  mockDB = {
+    rid: {},
+    sched: [
+      s('HACCP チーム定例', '会議', dt(T, '10:00', T, '11:00')),
+      s('札幌出張', '出張', dt(d(-1), '', d(1))),
+      s('本部で月次報告', '本部', dt(T, '15:30')),
+      s('缶納品', 'タスク', dt(T, '09:00', T, '12:00')),
+      s('テーブルマップのレイアウト比率の修正', 'タスク', dt(T)),
+      s('会員カード スプレッドシートのトリガー設定', 'タスク', dt(T)),
+      s('今日もう終わったタスク', 'タスク', dt(T), true),
+      s('官能検査（CCP-B4）の記録運用開始', 'タスク', dt(d(-2))),
+      s('JFS-B／フードサービス ギャップ分析の担当決めと着手', 'タスク', dt(d(-1))),
+      s('ｈａｃｃｐ教育記録DBの接続確認', 'タスク', dt(d(-24))),
+      s('SNS投稿ネタ帳の運用開始', 'タスク', dt(d(-9))),
+      s('HPのタスク移設', 'タスク', dt(d(-2))),
+      s('ノンアルコール飲料の開発', 'タスク', dt(d(-2))),
+      s('オンライン醸造所ツアー', 'タスク', dt('2025-10-01')),
+      s('済んだ古いタスク', 'タスク', dt(d(-3)), true),
+      s('過去の会議（タスクではない）', '会議', dt(d(-5))),
+      s('乾燥機の見積もり比較', 'タスク', dt(d(5))),
+      s('冬の限定醸造 メルツェンの仕込み計画', 'タスク', dt(d(12))),
+      s('接客マニュアルの改訂', 'タスク', null),
+      s('来週の業者来客', '来客', dt(d(8), '14:00')),
+      s('来週の本部会議', '会議', dt(d(9), '10:00')),
+      s('先週の済み1', 'タスク', dt(d(-6)), true),
+      s('先週の済み2', 'タスク', dt(d(-6)), true)
+    ],
+    overall: [
+      ov({ title: 'ゲストシェフ来店', cat: '来客・視察', dept: 'ビヤホール', date: dt(T, '18:00'), visitor: '山田 様', purpose: 'その他', status: '予約済', visitors: 2, visit: true }),
+      ov({ title: '井戸水タンク塩素補充（担当が自分）', cat: '点検・衛生', dept: '製造', date: dt(T), mine: true }),
+      ov({ title: '一日限定イベント', cat: 'イベント', dept: '飲食', done: true, date: dt(d(-1)), mine: true }),
+      ov({ title: '資材の納品（本社倉庫）', cat: '業者', dept: '製造', date: dt(d(1)), visitor: '佐藤 様', company: '〇〇資材株式会社', purpose: '納品・メンテナンス', status: '予約済', visit: true }),
+      ov({ title: '缶納品', cat: '作業', dept: '製造', date: dt(d(1), '09:00', d(1), '12:00'), mine: true }),
+      ov({ title: '地域団体の懇親会', cat: '顧客予約', dept: '飲食', date: dt(d(2)), reserved: 40, visit: true })
+    ],
+    logs: [
+      { id: id(), url: '', title: '夜の便', cat: 'その他', mood: '', day: T, at: T + 'T21:05', bin: true,
+        text: '21時時点。本日付けのタスク3件はいずれも完了チェックなし。<br>明日は缶納品9:00、資材の納品（佐藤様）。連続稼働が続いているため本日の終業を伝達。既存の予定・タスクの日付および完了状態は変更していない。' },
+      { id: id(), url: '', title: '夜にこっそり書いた悩み', cat: '悩み', mood: 'しんどい', day: T, at: T + 'T20:30', bin: false, text: '出してはいけない行' },
+      { id: id(), url: '', title: '昼前の便', cat: 'その他', mood: '', day: T, at: T + 'T11:05', bin: true,
+        text: '11:05時点。本日付けのタスク3件はいずれも完了チェックなし。13時以降の時刻指定はゲストシェフ18:00のみ。' },
+      { id: id(), url: '', title: '昼ごはん', cat: '食事', mood: 'good', day: T, at: T + 'T12:40', bin: false, text: 'そば' },
+      { id: id(), url: '', title: '朝の便', cat: 'その他', mood: 'ふつう', day: T, at: T + 'T08:00', bin: true, text: '8:00時点。' },
+      { id: id(), url: '', title: '寝不足', cat: '睡眠・体調', mood: 'しんどい', day: d(-2), at: d(-2) + 'T07:00', bin: false, text: '5時間' }
+    ],
+    index: {
+      generated: d(-1) + 'T18:07:00+09:00', vault: 'Obsidian Vault',
+      notes: [
+        note('20_Projects/HACCP記録システムの断絶を修復する.md', 'project', '記録が途切れている箇所を洗い出して戻す', { tasks_open: 12, tags: ['type/project'], frontmatter: { type: 'project', status: 'status/active', 期限: '2026-09-30', オーナー: '小沢健人' } }),
+        note('20_Projects/Cellarを立ち上げる.md', 'project', '自分用の仕事ハブ', { tasks_open: 20 }),
+        note('40_Resources/開発ログ/2026-09-12 開発ログ.md', 'devlog', 'HACCP BASE と訓練記録アプリの改修', { headings: ['HACCP BASE の週カレンダー', '訓練記録アプリ'] }),
+        note('40_Resources/開発ログ/2026-09-10 開発ログ.md', 'devlog', '冷却記録（FS-5）DB を新設', { mtime: d(-3), headings: ['冷却記録（FS-5）'] }),
+        note('40_Resources/開発ログ/Cellar 設計図.md', 'resource', 'Claude Code に渡す一式'),
+        note('50_Notes/毎日使う業務アプリは記録の置き場ではなく入口にする.md', 'note', '記録はDBに、アプリは入口に徹する', { mtime: d(-10), tags: ['type/note'] }),
+        note('50_Notes/既定値へのフォールバックは機能停止を隠す.md', 'note', '黙って既定値に落ちると壊れたことに気づけない', { mtime: d(-8) }),
+        note('60_Meetings/2026-07-30 千石蔵チーム定例.md', 'meeting', '接客マニュアルの改訂方針', { mtime: d(-40), frontmatter: { 案件: '千石蔵チーム定例' } }),
+        note('01_MOC/酒造資料 MOC.md', 'moc', 'PC にある酒造関係の書類の索引'),
+        note('40_Resources/酒造資料/製造免許・行政手続き.md', 'resource', '申請書一式の置き場', { headings: ['製造免許', '酒税申告'] }),
+        app('HACCP BASE', '安定', '現場', 'https://script.google.com/macros/s/MOCK1/exec', { 関連案件: '[[HACCP]]' }),
+        app('樽・缶在庫', '安定', '現場', 'https://script.google.com/macros/s/MOCK2/exec'),
+        app('発酵ロガー', '改修中', '特定の担当', 'https://script.google.com/macros/s/MOCK3/exec'),
+        app('LINE 定期タスクリマインダー', '停止', '自分', '')
+      ],
+      profile: {
+        current_view: ['指示の仕方：目的と制約だけ渡して手段は任せる傾向', '予定の進め方：他者が絡む件は当日中に決着させる'],
+        patterns: [{ pattern: '自分だけで完結する記録系・仕組み系のタスクが後ろに回る', first: '2026-09-01', last: '2026-09-11', count: 8 }]
+      },
+      docs_moc: [
+        { category: '製造免許・行政手続き', title: '製造免許・行政手続き', summary: '発泡酒／スピリッツ製造免許の申請書一式、酒税申告、営業許可', note: '40_Resources/酒造資料/製造免許・行政手続き.md' },
+        { category: '醸造技術・レシピ', title: '醸造技術・レシピ', summary: '仕込配合、成分・発酵データ、水質計算、官能評価', note: '40_Resources/酒造資料/醸造技術・レシピ.md' }
+      ]
+    },
+    dbmap: { date: T, generated: T + 'T09:00:00+09:00', items: [
+      { name: '在庫マスタDB', desc: 'ビアホールの在庫・発注マスタ', url: 'https://www.notion.so/mock-stock', section: '📦 商品・在庫マスター', kind: 'notion' },
+      { name: '体調管理DB', desc: '従業員健康チェック（法定・毎日）', url: 'https://www.notion.so/mock-health', section: '🏥 健康・衛生（毎日記録）', kind: 'notion' },
+      { name: '🍺 発酵ロガー', desc: '', url: 'https://script.google.com/macros/s/MOCK3/exec', section: '📱 現場アプリ', kind: 'app' }
+    ] }
+  };
+}
+
+function mockCall(p) {
+  return new Promise(function (resolve) { setTimeout(function () { resolve(mockRoute(p)); }, 120); });
+}
+function mockRoute(p) {
+  if (!mockDB) mockInit();
+  var ok = function (data) { return { ok: true, data: data, error: null, ts: new Date().toISOString() }; };
+  var ng = function (msg) { return { ok: false, data: null, error: msg, ts: new Date().toISOString() }; };
+  if (p.action === 'ping') return ok({ app: 'cellar-proxy (mock)' });
+  if (!p.token || p.token === 'bad') return ng('unauthorized');
+  if (MOCK_FAIL && MOCK_FAIL === p.action) return ng('Notion 404 object_not_found: モックでわざと失敗');
+  var T = /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') && (p.action === 'today' || p.action === 'overdue') ? p.date : todayJst();
+  var copy = function (o) { return JSON.parse(JSON.stringify(o)); };
+  var byDate = function (a, b) { var x = a.date.start + ' ' + a.date.time, y = b.date.start + ' ' + b.date.time; return x < y ? -1 : x > y ? 1 : 0; };
+  var find = function (id) { return mockDB.sched.filter(function (r) { return r.id === id; })[0]; };
+  var dated = mockDB.sched.filter(function (r) { return r.date; });
+  var openTasks = function () { return mockDB.sched.filter(function (r) { return r.sel === 'タスク' && !r.done; }); };
+  switch (p.action) {
+    case 'today': {
+      var from = addDays(T, -1), to = addDays(T, 3);
+      var logs = mockDB.logs.filter(function (r) { return r.cat !== '悩み'; }).sort(function (a, b) { return a.at < b.at ? 1 : -1; });
+      return ok(copy({
+        date: T,
+        events: dated.filter(function (r) { return r.sel !== 'タスク' && covers(r.date, T); }).sort(byDate),
+        tasks: dated.filter(function (r) { return r.sel === 'タスク' && !r.done && r.date.start === T; }).sort(byDate),
+        overall: mockDB.overall.filter(function (r) { return r.date.start <= to && (r.date.end || r.date.start) >= from; }).sort(byDate),
+        logs: logs.slice(0, 3),
+        bin: logs.filter(function (r) { return r.bin; })[0] || null
+      }));
+    }
+    case 'overdue': {
+      var rows = openTasks().filter(function (r) { return r.date && r.date.start < T; }).sort(byDate)
+        .map(function (r) { return Object.assign(copy(r), { kind: mockKindOf(r.title) }); });
+      return ok({ date: T, kinds: ['HACCP系', '記録系', 'その他'], rows: rows });
+    }
+    case 'tasks': {
+      var all = openTasks().slice().sort(function (a, b) { var x = a.date ? a.date.start : '9999', y = b.date ? b.date.start : '9999'; return x < y ? -1 : x > y ? 1 : 0; });
+      return ok(copy({ date: T, rows: all }));
+    }
+    case 'week': {
+      var f = p.from, t = p.to, days = [];
+      for (var x = f; x <= t; x = addDays(x, 1)) days.push({ date: x, done: 0, open: 0, backlog: 0, moods: [], cats: {}, meal: false });
+      days.forEach(function (day) {
+        dated.forEach(function (r) { if (r.sel === 'タスク' && r.date.start === day.date) { if (r.done) day.done++; else day.open++; } });
+        day.backlog = openTasks().filter(function (r) { return r.date && r.date.start <= day.date; }).length;
+        mockDB.logs.forEach(function (l) {
+          if (l.day !== day.date || l.cat === '悩み') return;
+          if (l.mood) day.moods.push(l.mood);
+          day.cats[l.cat] = (day.cats[l.cat] || 0) + 1;
+          if (l.cat === '食事') day.meal = true;
+        });
+      });
+      var nf = addDays(t, 1), nt = addDays(t, 7);
+      return ok(copy({ from: f, to: t, days: days, next: { from: nf, to: nt },
+        peaks: dated.filter(function (r) { return ['会議', '来客', '出張'].indexOf(r.sel) >= 0 && r.date.start <= nt && (r.date.end || r.date.start) >= nf; }).sort(byDate) }));
+    }
+    case 'index': return ok(copy(mockDB.index));
+    case 'dbmap': return ok(copy(mockDB.dbmap));
+    case 'complete': {
+      var r = find(p.id); if (!r) return ng('⼩沢 健⼈ スケジュール の行ではないので書き換えません');
+      r.done = true; return ok(copy(r));
+    }
+    case 'move': {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(p.date || '')) return ng('date は yyyy-MM-dd で渡してください');
+      var m = find(p.id); if (!m) return ng('⼩沢 健⼈ スケジュール の行ではないので書き換えません');
+      m.date = { start: p.date, time: m.date ? m.date.time : '', end: '', endTime: '' }; return ok(copy(m));
+    }
+    case 'create': {
+      var title = String(p.title || '').trim();
+      if (!title) return ng('タイトルが空です');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(p.date || '')) return ng('date は yyyy-MM-dd で渡してください');
+      if (p.rid && mockDB.rid[p.rid]) return ok(copy(mockDB.rid[p.rid]));
+      var row = { id: 'mock-new-' + mockDB.sched.length, url: 'https://www.notion.so/mock', title: title, sel: 'タスク', done: false,
+        date: { start: p.date, time: '', end: '', endTime: '' } };
+      mockDB.sched.push(row); if (p.rid) mockDB.rid[p.rid] = row;
+      return ok(copy(row));
+    }
+    case 'debug':
+      return ok({ schedule: { ok: true, missing: [] }, overall: { ok: true, missing: [] }, log: { ok: true, missing: [] }, map: { ok: true }, drive: { ok: true } });
+    default:
+      return ng('unknown action: ' + p.action);
+  }
+}
+
+/* ───────── 起動 ───────── */
+function init() {
+  if (MOCK) document.body.classList.add('is-mock');
+  bindUI();
+  $('#footInfo').textContent = routeName();
+  var v = defaultView();
+  if (!token) { current = v; show(v); showGate(); return; }
+  hideGate();
+  show(v);
+  if (v !== 'today') { shown.today = true; loadAll(); }
+}
+window.__cellar = { S: S, call: call, mockDB: function () { return mockDB; }, show: show };  // 検証用
+init();
+})();
+</script>
+</body>
+</html>
