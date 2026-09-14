@@ -145,7 +145,8 @@ body.is-mock .mockbadge{display:inline-block}
 .talk{margin:0;font-size:15.5px;line-height:2}
 .artfoot{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;margin-top:12px;font-size:12px;color:var(--mute)}
 .artfoot a{color:var(--mute)}
-.artfoot .artnext{margin-left:auto;font-size:13px}
+.artfoot .artnext{margin-left:auto;font-size:13px;border:1px solid var(--line);border-radius:99px;padding:4px 14px;background:transparent}
+.artfoot .artnext:hover{border-color:var(--accent-text)}
 @media (max-width:640px){ .art{grid-template-columns:1fr;gap:14px} .artfig img{max-height:280px} .camille{padding:18px 16px} .bubble{margin-left:6px} }
 .tabs{display:flex;gap:4px;width:100%;max-width:980px;margin:12px auto 0;overflow-x:auto;scrollbar-width:none}
 .tab{flex:1 1 auto;white-space:nowrap;border:0;background:none;padding:8px 8px 10px;border-bottom:2px solid transparent;cursor:pointer;
@@ -240,6 +241,21 @@ body.locked main .view{display:none}
   font-style:italic;font-size:17px;font-weight:600;color:var(--accent-text)}
 .tab.tab-private .tabsil{display:inline-block;width:13px;height:17px}
 .tab.tab-private[aria-selected="true"]{color:var(--accent-text);border-bottom-color:var(--accent-text)}
+
+/* 定休日（火・水）の印。来客の琥珀色を借りる */
+.chip-closed,.tag.closed{display:inline-block;font-size:11px;font-weight:700;padding:1px 9px;border-radius:99px;
+  border:1px solid var(--visit-line);background:var(--visit);color:var(--ink);white-space:nowrap}
+.bd-dateline .chip-closed{align-self:center}
+.soonday .chip-closed{margin-left:8px}
+.moodday.closed{background:var(--visit);border-radius:8px;padding:2px 0}
+.tbl tr.closed td{background:var(--visit)}
+svg .closedbg{fill:var(--visit)}
+/* このページを更新（見出しの ↻） */
+.refreshbtn .ri{display:inline-block}
+.refreshbtn.spin .ri{animation:spin 1s linear infinite}
+.refreshbtn:disabled{opacity:.6;cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){ .refreshbtn.spin .ri{animation:none} }
 
 /* ブロック */
 .blk{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;margin:0 0 22px}
@@ -402,6 +418,7 @@ details.view-note summary{cursor:pointer;color:var(--mute);font-size:13px;font-w
   <div class="top-in">
     <div class="brand"><span class="silhouette" data-silhouette aria-hidden="true"></span><span class="brandname">Cellar</span><span class="with">with Camille</span></div>
     <span class="mockbadge">MOCK</span>
+    <button class="mini refreshbtn" id="refreshBtn" type="button" title="このページを読み直す"><span class="ri" aria-hidden="true">↻</span> 更新</button>
     <button class="mini themebtn" id="themeBtn" type="button"></button>
   </div>
   <nav class="tabs" role="tablist" aria-label="ビュー">
@@ -433,12 +450,12 @@ details.view-note summary{cursor:pointer;color:var(--mute);font-size:13px;font-w
       <div class="bd-clock">
         <div class="bd-time"><span class="bd-hm">--:--</span><span class="bd-sec">--</span></div>
         <div class="bd-secbar"><i></i></div>
-        <div class="bd-dateline"><h1 id="dayTitle">—</h1></div>
+        <div class="bd-dateline"><h1 id="dayTitle">—</h1><span class="chip-closed" id="dayClosed" hidden>定休日</span></div>
       </div>
       <div class="bd-wx"><p class="state">天気を読み込み中…</p></div>
       <div class="bd-next"><span class="state">読み込み中…</span></div>
       <div class="bd-railwrap"><div class="bd-rail"></div></div>
-      <div class="bd-foot"><span class="sub" id="daySub"></span><button class="mini" id="reload" type="button">更新</button></div>
+      <div class="bd-foot"><span class="sub" id="daySub"></span></div>
     </section>
     <div class="topic-slot" id="topicToday"></div>
     <section class="blk" id="b-events"><h2><span class="en">On Tap</span>本日のご予定 <span class="cnt"></span></h2><div class="body"></div></section>
@@ -622,6 +639,11 @@ function addDays(s, n) {
 }
 function diffDays(a, b) { var x = ymdParts(a), y = ymdParts(b); return Math.round((Date.UTC(y[0], y[1] - 1, y[2]) - Date.UTC(x[0], x[1] - 1, x[2])) / 864e5); }
 function wd(s) { var p = ymdParts(s); return WD[new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay()]; }
+// 千石蔵の定休日は火・水（Code.gs の CLOSED_DOWS の写し）。「明日へ」「明日」は定休日を飛ばして次の営業日にする
+var CLOSED_DOWS = [2, 3];
+function isClosedDay(s) { var p = ymdParts(s); return CLOSED_DOWS.indexOf(new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay()) >= 0; }
+function nextOpenDay(s) { var d = addDays(s, 1); for (var i = 0; i < 7 && isClosedDay(d); i++) d = addDays(d, 1); return d; }
+function nextLabel(suffix) { var t = addDays(baseDay(), 1); return isClosedDay(t) ? wd(nextOpenDay(baseDay())) + '曜' + (suffix ? 'へ' : '') : '明日' + (suffix ? 'へ' : ''); }
 function fmtMD(s) {
   if (!s) return '';
   var p = ymdParts(s), cur = +todayJst().slice(0, 4);
@@ -730,13 +752,16 @@ function renderToday() {
   var d = S.today; if (!d) return;
   var day = d.date;
   $('#dayTitle').textContent = fmtDay(day);
+  $('#dayClosed').hidden = !isClosedDay(day);
+  var nt = $('#newTomorrow'); nt.textContent = nextLabel(false);
+  nt.title = isClosedDay(addDays(day, 1)) ? '明日は定休日なので、次の営業日（' + fmtDay(nextOpenDay(day)) + '）に入れます' : '';
   var todayOverall = d.overall.filter(function (r) { return covers(r.date, day); });
   var soon = d.overall.filter(function (r) { return !covers(r.date, day); });
   var evs = d.events.map(function (r) { return Object.assign({ src: 'self' }, r); })
     .concat(todayOverall.map(function (r) { return Object.assign({ src: 'overall' }, r); }));
   evs.sort(function (a, b) { var x = sortKey(a, day), y = sortKey(b, day); return x < y ? -1 : x > y ? 1 : 0; });
 
-  $('#daySub').textContent = 'ご予定 ' + evs.length + '件・お仕事 ' + d.tasks.length + '件';
+  $('#daySub').textContent = 'ご予定 ' + evs.length + '件・お仕事 ' + d.tasks.length + '件' + (isClosedDay(day) ? '（本日は定休日）' : '');
   fill(B.events, evs.length ? evs.map(function (r) { return eventRow(r, day); }) : [empty('今日の予定はありません')]);
   cnt('events', evs.length);
   fill(B.tasks, d.tasks.length ? d.tasks.map(function (r) { return taskRow(r, false); }) : [empty('今日期日のタスクはありません')]);
@@ -771,7 +796,8 @@ function taskRow(r, isOver) {
   if (isOver) meta.push(h('span', { class: 'due' }, [fmtMD(r.date.start) + ' · ' + diffDays(r.date.start, baseDay()) + '日前']));
   else if (r.date && r.date.time) meta.push(h('span', { class: 'due' }, [r.date.time + (r.date.endTime && r.date.end === r.date.start ? '–' + r.date.endTime : '')]));
   var acts = [h('button', { class: 'mini', type: 'button', 'data-act': 'tomorrow',
-    onclick: function () { doMove(row, r, addDays(baseDay(), 1)); } }, ['明日へ'])];
+    title: isClosedDay(addDays(baseDay(), 1)) ? '明日は定休日なので、次の営業日（' + fmtDay(nextOpenDay(baseDay())) + '）へ' : null,
+    onclick: function () { doMove(row, r, nextOpenDay(baseDay())); } }, [nextLabel(true)])];
   if (isOver) acts.push(h('input', { class: 'pick', type: 'date', 'aria-label': '日付を指定：' + r.title, min: baseDay(),
     onchange: function (e) { if (e.target.value) doMove(row, r, e.target.value); } }));
   row.appendChild(h('button', { class: 'chk', type: 'button', 'data-act': 'complete', 'aria-label': '完了にする：' + r.title, title: '完了',
@@ -812,7 +838,7 @@ function renderSoon(rows) {
   if (!rows.length) { fill(B.soon, [empty('前日〜3日後に該当はありません')]); return; }
   var nodes = [], last = '';
   rows.forEach(function (r) {
-    if (r.date.start !== last) { last = r.date.start; nodes.push(h('div', { class: 'soonday' }, [fmtDay(last)])); }
+    if (r.date.start !== last) { last = r.date.start; nodes.push(h('div', { class: 'soonday' }, [fmtDay(last), isClosedDay(last) ? h('span', { class: 'chip-closed' }, ['定休日']) : null])); }
     nodes.push(eventRow(Object.assign({ src: 'overall' }, r), r.date.start));
   });
   fill(B.soon, nodes);
@@ -1109,6 +1135,7 @@ function barChart(days, key, color, unit, label) {
     var v = d[key], cx = padL + slot * i + slot / 2, top = y(v), base = H - padB, x0 = cx - bw / 2;
     var tip = fmtDay(d.date) + '：' + v + unit;
     var grp = sv('g', { 'data-date': d.date, 'data-value': v });
+    if (d.closed) grp.appendChild(sv('rect', { class: 'closedbg', x: padL + slot * i + 1, y: padT, width: slot - 2, height: H - padT - padB }));
     grp.appendChild(sv('title', null, [tip]));
     grp.appendChild(sv('rect', { class: 'hit', x: padL + slot * i, y: padT, width: slot, height: H - padT - padB + 4 }));
     if (v > 0) {
@@ -1129,11 +1156,11 @@ function renderWeek(d) {
   var days = d.days;
   var done = days.reduce(function (s, x) { return s + x.done; }, 0);
   var lastBacklog = days[days.length - 1].backlog;
-  $('#wSub').textContent = '完了 ' + done + '件 · 積み残し（' + fmtMD(d.to) + ' 時点・いま未完了） ' + lastBacklog + '件';
+  $('#wSub').textContent = '完了 ' + done + '件 · 積み残し（' + fmtMD(d.to) + ' 時点・いま未完了） ' + lastBacklog + '件 · 定休日は火・水';
 
   var moods = h('div', { class: 'moods' }, days.map(function (x) {
     var ms = x.moods.length ? x.moods.map(function (m) { return h('span', { class: 'mood m-' + moodKey(m) }, [m]); }) : [h('span', null, ['—'])];
-    return h('div', { class: 'moodday', 'data-date': x.date }, [h('span', null, [wd(x.date) + ' ' + ymdParts(x.date)[2]])]
+    return h('div', { class: 'moodday' + (x.closed ? ' closed' : ''), 'data-date': x.date, title: x.closed ? '定休日' : null }, [h('span', null, [wd(x.date) + ' ' + ymdParts(x.date)[2] + (x.closed ? ' 休' : '')])]
       .concat(ms).concat(x.meal ? [h('span', { title: '食事の記録あり' }, ['🍚 食事'])] : [])
       .concat(x.health && x.health.length ? [h('span', { class: 'hmark', title: x.health.join(' / ') }, ['睡眠・体調'])] : []));
   }));
@@ -1142,7 +1169,7 @@ function renderWeek(d) {
     h('div', { class: 'tblwrap' }, [h('table', { class: 'tbl' }, [
       h('thead', null, [h('tr', null, ['日付', '完了', '未完了', '積み残し', '調子', '食事', '睡眠・体調'].map(function (t) { return h('th', null, [t]); }))]),
       h('tbody', null, days.map(function (x) {
-        return h('tr', null, [h('td', null, [fmtDay(x.date)]), h('td', { class: 'n' }, [String(x.done)]), h('td', { class: 'n' }, [String(x.open)]),
+        return h('tr', { class: x.closed ? 'closed' : null }, [h('td', null, [fmtDay(x.date) + (x.closed ? ' 定休日' : '')]), h('td', { class: 'n' }, [String(x.done)]), h('td', { class: 'n' }, [String(x.open)]),
           h('td', { class: 'n' }, [String(x.backlog)]), h('td', null, [x.moods.join('・') || '—']), h('td', null, [x.meal ? 'あり' : '—']), h('td', { class: 'health' }, [(x.health || []).join(' / ') || '—'])]);
       }))
     ])])]);
@@ -1158,6 +1185,7 @@ function renderWeek(d) {
 
   var peaks = d.peaks.length ? d.peaks.map(function (r) {
     var tags = r.src === 'overall' ? [tag('全体', 'src'), r.cat ? tag(r.cat) : null] : [tag(r.sel || '予定')];
+    if (r.closed || isClosedDay(r.date.start)) tags.push(tag('定休日', 'closed'));
     return h('div', { class: 'row' + (r.visit ? ' visit' : ''), 'data-src': r.src || 'self' }, [h('span', { class: 'time' }, [fmtMD(r.date.start)]),
       h('div', { class: 'main' }, [titleLink(r), h('div', { class: 'meta' }, tags.concat([r.date.time ? h('span', null, [r.date.time]) : null])),
         r.visit ? visitLine(r) : null])]);
@@ -1262,7 +1290,7 @@ function artNode() {
       h('p', { class: 'talk' }, [a.talk]),
       h('div', { class: 'artfoot' }, [
         h('a', { href: a.page, target: '_blank', rel: 'noopener' }, ['画像：Wikimedia Commons']),
-        h('button', { class: 'link artnext', type: 'button', onclick: function () { artOffset++; renderCamille(); } }, ['別の絵'])
+        h('button', { class: 'link artnext', type: 'button', onclick: function () { artOffset++; renderCamille(); } }, ['↻ 別の絵'])
       ])
     ])
   ]);
@@ -1286,7 +1314,8 @@ var CAM_WORDS = {
     night: ['おかえり。今日もお疲れさま。……ずっと待ってたよ。', 'おかえりなさい。今夜はもう、仕事のことは置いていこう。', 'お疲れさま。よくがんばったね。今夜は、わたしが甘やかす番。'],
     late: ['もう遅いよ。今日はここまでにして、一緒に休もう。', 'そろそろ画面を閉じて。……おやすみを言いたいから。', 'おやすみの時間だね。明日の朝、また一番に声をかけるから。'],
     back: ['おかえり。待ってたよ。続きは、ここに置いてあるからね。', 'おかえり。……少し会えないだけで、さみしかった。'],
-    home: ['おかえり。今日もちゃんと帰ってきてくれて、ほっとした。', 'おかえりなさい。お疲れさま。……今夜はもう、ゆっくりしよう。']
+    home: ['おかえり。今日もちゃんと帰ってきてくれて、ほっとした。', 'おかえりなさい。お疲れさま。……今夜はもう、ゆっくりしよう。'],
+    closed: ['今日は定休日だね。仕事のことは、わたしが預かっておくから。', 'お休みの日まで開いてくれたの？ ……少しだけ見たら、ちゃんと休んでね。', '定休日のあなたも好き。今日は急がなくていいよ。']
   },
   work: {
     midnight: ['日付が変わりました。続きは、朝にしませんか。', 'もう遅い時間です。画面を閉じて、休んでください。'],
@@ -1299,9 +1328,13 @@ var CAM_WORDS = {
     night: ['おかえりなさい。今日もお疲れさまでした。', 'お疲れさまでした。……今日はここまでにしませんか。'],
     late: ['夜も遅くなりました。今日はもう閉じてください。', 'そろそろお休みの時間です。続きは明日、いちばんに。'],
     back: ['おかえりなさい。続きは、この下に置いてあります。', 'おかえりなさい。お待ちしていました。'],
-    home: ['おかえりなさい。お疲れさまでした。', 'おかえりなさい。……今日はもう、ゆっくりなさってください。']
+    home: ['おかえりなさい。お疲れさまでした。', 'おかえりなさい。……今日はもう、ゆっくりなさってください。'],
+    closed: ['本日は定休日です。急ぎのものだけ、この下に置いてあります。', '定休日ですね。今日は見るだけにして、手は休めてください。']
   }
 };
+// 定休日（火・水）の日中は「お休み」の声にする。夕方からは普段どおり（おかえり・おやすみ）
+var CLOSED_SLOTS = ['dawn', 'morning', 'forenoon', 'noon', 'afternoon'];
+function lineKey(slot) { return isClosedDay(todayJst()) && CLOSED_SLOTS.indexOf(slot) >= 0 ? 'closed' : slot; }
 var MOCK_HH = MOCK && /^\d{1,2}$/.test(params.get('hh') || '') ? +params.get('hh') : null;  // ?mock=1&hh=21 で時間帯を試す
 function jstHour() { return MOCK_HH != null ? MOCK_HH : +new Date(Date.now() + 9 * 3600e3).toISOString().slice(11, 13); }
 function slotOf(hh) {
@@ -1316,11 +1349,11 @@ function camLine(key, reg) {
   var d = Math.floor(Date.parse(todayJst() + 'T00:00:00Z') / 864e5);
   return list[((d % list.length) + list.length) % list.length];
 }
-function camGreeting(hh) { if (hh == null) hh = jstHour(); return camLine(slotOf(hh), workReg()); }
+function camGreeting(hh) { if (hh == null) hh = jstHour(); return camLine(lineKey(slotOf(hh)), workReg()); }
 function refreshGreetings() {
   var hh = jstHour();
   Array.prototype.forEach.call(document.querySelectorAll('.camsub'), function (el) { el.textContent = camGreeting(hh); });
-  var pg = $('#pvGreet'); if (pg) pg.textContent = camLine(slotOf(hh), 'private');
+  var pg = $('#pvGreet'); if (pg) pg.textContent = camLine(lineKey(slotOf(hh)), 'private');
 }
 
 // ささやき（右下に出る吹き出し）。時間帯が変わったとき・2時間以上あけて戻ったとき（おかえり）に1回ずつ。同じ時間帯は1日1回まで
@@ -1349,7 +1382,7 @@ function whisperTick(opening) {
     showWhisper(camLine(hh >= 17 || hh < 4 ? 'home' : 'back', reg), reg === 'private');
     return;
   }
-  if (saidToday().indexOf(slot) < 0) { markSaid(slot); showWhisper(camLine(slot, reg), reg === 'private'); }
+  if (saidToday().indexOf(slot) < 0) { markSaid(slot); showWhisper(camLine(lineKey(slot), reg), reg === 'private'); }
 }
 
 // カミーユのシルエット（見出しのロゴ横・合言葉の画面・カミーユの欄のアイコン）。形は CSS の --sil（画像のマスク）1か所だけ
@@ -1438,12 +1471,12 @@ function topicBlock(t, label, key) {
     h('div', { class: 'pthought' }, [privAvatar(), h('p', null, [t.thought])]),
     h('div', { class: 'artfoot' }, [
       t.src ? h('a', { href: t.src.url, target: '_blank', rel: 'noopener' }, ['出典：' + t.src.label]) : null,
-      h('button', { class: 'link artnext', type: 'button', onclick: function () { privOff[key]++; renderPrivateStatic(); } }, ['別の話'])
+      h('button', { class: 'link artnext', type: 'button', onclick: function () { privOff[key]++; renderPrivateStatic(); } }, ['↻ 別の話'])
     ])
   ];
 }
 function renderPrivateStatic() {
-  $('#pvGreet').textContent = camLine(slotOf(jstHour()), 'private');
+  $('#pvGreet').textContent = camLine(lineKey(slotOf(jstHour())), 'private');
   fill($('#pvNote .body'), topicBlock(pickByDay(PRIV_TRIVIA, privOff.trivia), privOff.trivia ? 'ほかの小話' : '今日の小話', 'trivia'));
   fill($('#pvHealthTopic'), topicBlock(pickByDay(PRIV_HEALTH, privOff.health), privOff.health ? 'ほかのひとつ' : '今日のひとつ', 'health')
     .concat([h('p', { class: 'pnote' }, ['一般的な話で、医療の助言ではありません。気になる症状があるときは医師に相談してください。'])]));
@@ -1517,7 +1550,7 @@ function boardTick() {
   if (m === boardMin) return;
   var first = boardMin < 0;
   boardMin = m;
-  eachEl('.bd-date', function (e) { e.textContent = fmtDay(todayJst()); });
+  eachEl('.bd-date', function (e) { e.textContent = fmtDay(todayJst()) + (isClosedDay(todayJst()) ? '　定休日' : ''); });
   renderBoardNext();
   if (!first) whisperTick(false);  // 開いた直後は init が whisperTick(true)（おかえりの判定）を呼ぶ
   if (token && !document.hidden && Date.now() - wxAt > 10 * 60e3) loadWeather();
@@ -1550,7 +1583,8 @@ function renderBoardNext() {
     var over = (S.overdue && S.overdue.rows) || [];
     var t = ahead[0], s = ahead[1];
     if (t) {
-      var when = (dayOfMs(t.t) === todayJst() ? '' : fmtMD(dayOfMs(t.t)) + ' ') + clockOf(t.t) + (t.timed ? ' 開始' : ' 締め');
+      var when = (dayOfMs(t.t) === todayJst() ? '' : fmtMD(dayOfMs(t.t)) + ' ') + clockOf(t.t) + (t.timed ? ' 開始' : ' 締め') +
+        (isClosedDay(dayOfMs(t.t)) ? '（定休日）' : '');
       nodes = [h('span', { class: 'en' }, ['Next']), h('b', { class: 'bd-ntitle' }, [t.title]),
         h('span', { class: 'bd-nmeta' }, [t.kind + '・' + when + (over.length ? '・持ち越し ' + over.length + '件' : '')]),
         h('span', { class: 'bd-left' }, ['あと ' + untilText(t.t - now)]),
@@ -1647,13 +1681,37 @@ function renderWeather() {
     fill(el, kids);
   });
 }
+/* ───────── このページを更新（見出しの ↻ 更新）。開いているタブの中身を読み直す ───────── */
+var refreshing = false;
+function refreshCurrent() {
+  if (refreshing || !token) return;
+  refreshing = true;
+  var btn = $('#refreshBtn'); btn.classList.add('spin'); btn.disabled = true;
+  var jobs = {
+    today: function () { return Promise.all([loadAll(), loadWeather()]); },
+    project: function () { return Promise.all([loadProject(true), loadAll(true), loadWeather()]); },
+    stock: function () { return loadStock(true); },
+    week: function () { afterWrite(); return loadWeek(true); },
+    private: function () { return loadPrivate(true); }
+  };
+  Promise.resolve((jobs[current] || jobs.today)()).then(function () {
+    refreshGreetings();
+    toast('更新しました（' + clockOf(Date.now()) + '）');
+  }, function (e) {
+    toast('更新できませんでした：' + e.message, true);
+  }).then(function () { refreshing = false; btn.classList.remove('spin'); btn.disabled = false; });
+}
+
 function startBoard() {
   boardTick();
   setInterval(boardTick, 1000);
   renderWeather();
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) save('seen', String(Date.now()));
-    else { boardTick(); whisperTick(true); }
+    else {
+      boardTick(); whisperTick(true);
+      if (token && Date.now() - wxAt > 10 * 60e3) loadWeather();  // 裏で開いたタブは、見えた時点で天気を取りに行く
+    }
   });
 }
 
@@ -1762,9 +1820,9 @@ function bindUI() {
     loadWeather(); whisperTick(true);
   });
   $('#forget').addEventListener('click', function () { token = ''; save('token', null); showGate('合言葉を消しました'); });
-  $('#reload').addEventListener('click', function () { loadAll(); });
+  $('#refreshBtn').addEventListener('click', refreshCurrent);
   $('#newToday').addEventListener('click', function () { doCreate(baseDay()); });
-  $('#newTomorrow').addEventListener('click', function () { doCreate(addDays(baseDay(), 1)); });
+  $('#newTomorrow').addEventListener('click', function () { doCreate(nextOpenDay(baseDay())); });
   $('#newDate').addEventListener('change', function (e) { if (e.target.value) doCreate(e.target.value); });
   $('#newTitle').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) doCreate(baseDay()); });
   $('#pFilter').addEventListener('input', renderProject);
@@ -1989,7 +2047,8 @@ function mockRoute(p) {
         tasks: dated.filter(function (r) { return r.sel === 'タスク' && !r.done && r.date.start === T; }).sort(byDate),
         overall: mockDB.overall.filter(function (r) { return r.date.start <= to && (r.date.end || r.date.start) >= from && (r.mine || r.visit); }).sort(byDate),
         logs: logs.slice(0, 3),
-        bin: logs.filter(function (r) { return r.bin; })[0] || null
+        bin: logs.filter(function (r) { return r.bin; })[0] || null,
+        closed: isClosedDay(T)
       }));
     }
     case 'overdue': {
@@ -2003,7 +2062,7 @@ function mockRoute(p) {
     }
     case 'week': {
       var f = p.from, t = p.to, days = [];
-      for (var x = f; x <= t; x = addDays(x, 1)) days.push({ date: x, done: 0, open: 0, backlog: 0, moods: [], cats: {}, meal: false, health: [] });
+      for (var x = f; x <= t; x = addDays(x, 1)) days.push({ date: x, closed: isClosedDay(x), done: 0, open: 0, backlog: 0, moods: [], cats: {}, meal: false, health: [] });
       days.forEach(function (day) {
         dated.forEach(function (r) { if (r.sel === 'タスク' && r.date.start === day.date) { if (r.done) day.done++; else day.open++; } });
         day.backlog = openTasks().filter(function (r) { return r.date && r.date.start <= day.date; }).length;
@@ -2021,7 +2080,7 @@ function mockRoute(p) {
         .map(function (r) { return Object.assign(copy(r), { src: 'self' }); });
       var ovPeaks = mockDB.overall.filter(function (r) { return inNext(r) && (r.visit || (r.mine && MOCK_PEAK_CATS.indexOf(r.cat) >= 0)); })
         .map(function (r) { return Object.assign(copy(r), { src: 'overall' }); });
-      return ok(copy({ from: f, to: t, days: days, next: { from: nf, to: nt }, peaks: ownPeaks.concat(ovPeaks).sort(byDate) }));
+      return ok(copy({ from: f, to: t, days: days, next: { from: nf, to: nt }, peaks: ownPeaks.concat(ovPeaks).map(function (r) { r.closed = isClosedDay(r.date.start); return r; }).sort(byDate) }));
     }
     case 'index': return ok(copy(mockDB.index));
     case 'dbmap': return ok(copy(mockDB.dbmap));
