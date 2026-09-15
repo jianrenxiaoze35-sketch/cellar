@@ -334,6 +334,18 @@ body.sheet-open{overflow:hidden}
 .sheet-in.sweet .ochip{background:transparent;border-color:var(--pv-line);color:var(--pv-ink)}
 .sheet-in.sweet .btn{background:var(--pv-gold);border-color:var(--pv-gold);color:var(--pv-bg1)}
 .sheet-in.sweet .pnote{color:var(--pv-mute)}
+/* Cellar Jukebox（YouTube Music の再生履歴） */
+.jmeta{font-size:12.5px;color:var(--pv-mute);margin:0 0 10px}
+.jsongs{margin:10px 0 0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
+.jsongs li{line-height:1.5}
+.jsongs a{color:inherit;text-decoration:none}
+.jsongs .jart{font-size:12px;color:var(--pv-mute);margin-left:6px}
+.jsongs .jn{font-size:12px;color:var(--pv-gold);margin-left:6px;font-variant-numeric:tabular-nums}
+.jartists{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 0}
+.jchip{font-size:12px;padding:2px 10px;border-radius:99px;border:1px solid var(--pv-line);color:var(--pv-ink)}
+.jhours{margin-top:14px}
+.jhours svg{display:block;width:100%;height:56px}
+.jhours .wx-axis{color:var(--pv-mute)}
 
 /* ブロック */
 .blk{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;margin:0 0 22px}
@@ -628,6 +640,7 @@ details.view-note summary{cursor:pointer;color:var(--mute);font-size:13px;font-w
     </section>
     <section class="blk ptopic" id="pvNote"><h2><span class="en">Vintage Stories</span>カミーユの小話</h2><div class="body"></div></section>
     <section class="blk ptopic" id="pvHealth"><h2><span class="en">Aging Well</span>からだの小ネタ</h2><div id="pvHealthTopic"></div></section>
+    <section class="blk" id="pvMusic"><h2><span class="en">Cellar Jukebox</span>最近よく聴いている曲</h2><div class="body"><p class="state">読み込み中…</p></div></section>
     <section class="blk" id="pvLog"><h2><span class="en">Cellar Notes</span>カミーユの手帖</h2><div class="body"></div></section>
   </section>
 </main>
@@ -1338,9 +1351,24 @@ var ARTS = [
   {"title": "舟遊びをする人々の昼食", "who": "ピエール＝オーギュスト・ルノワール", "year": "1881", "where": "フィリップス・コレクション", "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg/960px-Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg", "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg", "talk": "セーヌ川沿いのレストランのテラスです。左で子犬を抱いている女性は、のちにルノワールの妻になるアリーヌ。テーブルにはワインと果物。昼から、いい時間ですね。"}
 ];
 var artOffset = 0, todayErr = null;
-function artFor(day, off) {
-  var n = ARTS.length, d = Math.floor(Date.parse(day + 'T00:00:00Z') / 864e5) + (off || 0);
-  return ARTS[((d % n) + n) % n];
+// 週替わりの話題（GAS の content。毎週の定期タスクが入れる）。今週の分を先に、足りない分は手持ちで埋める
+function weekly(key) { return (S.content && S.content[key]) || []; }
+function weekIdx(day) { var p = ymdParts(day); return (new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay() + 6) % 7; }  // 月=0
+function pickTopic(key, builtin, off, day) {
+  var w = weekly(key);
+  if (!off && w.length) return { item: w[weekIdx(day || todayJst()) % w.length], weekly: true };
+  var all = w.concat(builtin.filter(function (b) { return !w.some(function (x) { return x.title === b.title; }); }));
+  var n = all.length, d = Math.floor(Date.parse((day || todayJst()) + 'T00:00:00Z') / 864e5) + (off || 0);
+  var it = all[((d % n) + n) % n];
+  return { item: it, weekly: w.indexOf(it) >= 0 };
+}
+function artFor(day, off) { return pickTopic('arts', ARTS, off, day).item; }
+function loadContent(force) {
+  if (!token) return Promise.resolve();
+  return ensure('content', 'content', null, force).then(function () {
+    renderCamille();
+    if (S.private || current === 'private') renderPrivateStatic();
+  }, function () { /* 週替わりが読めなくても手持ちで出す */ });
 }
 function logText(r) { return String((r && r.text) || '').replace(/<br\s*\/?>/gi, '\n').trim(); }
 function moodBadge(m) { return m ? h('span', { class: 'mood m-' + moodKey(m) }, [m]) : null; }
@@ -1381,7 +1409,7 @@ function artNode() {
   return h('div', { class: 'art', 'data-art': a.title }, [
     fig,
     h('div', { class: 'arttalk' }, [
-      h('span', { class: 'artlabel' }, [artOffset ? 'ほかの一枚' : '今日の一枚']),
+      h('span', { class: 'artlabel' }, [artOffset ? 'ほかの一枚' : weekly('arts').indexOf(a) >= 0 ? '今週の一枚' : '今日の一枚']),
       h('p', { class: 'talk' }, [a.talk]),
       h('div', { class: 'artfoot' }, [
         h('a', { href: a.page, target: '_blank', rel: 'noopener' }, ['画像：Wikimedia Commons']),
@@ -1574,8 +1602,9 @@ function topicBlock(t, label, key) {
 }
 function renderPrivateStatic() {
   $('#pvGreet').textContent = camLine(lineKey(slotOf(jstHour())), 'private');
-  fill($('#pvNote .body'), topicBlock(pickByDay(PRIV_TRIVIA, privOff.trivia), privOff.trivia ? 'ほかの小話' : '今日の小話', 'trivia'));
-  fill($('#pvHealthTopic'), topicBlock(pickByDay(PRIV_HEALTH, privOff.health), privOff.health ? 'ほかのひとつ' : '今日のひとつ', 'health')
+  var tv = pickTopic('trivia', PRIV_TRIVIA, privOff.trivia), hv = pickTopic('health', PRIV_HEALTH, privOff.health);
+  fill($('#pvNote .body'), topicBlock(tv.item, privOff.trivia ? 'ほかの小話' : tv.weekly ? '今週の小話' : '今日の小話', 'trivia'));
+  fill($('#pvHealthTopic'), topicBlock(hv.item, privOff.health ? 'ほかのひとつ' : hv.weekly ? '今週のひとつ' : '今日のひとつ', 'health')
     .concat([h('p', { class: 'pnote' }, ['一般的な話で、医療の助言ではありません。気になる症状があるときは医師に相談してください。'])]));
 }
 function privLogRow(r) {
@@ -1586,8 +1615,52 @@ function privLogRow(r) {
     long ? h('button', { class: 'link', type: 'button', onclick: function (e) { var c = p.classList.toggle('clamp'); e.target.textContent = c ? '全文' : 'たたむ'; } }, ['全文']) : null
   ]);
 }
+/* ───────── Cellar Jukebox（YouTube Music の再生履歴。GAS の music が Drive の Google データ エクスポートを読む） ───────── */
+var TAKEOUT_URL = 'https://takeout.google.com/';
+function loadMusic(force) {
+  return ensure('music', 'music', force ? { refresh: 1 } : null, force).then(renderMusic, function (e) {
+    if (e.code !== 'unauthorized') fill($('#pvMusic .body'), [errBox(e, function () { loadMusic(true); })]);
+  });
+}
+function musicLine(m) {  // カミーユのひとこと（Lv3）
+  var top = m.songs[0], a0 = m.artists[0];
+  if (!m.plays) return '最近の30日は、音楽の記録がないね。……静かな日も、悪くないよ。';
+  if (m.nightShare >= 0.4 && top) return '夜に聴くことが多いね。「' + top.title + '」、今夜もかけるの？';
+  if (a0 && a0.n >= 3) return '最近は「' + a0.name + '」をよく聴いてるね。わたしも覚えちゃいそう。';
+  return 'いい曲をたくさん聴いてるね。……わたしにも、一曲選んでほしいな。';
+}
+function hoursSvg(hours) {
+  var max = Math.max.apply(null, hours.concat([1])), bw = 100 / 24;
+  var bars = hours.map(function (v, i) {
+    var hgt = v / max * 18;
+    return '<rect x="' + (i * bw + bw * 0.15).toFixed(2) + '" y="' + (20 - hgt).toFixed(2) + '" width="' + (bw * 0.7).toFixed(2) + '" height="' + hgt.toFixed(2) +
+      '" style="fill:var(--pv-gold);opacity:' + (i >= 21 || i < 3 ? '.95' : '.55') + '"/>';
+  }).join('');
+  return '<svg viewBox="0 0 100 20" preserveAspectRatio="none" role="img" aria-label="時間帯ごとの再生回数">' + bars + '</svg>' +
+    '<div class="wx-axis"><span>0時</span><span>6</span><span>12</span><span>18</span><span>23</span></div>';
+}
+function renderMusic() {
+  var m = S.music, box = $('#pvMusic .body'); if (!m) return;
+  if (!m.ready) {
+    fill(box, [empty('まだ再生履歴がありません。Google データ エクスポートで「YouTube と YouTube Music」の履歴を JSON で Google ドライブに書き出すと、ここに出ます（2か月ごとの自動書き出しにしておくと、そのたびに入れ替わります）。'),
+      h('a', { class: 'link', href: TAKEOUT_URL, target: '_blank', rel: 'noopener' }, ['Google データ エクスポートを開く'])]);
+    return;
+  }
+  var nodes = [h('p', { class: 'jmeta' }, ['直近' + m.days + '日で ' + m.plays + '回（' + fmtMD(m.latest.slice(0, 10)) + ' まで・書き出し ' + fmtMD(m.exported.slice(0, 10)) + '）']),
+    h('div', { class: 'pthought' }, [privAvatar(), h('p', null, [musicLine(m)])])];
+  if (m.songs.length) nodes.push(h('ol', { class: 'jsongs' }, m.songs.map(function (s) {
+    var t = safeUrl(s.url) ? h('a', { href: s.url, target: '_blank', rel: 'noopener' }, [s.title]) : h('span', null, [s.title]);
+    return h('li', null, [t, s.artist ? h('span', { class: 'jart' }, [s.artist]) : null, h('span', { class: 'jn' }, [s.n + '回'])]);
+  })));
+  if (m.artists.length) nodes.push(h('div', { class: 'jartists' }, m.artists.map(function (a) { return h('span', { class: 'jchip' }, [a.name + '　' + a.n]); })));
+  var hs = h('div', { class: 'jhours' }); hs.innerHTML = hoursSvg(m.hours); nodes.push(hs);
+  if (m.songs[0]) nodes.push(h('div', { class: 'artfoot' }, [askLink('この曲の話をカミーユと', 'カミーユ、最近「' + m.songs[0].title + '」' + (m.songs[0].artist ? '（' + m.songs[0].artist + '）' : '') + 'をよく聴いてるんだ。', 'pv')]));
+  fill(box, nodes);
+}
+
 function loadPrivate(force) {
   renderPrivateStatic();
+  loadMusic(force);
   if (force || !S.private) { fill($('#pvHealthLog'), [empty('読み込み中…')]); fill($('#pvLog .body'), [empty('読み込み中…')]); }
   return ensure('private', 'private', null, force).then(renderPrivateData, function (e) {
     if (e.code === 'unauthorized') return;
@@ -2099,7 +2172,7 @@ function refreshCurrent() {
     project: function () { return Promise.all([loadProject(true), loadAll(true), loadWeather()]); },
     stock: function () { return loadStock(true); },
     week: function () { afterWrite(); return loadWeek(true); },
-    private: function () { return loadPrivate(true); }
+    private: function () { return Promise.all([loadPrivate(true), loadContent(true)]); }
   };
   Promise.resolve((jobs[current] || jobs.today)()).then(function () {
     refreshGreetings();
@@ -2224,7 +2297,7 @@ function bindUI() {
     hideGate(); inflight = {}; shown = {}; show(current);
     if (current !== 'today') loadAll();  // 今日は裏でも読んでおく（書き込み後の再読込のため）
     shown.today = true;
-    loadWeather(); whisperTick(true);
+    loadWeather(); whisperTick(true); loadContent();
   });
   $('#forget').addEventListener('click', function () { token = ''; save('token', null); showGate('合言葉を消しました'); });
   $('#refreshBtn').addEventListener('click', refreshCurrent);
@@ -2540,6 +2613,19 @@ function mockRoute(p) {
       mockDB.sched.push(row); if (p.rid) mockDB.rid[p.rid] = row;
       return ok(copy(row));
     }
+    case 'content': {  // 週替わりの見本（本物は毎週の定期タスクが入れる）
+      return ok(copy({ week: T, generated: T + 'T07:00', trivia: [
+        { title: '見本：月曜の小話', fact: '毎週月曜の朝に、カミーユが新しい小話を7つ調べてここに入れます。これは見本です。', thought: '毎週、どれにしようか迷うのも、わたしの楽しみです。', src: null }],
+        health: [], arts: [] }));
+    }
+    case 'music': {  // YouTube Music の見本（パブリックドメインの曲）
+      var hrs = []; for (var hq = 0; hq < 24; hq++) hrs.push([0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 3, 1, 0, 0, 1, 2, 3, 4, 5, 6, 7, 4][hq]);
+      return ok({ ready: true, source: 'mock', exported: addDays(T, -2) + 'T09:00', latest: addDays(T, -2) + 'T23:10', total: 212, days: 30, plays: 41,
+        songs: [{ title: 'ジムノペディ第1番', artist: 'エリック・サティ', n: 9, url: '' }, { title: '月の光', artist: 'クロード・ドビュッシー', n: 7, url: '' },
+          { title: 'G線上のアリア', artist: 'J.S.バッハ', n: 5, url: '' }, { title: '亡き王女のためのパヴァーヌ', artist: 'モーリス・ラヴェル', n: 4, url: '' }],
+        artists: [{ name: 'エリック・サティ', n: 12 }, { name: 'クロード・ドビュッシー', n: 10 }, { name: 'J.S.バッハ', n: 8 }],
+        hours: hrs, nightShare: 0.46, recent: [] });
+    }
     case 'taskboot': {  // 公開ページに載るので人名は架空
       var uid = function (n) { return '00000000-0000-4000-8000-00000000000' + n; };
       return ok(copy({
@@ -2643,6 +2729,7 @@ function init() {
   show(v);
   if (v !== 'today') { shown.today = true; loadAll(); }
   whisperTick(true);
+  loadContent();
   if (MOCK && params.get('open') === 'order') setTimeout(openOrder, 300);   // モックの画面確認用（?mock=1&open=order|talk）
   if (MOCK && params.get('open') === 'talk') setTimeout(function () { openTalk(); talkSay('疲れた'); }, 300);
 }
