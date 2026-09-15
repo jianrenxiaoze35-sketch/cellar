@@ -256,6 +256,15 @@ svg .closedbg{fill:var(--visit)}
 .refreshbtn:disabled{opacity:.6;cursor:default}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){ .refreshbtn.spin .ri{animation:none} }
+/* カミーユに相談（claude.ai を質問文入りで開く） */
+.asks{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0 14px}
+.ask{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;line-height:1.4;text-decoration:none;color:var(--accent-text);
+  border:1px solid var(--line);border-radius:99px;padding:4px 12px 4px 8px;background:var(--card);white-space:nowrap}
+.ask:hover,.ask:focus-visible{border-color:var(--accent-text);outline:none}
+.ask.sm{font-size:12px;padding:2px 9px 2px 6px}
+.askicon{display:inline-block;width:11px;height:15px;flex:0 0 11px}
+#v-private .ask{color:var(--pv-gold);border-color:var(--pv-line);background:transparent}
+.care-reply .ask{align-self:center;margin-left:auto}
 
 /* ブロック */
 .blk{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;margin:0 0 22px}
@@ -572,7 +581,7 @@ details.view-note summary{cursor:pointer;color:var(--mute);font-size:13px;font-w
 var params = new URLSearchParams(location.search);
 var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
-var GAS_URL = '';  // GitHub Pages で使うときは cellar-proxy の /exec URL を入れる
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';  // GitHub Pages で使うときは cellar-proxy の /exec URL を入れる
 var READY = { today: true, project: true, stock: true, week: true, private: true };
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 var VAULT_NAME = 'Obsidian Vault';
@@ -798,6 +807,7 @@ function taskRow(r, isOver) {
   var acts = [h('button', { class: 'mini', type: 'button', 'data-act': 'tomorrow',
     title: isClosedDay(addDays(baseDay(), 1)) ? '明日は定休日なので、次の営業日（' + fmtDay(nextOpenDay(baseDay())) + '）へ' : null,
     onclick: function () { doMove(row, r, nextOpenDay(baseDay())); } }, [nextLabel(true)])];
+  acts.push(askLink('相談', function () { return ASK.task(r); }, 'sm'));
   if (isOver) acts.push(h('input', { class: 'pick', type: 'date', 'aria-label': '日付を指定：' + r.title, min: baseDay(),
     onchange: function (e) { if (e.target.value) doMove(row, r, e.target.value); } }));
   row.appendChild(h('button', { class: 'chk', type: 'button', 'data-act': 'complete', 'aria-label': '完了にする：' + r.title, title: '完了',
@@ -1192,6 +1202,7 @@ function renderWeek(d) {
   }) : [empty('来週の予定・来客はありません')];
 
   fill($('#wBody'), [
+    h('div', { class: 'asks', style: 'margin:0 4px 16px' }, [askLink('今週の振り返りをカミーユと', function () { return ASK.week(d); })]),
     h('div', { class: 'charts' }, [
       h('section', { class: 'blk chart', id: 'wDone' }, [h('h2', null, ['完了（その日付のタスク）']), barChart(days, 'done', 'var(--bar)', '件', '日別の完了件数')]),
       h('section', { class: 'blk chart', id: 'wBacklog' }, [h('h2', null, ['積み残し（いま未完了・日付がその日以前）']), barChart(days, 'backlog', 'var(--bar2)', '件', '日別の積み残し件数')])
@@ -1290,6 +1301,7 @@ function artNode() {
       h('p', { class: 'talk' }, [a.talk]),
       h('div', { class: 'artfoot' }, [
         h('a', { href: a.page, target: '_blank', rel: 'noopener' }, ['画像：Wikimedia Commons']),
+        askLink('この絵の話を聞く', ASK.art(a), 'sm'),
         h('button', { class: 'link artnext', type: 'button', onclick: function () { artOffset++; renderCamille(); } }, ['↻ 別の絵'])
       ])
     ])
@@ -1395,7 +1407,7 @@ function renderCamille() {
     fill(slot, [h('section', { class: 'blk camille', 'aria-label': 'カミーユから' }, [
       h('div', { class: 'camhead' }, [silhouetteNode('avatar'),
         h('span', { class: 'camname' }, ['カミーユ']), h('span', { class: 'camsub' }, [camGreeting()])])
-    ].concat(camLogNodes()).concat([artNode()]))]);
+    ].concat(camLogNodes()).concat([askRow(), artNode()]))]);
   });
 }
 
@@ -1471,6 +1483,7 @@ function topicBlock(t, label, key) {
     h('div', { class: 'pthought' }, [privAvatar(), h('p', null, [t.thought])]),
     h('div', { class: 'artfoot' }, [
       t.src ? h('a', { href: t.src.url, target: '_blank', rel: 'noopener' }, ['出典：' + t.src.label]) : null,
+      askLink('続きを聞く', ASK.topic(t), 'pv'),
       h('button', { class: 'link artnext', type: 'button', onclick: function () { privOff[key]++; renderPrivateStatic(); } }, ['↻ 別の話'])
     ])
   ];
@@ -1515,6 +1528,56 @@ function renderPrivateData() {
   fill($('#pvHealthLog'), nodes);
   fill($('#pvLog .body'), d.notes.length ? d.notes.map(privLogRow)
     : [empty('まだありません。夜の便でカミーユが調べたことを「ひとネタ：」の名前で秘書ログに残すと、ここに並びます。')]);
+}
+
+/* ───────── カミーユに相談（Claude と連携）。2026-09-14 追加 ───────── */
+// claude.ai/new?q= は入力欄に文を入れた状態で新しい会話を開く（2026-09-14 実機で確認。自動送信はされない・送るのは本人）。
+// 予定やタスクの中身は Claude が Notion コネクタで自分で読むので、渡すのは頼みごとと題名・Notion の URL だけ。
+// 文は「カミーユ、」で始める（claude.ai の camille スキルが呼ばれる）。日付・完了を変える前に確認を取るよう毎回添える
+var CLAUDE_NEW = 'https://claude.ai/new?q=';
+function askUrl(prompt) { return CLAUDE_NEW + encodeURIComponent(prompt); }
+function dayPhrase(d) { return fmtDay(d) + (isClosedDay(d) ? '・定休日' : ''); }
+var ASK = {
+  today: function () {
+    return 'カミーユ、Cellar から。今日（' + dayPhrase(baseDay()) + '）の段取りを一緒に見て。⼩沢 健⼈ スケジュール・全体スケジュール・秘書ログを Notion で読んでから、今日やることを3つに絞って。';
+  },
+  tomorrow: function () {
+    var d = baseDay();
+    return 'カミーユ、Cellar から。今日（' + dayPhrase(d) + '）の残りのうち、次の営業日（' + fmtDay(nextOpenDay(d)) + '）に回していいものを一緒に選んで。日付を変えるときは、先に確認して。';
+  },
+  overdue: function () {
+    var o = S.overdue;
+    return 'カミーユ、Cellar の持ち越し' + (o ? '（' + o.rows.length + '件）' : '') + 'を一緒に整理したい。⼩沢 健⼈ スケジュールの未完了タスクを読んで、「やめる」「日付を決める」「今週やる」に分けて提案して。日付や完了を変えるときは、先に確認して。';
+  },
+  task: function (r) {
+    return 'カミーユ、このタスクの進め方を相談したい。「' + (r.title || '（無題）') + '」' + (r.date ? '（期日 ' + fmtDay(r.date.start) + '）' : '') +
+      (safeUrl(r.url) ? ' ' + r.url : '') + ' Notion で中身を確かめて、最初の一歩を決めて。日付や完了を変えるときは、先に確認して。';
+  },
+  week: function (d) {
+    return 'カミーユ、今週（' + fmtMD(d.from) + '〜' + fmtMD(d.to) + '）の振り返りを一緒にして。秘書ログと⼩沢 健⼈ スケジュールを読んで、来週の山場もひとつ挙げて。';
+  },
+  art: function (a) { return 'カミーユ、Cellar の「今日の一枚」、' + a.who + '『' + a.title + '』の話をもっと聞かせて。'; },
+  topic: function (t) { return 'カミーユ、Cellar の小話「' + t.title + '」の続きを聞かせて。あなたはどう思う？'; },
+  care: function () { return 'カミーユ、今日のごはんと体調を Cellar から秘書ログに残したよ。見て、ひとことちょうだい。'; }
+};
+// prompt は文字列か関数。関数なら押した瞬間の状態（持ち越しの件数など）で文を作り直す
+function askLink(label, prompt, cls) {
+  var get = typeof prompt === 'function' ? prompt : function () { return prompt; };
+  var a = h('a', { class: 'ask' + (cls ? ' ' + cls : ''), href: askUrl(get()), target: '_blank', rel: 'noopener',
+    title: 'Claude で新しい会話を開きます（文が入った状態で開き、送信はあなたが押します）' });
+  var refresh = function () { a.href = askUrl(get()); };
+  a.addEventListener('mousedown', refresh); a.addEventListener('focus', refresh); a.addEventListener('click', refresh);
+  var s = h('span', { class: 'askicon', 'aria-hidden': 'true' });
+  s.innerHTML = '<span class="silmask' + (cls === 'pv' ? ' private' : '') + '"></span>';
+  a.appendChild(s); a.appendChild(document.createTextNode(label));
+  return a;
+}
+function askRow() {
+  return h('div', { class: 'asks', 'aria-label': 'カミーユに相談（Claude が開きます）' }, [
+    askLink('今日の段取り', ASK.today),
+    askLink(isClosedDay(addDays(baseDay(), 1)) ? '次の営業日に回すもの' : '明日に回すもの', ASK.tomorrow),
+    askLink('持ち越しの整理', ASK.overdue)
+  ]);
 }
 
 /* ───────── 盤 Cellar Board（時計・天気・次にくるもの・一日のレール）。国稀 常駐ボード（常駐ボード_GAS）から ───────── */
@@ -1744,7 +1807,7 @@ function careReply(kind, v, sleep) {
   return CARE_REPLY[v] || 'ちゃんと残したよ。ありがとう。';
 }
 function setCareDisabled(v) { eachEl('#pvCare .care .btn', function (b) { b.disabled = v; }); }
-function showCareReply(text) { var box = $('#careReply'); fill(box, [privAvatar(), h('p', null, [text])]); box.hidden = false; }
+function showCareReply(text) { var box = $('#careReply'); fill(box, [privAvatar(), h('p', null, [text]), askLink('カミーユと話す', ASK.care, 'pv')]); box.hidden = false; }
 function doRecord(kind) {
   if (recording) return;
   var args = { kind: kind, date: todayJst(), rid: rid() }, sleep = null;
