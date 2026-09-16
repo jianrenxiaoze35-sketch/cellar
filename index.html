@@ -2998,7 +2998,7 @@ function setPrivTab(v) {
   var t = $('.tab[data-view="private"]'); if (t) t.hidden = !v;
   if (!v && current === 'private') show('today');
 }
-function roomTimeOf(hh) { return hh >= 4 && hh < 9 ? 'dawn' : hh < 16 ? 'day' : hh < 19 ? 'dusk' : 'night'; }
+function roomTimeOf(hh) { return hh < 4 ? 'night' : hh < 9 ? 'dawn' : hh < 16 ? 'day' : hh < 19 ? 'dusk' : 'night'; }  // 0-4時は夜（2026-09-17 本番の1:47に昼になっていたのを直した）
 function roomOpen() { return !$('#room').hidden; }
 // 話題（2026-09-16）：ふだん／お買いもの／音楽／わたしの趣味／夜の話。どれも読むだけ（content・amazon・music）で、書き込みはしない
 var ROOM_TOPICS = [['talk', 'ふだん'], ['shop', 'お買いもの'], ['music', '音楽'], ['hobby', 'わたしの趣味'], ['night', '夜の話']];
