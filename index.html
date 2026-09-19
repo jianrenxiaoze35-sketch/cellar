@@ -404,7 +404,7 @@ a.ttl:hover{text-decoration:underline}
 .mini{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px 9px;font-size:12px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block}
 .mini:hover{border-color:var(--accent)}
 .mini[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.pick{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:2px 4px;font-size:12px;width:8.6em}
+input.pick{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:2px 4px;font-size:12px;width:8.6em}  /* 日付の入力だけ。Private のカード（div.pick）に幅が漏れて縦長になっていた（2026-09-19） */
 .due{white-space:nowrap}
 .late{color:var(--err)}
 
