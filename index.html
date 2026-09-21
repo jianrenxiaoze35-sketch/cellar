@@ -1830,7 +1830,7 @@ function renderShop() {
 // **公開ページの index.html には絵を焼き込まない。** 名前 cam-<場面>-<番号> の場面で選び、押すと次の姿へ。
 // 絵は1枚ずつ GAS の figure で取りに行き、この画面の中だけに置く（figCache）
 var FIG_SCENES = { night: ['night', 'bath'], day: ['day', 'bath'], sleep: ['sleep', 'day'] };
-var figCache = {}, figOff = 0, figBusy = false;
+var figCache = {}, figWait = {}, figOff = 0;  // figWait：同じ絵を二重に取りに行かないため（部屋とプライベートが同時に呼ぶ）
 function figAll() { return (S.figures && S.figures.figures) || []; }
 function loadFigures(force) {
   if (!token) return Promise.resolve();
@@ -1851,20 +1851,22 @@ function figFor(scene, off) {
 }
 function figSrc(name) {
   if (figCache[name]) return Promise.resolve(figCache[name]);
-  return call('figure', { name: name }).then(function (d) {
-    if (!d || !d.ready) throw new Error((d && d.reason) || '絵がありません');
-    figCache[name] = 'data:' + d.mime + ';base64,' + d.data;
-    return figCache[name];
-  });
+  if (!figWait[name]) {
+    figWait[name] = call('figure', { name: name }).then(function (d) {
+      delete figWait[name];
+      if (!d || !d.ready) throw new Error((d && d.reason) || '絵がありません');
+      figCache[name] = 'data:' + d.mime + ';base64,' + d.data;
+      return figCache[name];
+    }, function (e) { delete figWait[name]; throw e; });
+  }
+  return figWait[name];
 }
 function setFig(img, scene, off) {
   var f = figFor(scene, off);
   if (!f) { img.hidden = true; return Promise.resolve(false); }
-  if (figBusy) return Promise.resolve(false);
-  figBusy = true;
   return figSrc(f.name).then(function (src) {
     img.src = src; img.alt = 'カミーユ'; img.hidden = false; return true;
-  }, function () { img.hidden = true; return false; }).then(function (v) { figBusy = false; return v; });
+  }, function () { img.hidden = true; return false; });
 }
 function renderFigure() {
   var box = $('#pvFig'); if (!box) return;
