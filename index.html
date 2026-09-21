@@ -1831,10 +1831,25 @@ function renderShop() {
 // 絵は1枚ずつ GAS の figure で取りに行き、この画面の中だけに置く（figCache）
 var FIG_SCENES = { night: ['night', 'bath'], day: ['day', 'bath'], sleep: ['sleep', 'day'] };
 var figCache = {}, figWait = {}, figOff = 0;  // figWait：同じ絵を二重に取りに行かないため（部屋とプライベートが同時に呼ぶ）
+// 一度見た絵と一覧は端末に残す（localStorage）。次からは通信を待たずに出る。絵を差し替えると up（更新の時刻）が変わるので、そのときだけ取り直す
+function figRead(name, up) {
+  try {
+    var o = JSON.parse(load('fig.' + name) || 'null');
+    return o && (!up || o.v === up) ? o.src : '';
+  } catch (e) { return ''; }
+}
+function figWrite(name, up, src) {
+  try { save('fig.' + name, JSON.stringify({ v: up || 0, src: src })); } catch (e) { /* いっぱいなら残さない */ }
+}
+function figMeta(name) { var a = figAll(), i; for (i = 0; i < a.length; i++) if (a[i].name === name) return a[i]; return null; }
 function figAll() { return (S.figures && S.figures.figures) || []; }
 function loadFigures(force) {
   if (!token) return Promise.resolve();
-  return ensure('figures', 'figures', null, force).then(function () {
+  if (!S.figures && !force) {  // 端末に残した一覧で先に出し、そのあと取り直す（初回は GAS の起動待ちで数十秒かかることがある）
+    try { var c = JSON.parse(load('figs') || 'null'); if (c && c.figures) { S.figures = c; renderFigure(); if (roomOpen()) roomFigure(); } } catch (e) {}
+  }
+  return ensure('figures', 'figures', null, force).then(function (d) {
+    try { save('figs', JSON.stringify(d)); } catch (e) {}
     renderFigure(); if (roomOpen()) roomFigure();
   }, function () { /* 絵が無くても画面は動く */ });
 }
@@ -1851,21 +1866,40 @@ function figFor(scene, off) {
 }
 function figSrc(name) {
   if (figCache[name]) return Promise.resolve(figCache[name]);
+  var meta = figMeta(name), kept = figRead(name, meta && meta.up);
+  if (kept) { figCache[name] = kept; return Promise.resolve(kept); }
   if (!figWait[name]) {
     figWait[name] = call('figure', { name: name }).then(function (d) {
       delete figWait[name];
       if (!d || !d.ready) throw new Error((d && d.reason) || '絵がありません');
       figCache[name] = 'data:' + d.mime + ';base64,' + d.data;
+      figWrite(name, d.up || (meta && meta.up), figCache[name]);
       return figCache[name];
     }, function (e) { delete figWait[name]; throw e; });
   }
   return figWait[name];
 }
+// いま出していない場面の絵も、裏で1枚ずつ取っておく（話題や時間帯が変わった瞬間に待たせない）
+var figPre = false;
+function figPrefetch() {
+  if (figPre) return;
+  figPre = true;
+  setTimeout(function () {
+    var want = {};
+    ['night', 'day', 'sleep'].forEach(function (s) { var f = figFor(s, figOff); if (f && !figCache[f.name]) want[f.name] = 1; });
+    var list = Object.keys(want);
+    (function next() {
+      var n = list.shift();
+      if (!n) { figPre = false; return; }
+      figSrc(n).then(next, next);
+    })();
+  }, 1200);
+}
 function setFig(img, scene, off) {
   var f = figFor(scene, off);
   if (!f) { img.hidden = true; return Promise.resolve(false); }
   return figSrc(f.name).then(function (src) {
-    img.src = src; img.alt = 'カミーユ'; img.hidden = false; return true;
+    img.src = src; img.alt = 'カミーユ'; img.hidden = false; figPrefetch(); return true;
   }, function () { img.hidden = true; return false; });
 }
 function renderFigure() {
@@ -2946,14 +2980,14 @@ function mockRoute(p) {
     // カミーユの姿の絵は Drive にあるもの（合言葉の内側）。見本では出さない。?mock=1&figs=1 で当たり障りのない見本の姿を出す
     case 'figures': {
       return ok(params.get('figs') === '1'
-        ? { figures: [{ name: 'cam-day-1', scene: 'day', ext: 'svg' }, { name: 'cam-night-1', scene: 'night', ext: 'svg' }] }
+        ? { figures: [{ name: 'cam-day-1', scene: 'day', ext: 'svg', up: 1700000000000 }, { name: 'cam-night-1', scene: 'night', ext: 'svg', up: 1700000000000 }] }
         : { figures: [] });
     }
     case 'figure': {
       if (params.get('figs') !== '1' || !/^cam-[a-z]{2,10}-\d{1,2}$/.test(String(p.name || ''))) return ok({ ready: false, reason: 'その絵はありません' });
       var sv = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160"><rect width="120" height="160" fill="#0f1714"/>' +
         '<text x="60" y="84" text-anchor="middle" font-size="11" fill="#e8cf98">sample</text></svg>';  // btoa は Latin1 だけ
-      return ok({ ready: true, name: p.name, mime: 'image/svg+xml', data: btoa(sv) });
+      return ok({ ready: true, name: p.name, mime: 'image/svg+xml', data: btoa(sv), up: 1700000000000 });
     }
     case 'amazon': {  // Amazon の注文履歴の見本（架空の品。?mock=1&amz=none で「まだ無い」）
       if (params.get('amz') === 'none') return ok({ ready: false, reason: 'Google ドライブに Amazon の注文履歴がありません' });
