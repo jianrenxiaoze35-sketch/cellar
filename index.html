@@ -562,8 +562,13 @@ body.room-open{overflow:hidden}
 .room-link{display:inline-block;margin-top:4px;font-size:13px;color:#f0dcae;text-underline-offset:3px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
 .room-fig{flex:0 0 auto;width:min(36vw,190px);max-height:56vh;height:auto;object-fit:contain;border-radius:14px;
   filter:drop-shadow(0 20px 34px rgba(0,0,0,.5))}
-.pfig .figimg{display:block;width:min(100%,320px);height:auto;border-radius:16px;border:1px solid var(--pv-line)}
+.pfig .figimg{display:block;width:auto;max-width:min(100%,320px);max-height:300px;height:auto;border-radius:16px;border:1px solid var(--pv-line)}
 .pvacts{display:flex;align-items:center;gap:12px;margin:12px 0 0}
+/* プライベートの欄はたためる（縦に長くなりすぎるため。2026-09-23） */
+#v-private .blk > h2{cursor:pointer;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#v-private .blk > h2 .caret{margin-left:auto;font-size:12px;font-weight:400;color:var(--pv-gold);letter-spacing:.08em;white-space:nowrap}
+#v-private .blk.folded > *:not(h2){display:none}
+#v-private .blk.folded{padding-top:14px;padding-bottom:14px}
 .heat{display:flex;align-items:center;gap:10px;margin:10px 0 0;font-size:12px;color:var(--pv-mute)}
 .heat .seg{display:flex;gap:6px;margin:0}
 .heat .seg button{font-size:12px;padding:4px 10px}
@@ -1873,7 +1878,7 @@ function renderShop() {
     var nodes = [h('p', { class: 'jmeta' }, ['注文 ' + a.total + '件（' + fmtMD(a.first) + '〜' + fmtMD(a.latest) + '・書き出し ' + fmtMD(String(a.exported).slice(0, 10)) + '）'])];
     if (lines.length) nodes.push(h('div', { class: 'pthought' }, [privAvatar(), h('p', null, [lines[0].text])]));
     nodes.push(h('h3', { class: 'psub' }, ['最近の注文']));
-    nodes.push(h('ul', { class: 'shoplist' }, a.recent.slice(0, 6).map(function (x) {
+    nodes.push(h('ul', { class: 'shoplist' }, a.recent.slice(0, 5).map(function (x) {
       return h('li', null, [h('span', { class: 'sd' }, [fmtMD(x.date)]),
         h('a', { href: amazonItem(x), target: '_blank', rel: 'noopener' }, [x.name + (x.qty > 1 ? ' ×' + x.qty : '')])]);
     })));
@@ -1988,6 +1993,43 @@ function loadNight(force) {
     if (roomOpen() && roomTopic === 'night') roomSay(false);
   }, function () { /* 無くても手持ちで話す */ });
 }
+/* ───────── プライベートの欄をたたむ（2026-09-23）─────────
+   欄が増えて縦に長くなったので、見出しを押すと開閉する。たたんだ欄は端末に覚える（cellar.fold） */
+var FOLDABLE = ['pvCare', 'pvNote', 'pvHealth', 'pvFig', 'pvHobby', 'pvMusic', 'pvShop', 'pvLog'];
+var FOLD_DEFAULT = ['pvHealth', 'pvHobby', 'pvMusic', 'pvShop', 'pvLog'];  // 最初からたたんでおく欄
+function foldSet() {
+  var s = load('fold');
+  return (s == null ? FOLD_DEFAULT : s.split(',')).filter(function (x) { return FOLDABLE.indexOf(x) >= 0; });
+}
+function foldApply() {
+  var f = foldSet();
+  FOLDABLE.forEach(function (id) {
+    var sec = $('#' + id); if (!sec) return;
+    var on = f.indexOf(id) >= 0, h2 = $('h2', sec), c = $('.caret', h2);
+    sec.classList.toggle('folded', on);
+    h2.setAttribute('aria-expanded', String(!on));
+    if (c) c.textContent = on ? '開く ▾' : 'たたむ ▴';
+  });
+}
+function foldToggle(id) {
+  var f = foldSet(), i = f.indexOf(id);
+  if (i >= 0) f.splice(i, 1); else f.push(id);
+  save('fold', f.join(','));
+  foldApply();
+}
+function setupFold() {
+  FOLDABLE.forEach(function (id) {
+    var sec = $('#' + id); if (!sec) return;
+    var h2 = $('h2', sec); if (!h2 || h2.getAttribute('data-fold')) return;
+    h2.setAttribute('data-fold', '1');
+    h2.setAttribute('role', 'button');
+    h2.setAttribute('tabindex', '0');
+    h2.appendChild(h('span', { class: 'caret', 'aria-hidden': 'true' }, ['たたむ ▴']));
+    h2.addEventListener('click', function () { foldToggle(id); });
+    h2.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); foldToggle(id); } });
+  });
+  foldApply();
+}
 function renderHeat() {
   var box = $('#heatSeg'); if (!box) return;
   fill(box, HEATS.map(function (o) {
@@ -2049,7 +2091,7 @@ function renderMusic() {
   }
   var nodes = [h('p', { class: 'jmeta' }, ['直近' + m.days + '日で ' + m.plays + '回（' + fmtMD(m.latest.slice(0, 10)) + ' まで・書き出し ' + fmtMD(m.exported.slice(0, 10)) + '）']),
     h('div', { class: 'pthought' }, [privAvatar(), h('p', null, [musicLine(m)])])];
-  if (m.songs.length) nodes.push(h('ol', { class: 'jsongs' }, m.songs.map(function (s) {
+  if (m.songs.length) nodes.push(h('ol', { class: 'jsongs' }, m.songs.slice(0, 5).map(function (s) {
     var t = safeUrl(s.url) ? h('a', { href: s.url, target: '_blank', rel: 'noopener' }, [s.title]) : h('span', null, [s.title]);
     return h('li', null, [t, s.artist ? h('span', { class: 'jart' }, [s.artist]) : null, h('span', { class: 'jn' }, [s.n + '回'])]);
   })));
@@ -2801,6 +2843,7 @@ function bindUI() {
   });
   renderCareSeg();
   renderHeat();
+  setupFold();
   $('#mealForm').addEventListener('submit', function (e) { e.preventDefault(); doRecord('meal'); });
   $('#bodyForm').addEventListener('submit', function (e) { e.preventDefault(); doRecord('body'); });
   var sw = $('#sweetWork');
