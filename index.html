@@ -891,7 +891,7 @@ var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.r
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';  // GitHub Pages で使うときは cellar-proxy の /exec URL を入れる
 var READY = { today: true, project: true, stock: true, week: true, private: true };
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印（9/21 に別PCの 9/19 版を上書きした事故から）
-var BUILD = '2026-09-29 v2';
+var BUILD = '2026-09-29 v2.1';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 var VAULT_NAME = 'Obsidian Vault';
 
@@ -1155,7 +1155,13 @@ function kindKey(k) { return k === 'HACCP系' ? 'haccp' : k === '記録系' ? 'k
 var MOVE_WORDS = ['判断', '決め', '決定', '承認', '返事', '返信', '選ぶ', '選定', '実機', '削除', 'アップロード', '本人', '承諾', '署名', '押印', 'サイン'];
 var OTHER_WORDS = ['様', 'さん', '送付', '送る', '返信', '提出', '依頼', '連絡', '報告', '共有', '納品', '請求', '見積'];
 function hasWord(t, words) { t = String(t || ''); return words.some(function (w) { return t.indexOf(w) >= 0; }); }
-function isMove(r) { return hasWord(r.title, MOVE_WORDS); }
+// HACCP の用語は判断・操作の意味ではないので外す（9/29 本番の実データで「承認供給者リスト」「判断基準」が引っかかった）
+var MOVE_NOT = ['承認供給者', '判断基準', '判断樹', '承認済', '削除済'];
+function isMove(r) {
+  var t = String(r.title || '');
+  MOVE_NOT.forEach(function (w) { t = t.split(w).join(''); });
+  return hasWord(t, MOVE_WORDS);
+}
 function hasOther(r) { return hasWord(r.title, OTHER_WORDS); }
 function renderMove() {
   if (!B.move) return;
