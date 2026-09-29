@@ -891,7 +891,7 @@ var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.r
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';  // GitHub Pages で使うときは cellar-proxy の /exec URL を入れる
 var READY = { today: true, project: true, stock: true, week: true, private: true };
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印（9/21 に別PCの 9/19 版を上書きした事故から）
-var BUILD = '2026-09-29 v2.1';
+var BUILD = '2026-09-29 v2.2';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 var VAULT_NAME = 'Obsidian Vault';
 
@@ -1176,7 +1176,8 @@ function renderMove() {
     if (it.state !== 'stop' && !(it.state === 'none' && (it.key === 'amazon' || it.key === 'music'))) return;
     nodes.push(h('div', { class: 'row sysmove' }, [h('span', { class: 'sysdot st-' + it.state }),
       h('div', { class: 'main' }, [h('span', { class: 'ttl' }, [it.label + (it.state === 'stop' ? 'が止まっています' : 'がまだ届いていません')]),
-        h('div', { class: 'meta' }, [it.fix])])]));
+        h('div', { class: 'meta' }, [it.fix])]),
+      folderLink(it)]));
   });
   cnt('move', nodes.length);
   fill(B.move, nodes.length ? nodes : [empty('いま、あなたの判断や操作を待っているものはありません')]);
@@ -1212,6 +1213,11 @@ function doRoutine(row, x, undo) {
     S.pulse.routines = d; renderRoutines(); toast((undo ? '戻しました：' : '済：') + x.title);
   }, function (e) { row.classList.remove('busy'); toast('残せませんでした：' + e.message, true); });
 }
+// 受け取り箱（ドライブの Cellar/Amazon 注文履歴・Cellar/YouTube Music）を開く。ドライブの URL だけを通す
+function folderLink(it) {
+  if (!/^https:\/\/drive\.google\.com\//.test(it.folder || '')) return null;
+  return h('div', { class: 'acts' }, [h('a', { class: 'mini', href: it.folder, target: '_blank', rel: 'noopener' }, ['置き場を開く'])]);
+}
 var PULSE_STATE = { ok: '届いている', late: '遅れ気味', stop: '止まっている', none: 'まだ無い' };
 function renderPulse() {
   var p = S.pulse; if (!p || !B.pulse) return;
@@ -1220,7 +1226,8 @@ function renderPulse() {
     return h('div', { class: 'pchip st-' + it.state, title: it.fix }, [
       h('span', { class: 'sysdot st-' + it.state }), h('b', null, [it.label]),
       h('span', { class: 'pmeta' }, [[PULSE_STATE[it.state], when, it.note].filter(Boolean).join('・')]),
-      it.state === 'ok' ? null : h('span', { class: 'pfix' }, [it.fix])
+      it.state === 'ok' ? null : h('span', { class: 'pfix' }, [it.fix]),
+      it.state === 'ok' ? null : folderLink(it)
     ]);
   })), h('p', { class: 'pnote' }, ['サーバー ' + p.version + '・画面 ' + BUILD])]);
 }
@@ -3360,8 +3367,10 @@ function mockRoute(p) {
       return ok({ today: T, version: 'P8 (mock)', routines: rt, items: [
         { key: 'index', label: '索引（Obsidian）', at: T + 'T21:07', age: 0, state: 'ok', note: '121件', fix: '毎晩 21:07 の obsidian タスクが送る' },
         { key: 'content', label: '週替わりの話題', at: T, age: 1, state: 'ok', note: mondayOf(T) + ' の週', fix: '月曜 6:30 の定期タスク' },
-        { key: 'music', label: 'YouTube Music', at: addDays(T, -12), age: 12, state: 'ok', note: '', fix: '' },
-        { key: 'amazon', label: 'Amazon 注文履歴', at: '', age: null, state: params.get('amz') === 'none' ? 'none' : 'ok', note: '', fix: 'Amazon の「データをリクエストする」で取り寄せて、Cellar フォルダへ' },
+        { key: 'music', label: 'YouTube Music', at: params.get('mus') === 'none' ? '' : addDays(T, -12), age: params.get('mus') === 'none' ? null : 12,
+          state: params.get('mus') === 'none' ? 'none' : 'ok', note: '', fix: '見本：zip を「Cellar/YouTube Music」へ', folder: 'https://drive.google.com/drive/folders/mock-music' },
+        { key: 'amazon', label: 'Amazon 注文履歴', at: '', age: null, state: params.get('amz') === 'none' ? 'none' : 'ok', note: '',
+          fix: '見本：zip（か中の csv）を「Cellar/Amazon 注文履歴」へ', folder: 'https://drive.google.com/drive/folders/mock-amazon' },
         { key: 'night', label: '夜の話（近め）', at: '', age: null, state: params.get('night') === '1' ? 'ok' : 'none', note: '', fix: 'cellar-night.py --post' },
         { key: 'figures', label: 'カミーユの姿の絵', at: '', age: null, state: params.get('figs') === '1' ? 'ok' : 'none', note: '', fix: 'cellar-figures.py --push' }] });
     }
