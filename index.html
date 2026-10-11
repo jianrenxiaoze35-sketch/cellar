@@ -163,6 +163,39 @@ a.ev:hover .ttl { text-decoration: underline; }
 .memos .body { white-space: pre-wrap; margin-top: 2px; overflow-wrap: anywhere; }
 .memos .of { font-size: 12px; color: var(--bottle); }
 .memos .empty { color: var(--muted); font-size: 14px; border: 0; }
+/* 案件ノート（2026-10-10）：冊を選び、1行ずつ積む。古い行はぼかし、触ると見える */
+.nlock { max-width: 420px; }
+.nlock p { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
+.nlock input { width: 100%; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 9px 12px; font-size: 16px; }
+.nlock .row3 { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.nbooks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.nbooks button { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 4px 14px; cursor: pointer; font-size: 14px; }
+.nbooks button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.nbooks .c { font-size: 12px; opacity: .7; margin-left: 6px; }
+.nwrap { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 28px 44px; }
+@media (max-width: 860px) { .nwrap { grid-template-columns: 1fr; } }
+.nhead { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.nhead label { display: flex; align-items: center; gap: 6px; }
+.nhead input { border: 0; border-bottom: 1px solid var(--rule); background: transparent; padding: 2px 4px; font-size: 13px; color: var(--ink); min-width: 0; }
+.nhead input[type=text] { width: 9em; }
+.nhead input.wide { width: 16em; }
+.nhead .due input { color: var(--late); font-weight: 700; }
+.nadd { display: flex; gap: 8px; }
+.nadd input { flex: 1; min-width: 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 9px 12px; font-size: 16px; }
+.nadd select { max-width: 11em; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); font-size: 13px; padding: 0 6px; }
+.ncam { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+.ncam b { color: var(--bottle); font-weight: 500; margin-right: 6px; }
+.nlines { list-style: none; margin: 14px 0 0; padding: 0; }
+.nlines li { padding: 9px 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 0 12px; }
+.nlines .at { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.nlines .tx { white-space: pre-wrap; overflow-wrap: anywhere; }
+.nlines .tk { display: block; font-size: 12px; color: var(--bottle); }
+.nlines li.old .tx { filter: blur(5px); cursor: pointer; transition: filter .25s ease; user-select: none; }
+.nlines li.old.shown .tx { filter: none; user-select: auto; }
+.nlines .more { border: 0; }
+.ntasks .time { grid-template-columns: 52px minmax(0, 1fr) auto; }
+.ntasks .cnt { font-size: 12px; color: var(--muted); }
+
 .pulse { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--muted); }
 .pulse span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--bottle); margin-right: 6px; vertical-align: 1px; }
 .pulse span.st-late::before { background: var(--amber); }
@@ -276,6 +309,45 @@ a.ev:hover .ttl { text-decoration: underline; }
 .rheat button[aria-pressed="true"] { color: var(--ivory); background: rgba(239, 232, 218, .16); }
 @media (max-width: 760px) { .rfig { max-width: 90vw; height: 62vh; right: -6vw; opacity: 0; } .rfig.on { opacity: .9; } }
 
+/* ───────── ギャラリー（部屋の奥）：金の額と真鍮の札。昼は湖からの光、夕方からは灯り ───────── */
+.gal { position: absolute; inset: 0; z-index: 6; overflow: auto; padding: max(16px, env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 40px;
+  --wall: #4A4238; --wall2: #3A332B; background: radial-gradient(120% 80% at 0% 10%, rgba(255, 246, 225, .22), transparent 60%), linear-gradient(var(--wall), var(--wall2)); color: var(--ivory); }
+.gal.lamp { --wall: #2A211A; --wall2: #17110C; background: radial-gradient(60% 40% at 50% 0%, rgba(255, 190, 110, .14), transparent 70%), linear-gradient(var(--wall), var(--wall2)); }
+.gtop { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.gtop h2 { font: 500 18px var(--mincho); letter-spacing: .2em; margin: 0 auto 0 0; }
+.grooms { display: flex; flex-wrap: wrap; gap: 6px; }
+.grooms button { border: 1px solid rgba(239, 232, 218, .3); background: rgba(0, 0, 0, .2); color: var(--ivory-dim); border-radius: 999px; padding: 4px 14px; cursor: pointer; font: 13px var(--mincho); }
+.grooms button[aria-pressed="true"] { background: rgba(239, 232, 218, .9); color: #1A1714; }
+.gcam { font: 15px/1.9 var(--mincho); margin: 16px 0 6px; min-height: 1.9em; }
+.gwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 40px 34px; margin-top: 22px; }
+.gitem { position: relative; text-align: center; }
+.gal.lamp .gitem::before { content: ""; position: absolute; left: 10%; right: 10%; top: -30px; height: 70%; pointer-events: none;
+  background: radial-gradient(50% 60% at 50% 0%, rgba(255, 200, 120, .32), transparent 70%); }
+.frame { position: relative; display: block; width: 100%; border: 0; cursor: pointer; padding: 13px; border-radius: 2px;
+  background: linear-gradient(135deg, #7A5A20, #E9CF7C 22%, #A07C32 46%, #F3DF98 70%, #7A5A20);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .5), inset 0 0 0 2px rgba(60, 40, 10, .45), inset 0 0 0 5px rgba(255, 235, 170, .25); }
+.frame .mat { background: #1C140C; padding: 4px; }
+.frame img, .frame .ph { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: #2a2018; }
+.gal.lamp .frame img { filter: brightness(.92) sepia(.1); }
+.plate { display: inline-block; margin-top: 12px; max-width: 92%; padding: 6px 12px; border-radius: 2px; text-align: center;
+  background: linear-gradient(#E2C982, #B08D3C); color: #2A1D08; font: 12px/1.6 var(--mincho);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 2px 5px rgba(0, 0, 0, .45); }
+.plate b { display: block; font-size: 13px; font-weight: 500; }
+.plate small { display: block; opacity: .8; }
+.gempty { font: 15px var(--mincho); color: var(--ivory-dim); }
+.gsheet { left: 50%; bottom: 0; width: min(560px, 100%); transform: translate(-50%, 100%); opacity: 0; border-radius: 14px 14px 0 0; padding: 18px 20px max(18px, env(safe-area-inset-bottom)); max-height: 92vh; overflow: auto; }
+.gsheet.open { transform: translate(-50%, 0); opacity: 1; }
+.gsheet h3 { font: 500 16px var(--mincho); margin: 0 0 10px; letter-spacing: .1em; }
+.gsheet label { display: block; font-size: 13px; color: var(--ivory-dim); margin: 10px 0 4px; }
+.gsheet input[type=text], .gsheet select { width: 100%; background: rgba(0, 0, 0, .3); border: 1px solid rgba(239, 232, 218, .25); border-radius: 6px; color: var(--ivory); padding: 8px 10px; font-size: 16px; }
+.gsheet .again { display: flex; gap: 14px; font-size: 14px; color: var(--ivory); }
+.gsheet .again label { display: flex; gap: 4px; align-items: center; margin: 0; color: var(--ivory); }
+.gprev { display: block; max-width: 220px; max-height: 260px; margin: 8px auto 0; border: 8px solid #B08D3C; }
+.gsheet .acts { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 16px; font-size: 12px; color: var(--ivory-dim); }
+.glight { position: fixed; inset: 0; z-index: 40; background: rgba(8, 6, 4, .88); display: grid; place-items: center; padding: 20px; cursor: zoom-out; }
+.glight .frame { width: min(520px, 86vw); cursor: zoom-out; }
+.glight .plate { font-size: 14px; }
+
 /* ───────── しらせ ───────── */
 #toast { position: fixed; z-index: 60; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--paper);
   padding: 8px 16px; border-radius: 8px; font-size: 14px; max-width: calc(100vw - 32px); transition: opacity .3s ease, transform .3s ease; }
@@ -320,6 +392,7 @@ a.ev:hover .ttl { text-decoration: underline; }
     <div class="w-nav" role="tablist" aria-label="仕事のページ">
       <button type="button" role="tab" data-tab="sched" aria-selected="true">スケジュール</button>
       <button type="button" role="tab" data-tab="ideas" aria-selected="false">アイデア</button>
+      <button type="button" role="tab" data-tab="notes" aria-selected="false">案件ノート</button>
     </div>
 
     <div class="w-tab" id="tab-sched" role="tabpanel">
@@ -351,6 +424,32 @@ a.ev:hover .ttl { text-decoration: underline; }
           <div class="memo-act"><span class="hint" id="ideaHint">Ctrl＋Enter でも保存できます</span><button type="button" class="save" id="ideaSave">保存する</button></div>
           <ol class="memos" id="ideaList"></ol>
         </section>
+      </div>
+    </div>
+
+    <!-- 案件ノート：鍵の内側。本文は個人ドライブ（Cellar/notes.json） -->
+    <div class="w-tab" id="tab-notes" role="tabpanel" hidden>
+      <form class="nlock" id="nlock" autocomplete="off">
+        <p>案件ノートは、もう一段の鍵の内側です。</p>
+        <input id="nkey" type="password" aria-label="ノートの鍵">
+        <div class="row3"><button type="submit" class="save">開く</button><span class="state" id="nlockMsg"></span></div>
+      </form>
+      <div id="nbody" hidden>
+        <div class="nbooks" id="nbooks" role="tablist" aria-label="案件"></div>
+        <div class="nwrap">
+          <section aria-label="ノート">
+            <div class="nhead" id="nhead"></div>
+            <form class="nadd" id="nadd" autocomplete="off">
+              <input id="ntext" placeholder="1行書く（Enter で積む・書き換えない）" aria-label="1行書く">
+              <select id="ntask" aria-label="タスクに紐づける"></select>
+            </form>
+            <p class="ncam" id="ncam" hidden></p>
+            <ol class="nlines" id="nlines"></ol>
+          </section>
+          <aside class="ntasks" aria-label="この案件のタスク">
+            <section class="w-sec"><h2>この案件のタスク <span class="n"></span></h2><div id="ntasks"></div></section>
+          </aside>
+        </div>
       </div>
     </div>
 
@@ -404,6 +503,7 @@ a.ev:hover .ttl { text-decoration: underline; }
     <h1>カミーユの部屋</h1>
     <div style="display:flex;gap:14px;align-items:center">
       <div class="rheat" id="rheat" hidden></div>
+      <button type="button" class="pill" id="galOpen">ギャラリー</button>
       <button type="button" class="pill" id="leave">部屋を出る</button>
     </div>
   </div>
@@ -414,6 +514,29 @@ a.ev:hover .ttl { text-decoration: underline; }
     <div style="display:flex;gap:14px;align-items:center"><button type="button" class="pvlink" id="rnext" style="margin:0">ほかの話</button></div>
     <div class="rtopics" id="rtopics" role="group" aria-label="話題"></div>
   </div>
+  <!-- ギャラリー：部屋の奥。1品＝1枚の絵 -->
+  <div class="gal" id="gal" hidden>
+    <div class="gtop">
+      <h2>ギャラリー</h2>
+      <div class="grooms" id="grooms" role="group" aria-label="部屋"></div>
+      <button type="button" class="pill keep" id="gAdd">飾る</button>
+      <button type="button" class="pill" id="gBack">部屋に戻る</button>
+    </div>
+    <p class="gcam" id="gcam"></p>
+    <div class="gwall" id="gwall"></div>
+  </div>
+  <form class="glass gsheet" id="gsheet" aria-label="飾る" aria-hidden="true" autocomplete="off">
+    <h3>一品を飾る</h3>
+    <input type="file" id="gFile" accept="image/*" aria-label="写真">
+    <canvas class="gprev" id="gPrev" hidden></canvas>
+    <label for="gName">名前</label><input type="text" id="gName" maxlength="60">
+    <label for="gNote">ひとこと（香り、しみた所）</label><input type="text" id="gNote" maxlength="200">
+    <label for="gRoom">部屋</label><select id="gRoom"></select>
+    <label>また欲しいか</label>
+    <div class="again"><label><input type="radio" name="gAgain" value="yes" checked> また欲しい</label><label><input type="radio" name="gAgain" value="maybe"> どちらでも</label><label><input type="radio" name="gAgain" value="no"> もういい</label></div>
+    <div class="acts"><span id="gMsg">写真を選ぶと、油彩風に整えます</span><span style="display:flex;gap:10px"><button type="button" class="pill" id="gCancel">やめる</button><button type="submit" class="pill keep" id="gSave">飾る</button></span></div>
+  </form>
+  <div class="glight" id="glight" hidden></div>
 </section>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -963,7 +1086,265 @@ function showTab(tab) {
   document.querySelectorAll('.w-nav [role=tab]').forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-tab') === tab)); });
   $('#tab-sched').hidden = tab !== 'sched';
   $('#tab-ideas').hidden = tab !== 'ideas';
+  $('#tab-notes').hidden = tab !== 'notes';
   if (tab === 'ideas' && !S.ideas) loadIdeas();
+  if (tab === 'notes') showNotes();
+}
+
+/* ───────── 案件ノート（2026-10-10）：大型案件ごとに1冊。開いてすぐ1行書ける。書き換えない・足していくだけ ─────────
+   鍵（NOTE_KEY。無ければ部屋の合図と同じ）の内側。本文は個人ドライブの Cellar/notes.json。
+   古い行は初期表示でぼかし、触ると見える（人前で開いても安全）。15分さわらないと鍵をかけ直す。
+   カミーユの「前回のメモ」はこの画面の中でだけ出す（Notion の便には引かない）。言い換えない・要約しない */
+var NOTE_BOOKS = ['HACCP', '乾燥機事業', '物販新ブランド', '冬の醸造限定品', 'マニュアル作成', 'イベント企画'];
+var BOOK_WORDS = {
+  'HACCP': ['HACCP', 'JFS', 'CCP', 'FS-', '衛生', '監査', '温度記録', '冷却記録', '官能検査', '水質', 'CIP', 'ATP', '防虫', 'アレルゲン'],
+  '乾燥機事業': ['乾燥機'],
+  '物販新ブランド': ['物販', '新ブランド', 'グッズ', '手ぬぐい', 'ステッカー'],
+  '冬の醸造限定品': ['限定醸造', '限定品', '冬の醸造', 'メルツェン', 'ヴァイツェン', 'FUYUGOMORI', 'ŌSHIBARE', 'OSHIBARE', 'マシケドロップス', 'ケラー'],
+  'マニュアル作成': ['マニュアル', '手順書'],
+  'イベント企画': ['イベント', '企画', '出店', '収穫祭', 'フェス', '祭', 'ツアー']
+};
+var NOTE = { key: '', data: null, book: load('nbook') || 'HACCP', tasks: null, timer: null, rid: '' };
+if (NOTE_BOOKS.indexOf(NOTE.book) < 0) NOTE.book = 'HACCP';
+function showNotes() {
+  $('#nlock').hidden = !!NOTE.key; $('#nbody').hidden = !NOTE.key;
+  if (NOTE.key) { renderNotes(); armNotes(); } else setTimeout(function () { $('#nkey').focus(); }, 50);
+}
+function armNotes() { clearTimeout(NOTE.timer); NOTE.timer = setTimeout(lockNotes, 15 * 60e3); }
+function lockNotes() { NOTE.key = ''; NOTE.data = null; fill($('#nlines'), []); fill($('#nhead'), []); $('#ntext').value = ''; showNotes(); }
+$('#tab-notes').addEventListener('pointerdown', function () { if (NOTE.key) armNotes(); });
+$('#nlock').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var key = $('#nkey').value.trim(); if (!key) return;
+  $('#nlockMsg').textContent = '開いています…';
+  Promise.all([call('notes', { room: key }), call('tasks').catch(function () { return null; })]).then(function (r) {
+    NOTE.key = key; NOTE.data = r[0]; NOTE.tasks = r[1] && r[1].rows; $('#nkey').value = ''; $('#nlockMsg').textContent = ''; showNotes();
+  }, function (err) {
+    $('#nkey').value = '';
+    $('#nlockMsg').textContent = err.code === 'room' ? '鍵が違います' : err.code === 'room-locked' ? 'しばらく開けません（15分）' : '開けませんでした：' + err.message;
+  });
+});
+function bookData(name) { return ((NOTE.data && NOTE.data.books) || []).filter(function (b) { return b.name === name; })[0] || { name: name, head: { owner: '', next: '', waiting: '' }, lines: [] }; }
+function putBook(b) { var bs = NOTE.data.books; for (var i = 0; i < bs.length; i++) if (bs[i].name === b.name) { bs[i] = b; return; } bs.push(b); }
+function bookTasks(name) {
+  var words = BOOK_WORDS[name] || [];
+  return (NOTE.tasks || []).filter(function (r) { return hasWord(norm(r.title), words.map(norm)); });
+}
+function renderNotes() {
+  var b = bookData(NOTE.book), day = todayJst();
+  fill($('#nbooks'), NOTE_BOOKS.map(function (n) {
+    var c = bookData(n).lines.length;
+    return h('button', { type: 'button', role: 'tab', 'aria-selected': String(n === NOTE.book), onclick: function () { NOTE.book = n; save('nbook', n); renderNotes(); } },
+      [n, c ? h('span', { class: 'c' }, [String(c)]) : null]);
+  }));
+  // 頭：担当／次の確認日／待っているもの（ここだけは書き換えられる。預け帳の代わり）
+  var hd = b.head || {};
+  function headInput(key, type, label, cls) {
+    var inp = h('input', { type: type, value: hd[key] || '', class: cls || null, 'aria-label': label });
+    inp.addEventListener('change', function () {
+      var head = Object.assign({}, b.head || {}); head[key] = inp.value.trim();
+      call('notehead', Object.assign({ room: NOTE.key, book: b.name }, head)).then(function (nb) { putBook(nb); renderNotes(); toast('残しました：' + label); },
+        function (e) { toast('残せませんでした：' + e.message, true); });
+    });
+    return h('label', { class: key === 'next' && hd.next && hd.next <= day ? 'due' : null }, [label, inp]);
+  }
+  fill($('#nhead'), [headInput('owner', 'text', '担当'), headInput('next', 'date', '次の確認日'), headInput('waiting', 'text', '待っているもの', 'wide')]);
+  // タスクに紐づける（任意）
+  var tasks = bookTasks(b.name);
+  fill($('#ntask'), [h('option', { value: '' }, ['タスクなし'])].concat(tasks.map(function (r) { return h('option', { value: r.id }, [(r.title || '（無題）').slice(0, 24)]); })));
+  // 前回のメモ：今日より前の最新の1行を、そのまま引く
+  var last = b.lines[0], cam = $('#ncam');
+  cam.hidden = !last || last.at.slice(0, 10) >= day;
+  if (!cam.hidden) fill(cam, [h('b', null, ['カミーユ']), '前回は ' + stampOf(last.at) + ' に、ここまで書いていました。']);
+  // 行：最新3行はそのまま、それより前はぼかす（触ると見える）
+  var lines = b.lines;
+  fill($('#nlines'), lines.length ? lines.map(function (x, i) {
+    var li = h('li', { class: i >= 3 ? 'old' : null }, [h('span', { class: 'at' }, [stampOf(x.at)]),
+      h('span', { class: 'tx', title: i >= 3 ? '触ると見えます' : null }, [x.text, x.taskTitle ? h('span', { class: 'tk' }, ['タスク：' + x.taskTitle]) : null])]);
+    if (i >= 3) li.addEventListener('click', function () { li.classList.toggle('shown'); });
+    return li;
+  }) : [h('li', { class: 'more' }, [h('span'), h('span', { class: 'state' }, ['まだ何も書いていません。上の欄に1行どうぞ。'])])]);
+  // 右：この案件のタスク（日付・メモ件数）
+  $('.ntasks .n').textContent = tasks.length ? tasks.length + '件' : '';
+  fill($('#ntasks'), tasks.length ? tasks.map(function (r) {
+    var n = lines.filter(function (x) { return x.task === r.id; }).length;
+    return h('div', { class: 'time' }, [h('span', { class: 'h' }, [r.date ? fmtMD(r.date.start) : '']), titleNode(r), h('span', { class: 'cnt' }, [n ? 'メモ ' + n : ''])]);
+  }) : [state(NOTE.tasks ? '題名でこの案件に当たる未完了タスクはありません' : 'タスクを読めませんでした')]);
+}
+$('#nadd').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var text = $('#ntext').value.trim(); if (!text || !NOTE.key) return;
+  var sel = $('#ntask'), taskId = sel.value, taskTitle = taskId ? sel.options[sel.selectedIndex].textContent : '';
+  NOTE.rid = NOTE.rid || rid();
+  $('#ntext').disabled = true;
+  call('noteadd', { room: NOTE.key, book: NOTE.book, text: text, task: taskId, taskTitle: taskTitle, rid: NOTE.rid }, { long: true }).then(function (nb) {
+    putBook(nb); NOTE.rid = ''; $('#ntext').value = ''; renderNotes();
+  }, function (err) { toast('積めませんでした：' + err.message + '（書いたものは残っています）', true); })
+    .then(function () { $('#ntext').disabled = false; $('#ntext').focus(); });
+});
+$('#ntext').addEventListener('input', function () { NOTE.rid = ''; });
+
+/* ───────── ギャラリー（2026-10-10）：部屋の奥の小さな画廊。写真1枚と一言を、油彩風の絵にして金の額に ───────── */
+var GAL_ROOMS = [['whisky', 'ウイスキーの間'], ['pipe', 'パイプの間'], ['music', '音楽の間'], ['study', '書斎']];
+var AGAIN_LABEL = { yes: 'また欲しい', maybe: 'どちらでも', no: 'もういい' };
+var GAL = { room: 'whisky', imgs: {}, file: null, b64: '', mime: '', rid: '' };
+function galItems() { return (ROOM.pack && ROOM.pack.gallery) || []; }
+fill($('#gRoom'), GAL_ROOMS.map(function (r) { return h('option', { value: r[0] }, [r[1]]); }));
+$('#galOpen').addEventListener('click', openGallery);
+$('#gBack').addEventListener('click', function () { $('#gal').hidden = true; closeGSheet(); armRoom(); });
+function openGallery() {
+  armRoom();
+  var hh = hourOf(jstNow()), s = sunOf(jstNow());
+  $('#gal').classList.toggle('lamp', hh >= s.set - 0.5 || hh < s.rise);  // 夕暮れからは暖炉とランプの灯り
+  $('#gal').hidden = false;
+  renderGallery();
+}
+function galSay() {
+  var items = galItems(), hh = hourOf(jstNow());
+  var cups = items.filter(function (x) { return x.room === 'whisky' && x.again !== 'no'; });
+  if (hh >= 17 && cups.length) {
+    var pick = cups.filter(function (x) { return x.again === 'yes'; }); pick = pick.length ? pick : cups;
+    var c = pick[dayIndex() % pick.length];
+    return '今夜の一杯は『' + c.name + '』にしない？' + (c.note ? '　前に書いてたね、「' + c.note + '」って。' : '');
+  }
+  var d = jstNow().getUTCDate(), old = items.filter(function (x) { return x.seen && diffDays(x.seen.slice(0, 10), todayJst()) >= 30; })
+    .sort(function (a, b) { return a.seen < b.seen ? -1 : 1; });
+  if (d <= 7 && old.length) return '『' + old[0].name + '』、しばらく見ていないね。久しぶりに開けてみない？';
+  return items.length ? '飾ったものを見ていると、あなたの好みが少しずつ分かってくる。' : 'ここはまだ、からっぽの画廊。最初の一品、なにを飾る？';
+}
+function renderGallery() {
+  fill($('#grooms'), GAL_ROOMS.map(function (r) {
+    var n = galItems().filter(function (x) { return x.room === r[0]; }).length;
+    return h('button', { type: 'button', 'aria-pressed': String(GAL.room === r[0]), onclick: function () { GAL.room = r[0]; renderGallery(); } }, [r[1] + (n ? '　' + n : '')]);
+  }));
+  $('#gcam').textContent = galSay();
+  var list = galItems().filter(function (x) { return x.room === GAL.room; });
+  fill($('#gwall'), list.length ? list.map(galItem) : [h('p', { class: 'gempty' }, ['この部屋には、まだ何も飾っていません。「飾る」から写真を1枚。'])]);
+}
+function plateOf(x) {
+  return h('div', { class: 'plate' }, [h('b', null, [x.name]), h('small', null, [fmtMD(x.at) + '　' + (AGAIN_LABEL[x.again] || '')]), x.note ? h('span', null, [x.note]) : null]);
+}
+function galItem(x) {
+  var img = h('img', { alt: x.name, loading: 'lazy' }), ph = h('div', { class: 'ph' });
+  var frame = h('button', { class: 'frame', type: 'button', 'aria-label': x.name + 'を見る', onclick: function () { galLight(x); } }, [h('div', { class: 'mat' }, [ph])]);
+  galImg(x.id).then(function (src) { if (src) { img.src = src; ph.replaceWith(img); } });
+  return h('div', { class: 'gitem' }, [frame, plateOf(x)]);
+}
+function galImg(id) {
+  if (GAL.imgs[id]) return Promise.resolve(GAL.imgs[id]);
+  var key = ROOM.key;
+  return call('galleryimg', { room: key, id: id }).then(function (d) {
+    if (!d || !d.ready || ROOM.key !== key) return '';
+    return (GAL.imgs[id] = 'data:' + d.mime + ';base64,' + d.data);
+  }, function () { return ''; });
+}
+function galLight(x) {
+  armRoom();
+  var box = $('#glight'), img = h('img', { alt: x.name });
+  galImg(x.id).then(function (src) { img.src = src; });
+  fill(box, [h('div', { style: 'text-align:center' }, [h('div', { class: 'frame' }, [h('div', { class: 'mat' }, [img])]), plateOf(x)])]);
+  box.hidden = false;
+  call('gallerysee', { room: ROOM.key, id: x.id }).then(function (d) { if (ROOM.pack) ROOM.pack.gallery = d.items; }, function () {});
+}
+$('#glight').addEventListener('click', function () { $('#glight').hidden = true; });
+// 飾る：写真1枚と一言だけ。油彩風の処理はこの画面でやる（Kuwahara フィルタ＋暖かい色＋キャンバスの目）
+$('#gAdd').addEventListener('click', function () {
+  armRoom(); GAL.b64 = ''; GAL.rid = ''; $('#gFile').value = ''; $('#gName').value = ''; $('#gNote').value = '';
+  $('#gRoom').value = GAL.room; $('#gPrev').hidden = true; $('#gMsg').textContent = '写真を選ぶと、油彩風に整えます';
+  $('#gsheet').classList.add('open'); $('#gsheet').setAttribute('aria-hidden', 'false');
+});
+function closeGSheet() { $('#gsheet').classList.remove('open'); $('#gsheet').setAttribute('aria-hidden', 'true'); }
+$('#gCancel').addEventListener('click', closeGSheet);
+$('#gFile').addEventListener('change', function () {
+  var f = this.files && this.files[0]; if (!f) return;
+  $('#gMsg').textContent = '油彩風に整えています…'; $('#gSave').classList.add('busy');
+  oilPaint(f).then(function (r) {
+    GAL.b64 = r.b64; GAL.mime = r.mime; GAL.rid = '';
+    var pv = $('#gPrev'); pv.width = r.canvas.width; pv.height = r.canvas.height; pv.getContext('2d').drawImage(r.canvas, 0, 0); pv.hidden = false;
+    $('#gMsg').textContent = Math.round(r.bytes / 1024) + 'KB・この絵で飾ります';
+  }, function (e) { $('#gMsg').textContent = '写真を読めませんでした：' + e.message; })
+    .then(function () { $('#gSave').classList.remove('busy'); });
+});
+$('#gsheet').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var name = $('#gName').value.trim();
+  if (!GAL.b64) { $('#gMsg').textContent = '先に写真を選んでください'; return; }
+  if (!name) { $('#gMsg').textContent = '名前を入れてください'; $('#gName').focus(); return; }
+  GAL.rid = GAL.rid || rid();
+  var again = (document.querySelector('input[name=gAgain]:checked') || {}).value || 'maybe';
+  $('#gSave').classList.add('busy'); $('#gMsg').textContent = '飾っています…';
+  call('galleryadd', { room: ROOM.key, galroom: $('#gRoom').value, name: name, note: $('#gNote').value.trim(), again: again,
+    mime: GAL.mime, b64: GAL.b64, date: todayJst(), rid: GAL.rid }, { long: true }).then(function (d) {
+    if (ROOM.pack) ROOM.pack.gallery = d.items;
+    GAL.room = $('#gRoom').value; closeGSheet(); renderGallery(); toast('飾りました：' + name);
+  }, function (err) { $('#gMsg').textContent = '飾れませんでした：' + err.message; })
+    .then(function () { $('#gSave').classList.remove('busy'); });
+});
+// 写真 → 油彩風。長い辺 720px に縮め、Kuwahara（半径4）で筆のかたまりを作り、少し温かく、キャンバスの目を足す
+function oilPaint(file) {
+  return new Promise(function (resolve, reject) {
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onerror = function () { URL.revokeObjectURL(url); reject(new Error('画像ではありません')); };
+    im.onload = function () {
+      URL.revokeObjectURL(url);
+      var k = Math.min(1, 720 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.max(1, Math.round(im.naturalWidth * k)), hgt = Math.max(1, Math.round(im.naturalHeight * k));
+      var cvs = document.createElement('canvas'); cvs.width = w; cvs.height = hgt;
+      var c2 = cvs.getContext('2d'); c2.drawImage(im, 0, 0, w, hgt);
+      var src = c2.getImageData(0, 0, w, hgt), out = c2.createImageData(w, hgt);
+      kuwahara(src.data, out.data, w, hgt, 4);
+      var d = out.data;
+      for (var y = 0; y < hgt; y++) for (var x = 0; x < w; x++) {
+        var i = (y * w + x) * 4, weave = ((x >> 1) + (y >> 1)) % 2 ? 4 : -4, n = (Math.random() - .5) * 8 + weave;
+        d[i] = clamp8(d[i] * 1.05 + 8 + n); d[i + 1] = clamp8(d[i + 1] * 1.01 + 3 + n); d[i + 2] = clamp8(d[i + 2] * .92 + n);
+      }
+      c2.putImageData(out, 0, 0);
+      encode(cvs, .84).then(resolve, reject);
+    };
+    im.src = url;
+  });
+}
+function clamp8(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
+// 4つの区画のうち、明るさのばらつきがいちばん小さい区画の平均色を取る（総和表で O(画素数)）
+function kuwahara(s, o, w, hgt, r) {
+  var W1 = w + 1, n = W1 * (hgt + 1);
+  var SR = new Float64Array(n), SG = new Float64Array(n), SB = new Float64Array(n), SL = new Float64Array(n), SL2 = new Float64Array(n);
+  for (var y = 0; y < hgt; y++) {
+    var rr = 0, gg = 0, bb = 0, ll = 0, l2 = 0;
+    for (var x = 0; x < w; x++) {
+      var i = (y * w + x) * 4, L = .299 * s[i] + .587 * s[i + 1] + .114 * s[i + 2];
+      rr += s[i]; gg += s[i + 1]; bb += s[i + 2]; ll += L; l2 += L * L;
+      var a = (y + 1) * W1 + x + 1, up = y * W1 + x + 1;
+      SR[a] = SR[up] + rr; SG[a] = SG[up] + gg; SB[a] = SB[up] + bb; SL[a] = SL[up] + ll; SL2[a] = SL2[up] + l2;
+    }
+  }
+  function box(T, x0, y0, x1, y1) { return T[(y1 + 1) * W1 + x1 + 1] - T[y0 * W1 + x1 + 1] - T[(y1 + 1) * W1 + x0] + T[y0 * W1 + x0]; }
+  for (var y2 = 0; y2 < hgt; y2++) for (var x2 = 0; x2 < w; x2++) {
+    var best = Infinity, br = 0, bg = 0, bbl = 0;
+    for (var q = 0; q < 4; q++) {
+      var xa = q & 1 ? x2 : x2 - r, ya = q & 2 ? y2 : y2 - r;
+      var x0 = Math.max(0, xa), y0 = Math.max(0, ya), x1 = Math.min(w - 1, xa + r), y1 = Math.min(hgt - 1, ya + r);
+      var cnt = (x1 - x0 + 1) * (y1 - y0 + 1), mL = box(SL, x0, y0, x1, y1) / cnt, v = box(SL2, x0, y0, x1, y1) / cnt - mL * mL;
+      if (v < best) { best = v; br = box(SR, x0, y0, x1, y1) / cnt; bg = box(SG, x0, y0, x1, y1) / cnt; bbl = box(SB, x0, y0, x1, y1) / cnt; }
+    }
+    var j = (y2 * w + x2) * 4; o[j] = br; o[j + 1] = bg; o[j + 2] = bbl; o[j + 3] = 255;
+  }
+}
+// webp で書き出す（使えない端末は jpeg）。560KB を超えたら質を下げる
+function encode(cvs, q) {
+  return new Promise(function (resolve, reject) {
+    cvs.toBlob(function (b) {
+      if (!b) { reject(new Error('書き出せませんでした')); return; }
+      var mime = b.type === 'image/webp' ? 'image/webp' : 'image/jpeg';
+      var next = function (blob) {
+        if (blob.size > 560 * 1024 && q > .4) { q -= .12; cvs.toBlob(next, mime, q); return; }
+        var fr = new FileReader();
+        fr.onload = function () { resolve({ b64: String(fr.result).split(',')[1], mime: mime, bytes: blob.size, canvas: cvs }); };
+        fr.onerror = function () { reject(new Error('読めませんでした')); };
+        fr.readAsDataURL(blob);
+      };
+      if (mime === 'image/jpeg' && b.type !== 'image/jpeg') cvs.toBlob(next, 'image/jpeg', q); else next(b);
+    }, 'image/webp', q);
+  });
 }
 
 /* ───────── アイデア：話題とメモ ───────── */
@@ -1270,6 +1651,9 @@ function dropRoom() {
   ROOM.key = ''; ROOM.pack = null; ROOM.figs = {}; ROOM.n = 0; clearTimeout(ROOM.timer);
   var f = $('#rfig'); f.classList.remove('on'); f.removeAttribute('src');
   fill($('#rline'), []); fill($('#rlist'), []);
+  if (typeof GAL !== 'undefined') { GAL.imgs = {}; GAL.b64 = ''; }
+  $('#gal').hidden = true; $('#glight').hidden = true; fill($('#gwall'), []); fill($('#glight'), []);
+  $('#gsheet').classList.remove('open');
 }
 function armRoom() { clearTimeout(ROOM.timer); ROOM.timer = setTimeout(function () { if (house === 'room') setHouse('private'); }, 10 * 60e3); }
 $('#room').addEventListener('pointerdown', armRoom);
@@ -1296,7 +1680,8 @@ function enterRoom() {
     return h('button', { type: 'button', 'aria-pressed': String(x[0] === ROOM.topic), onclick: function () { ROOM.topic = x[0]; ROOM.n = 0; renderRoom(); } }, [x[1]]);
   }));
   showFigure(t, p);
-  renderRoom(p.say);
+  var g = galSay();  // 夕方からは、ギャラリーのウイスキーから「今夜の一杯」を先に
+  renderRoom(/^今夜の一杯/.test(g) ? g : p.say);
 }
 // 姿の絵：時間帯に合う場面から1枚。絵はその都度 GAS から（端末に残さない）
 var FIG_SCENES = { night: ['night', 'bath'], day: ['day', 'bath'], sleep: ['sleep', 'day'] };
@@ -1403,7 +1788,8 @@ function mockInit() {
       ov({ title: '外部監査の事前打ち合わせ', cat: '会議', date: dt(d(2), '10:00'), mine: true }),
       ov({ title: 'ご予約 7名様', cat: '顧客予約', date: dt(d(3), '19:30'), visit: true })
     ],
-    routines: {}, ideas: [], talks: [], rid: {}
+    routines: {}, ideas: [], talks: [], rid: {},
+    notes: { books: {} }, gallery: [], galimg: {}
   };
 }
 var MOCK_ROOM = {  // 見本だけ。本物は Code.gs の ROOM_DEFAULTS
@@ -1457,7 +1843,33 @@ function mockRoute(p) {
     }
     case 'talkdel': { var b2 = db.talks.length; db.talks = db.talks.filter(function (x) { return x.id !== p.id; }); return b2 === db.talks.length ? ng('その話はありません') : ok({ items: db.talks, synced: '' }); }
     case 'room': return p.room === 'mock' ? ok({ defaults: MOCK_ROOM, figures: [], night: { generated: '', lines: [] }, content: { shop: [], songs: [], hobby: [], night: [] },
-      music: { ready: false }, amazon: { ready: false }, err: {} }) : ng('room');
+      music: { ready: false }, amazon: { ready: false }, gallery: db.gallery, err: {} }) : ng('room');
+    case 'tasks': return ok({ date: T, rows: open() });
+    case 'notes': case 'noteadd': case 'notehead': {
+      if (p.room !== 'mock') return ng('room');
+      var book = function (n) { var b = db.notes.books[n] || { head: { owner: '', next: '', waiting: '' }, lines: [] }; return { name: n, head: b.head, lines: b.lines }; };
+      if (p.action === 'notes') return ok({ books: NOTE_BOOKS.map(book) });
+      if (NOTE_BOOKS.indexOf(p.book) < 0) return ng('その案件のノートはありません: ' + p.book);
+      var bk = book(p.book);
+      if (p.action === 'noteadd') {
+        if (!String(p.text || '').trim()) return ng('メモが空です');
+        if (!bk.lines.some(function (x) { return x.id === p.rid; })) bk.lines.unshift({ id: p.rid || rid(), at: now, text: String(p.text).trim(), task: p.task || '', taskTitle: p.taskTitle || '' });
+      } else bk.head = { owner: p.owner || '', next: /^\d{4}-\d{2}-\d{2}$/.test(p.next || '') ? p.next : '', waiting: p.waiting || '' };
+      db.notes.books[p.book] = { head: bk.head, lines: bk.lines };
+      return ok(book(p.book));
+    }
+    case 'gallery': return p.room === 'mock' ? ok({ items: db.gallery }) : ng('room');
+    case 'galleryadd': {
+      if (p.room !== 'mock') return ng('room');
+      if (!p.name) return ng('名前を入れてください');
+      if (!db.gallery.some(function (x) { return x.id === p.rid; })) {
+        var gid = p.rid || rid(); db.galimg[gid] = { mime: p.mime, data: p.b64 };
+        db.gallery.unshift({ id: gid, at: p.date || T, room: p.galroom, name: p.name, note: p.note || '', again: p.again || 'maybe', file: 'gal-' + gid, seen: now });
+      }
+      return ok({ items: db.gallery });
+    }
+    case 'galleryimg': { if (p.room !== 'mock') return ng('room'); var gi = db.galimg[p.id]; return ok(gi ? { ready: true, id: p.id, mime: gi.mime, data: gi.data } : { ready: false }); }
+    case 'gallerysee': { if (p.room !== 'mock') return ng('room'); db.gallery.forEach(function (x) { if (x.id === p.id) x.seen = now; }); return ok({ items: db.gallery }); }
     case 'figure': return p.room === 'mock' ? ok({ ready: false, reason: 'モックには絵を置かない' }) : ng('room');
     default: return ng('unknown action: ' + p.action);
   }
