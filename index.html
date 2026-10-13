@@ -7,7 +7,7 @@
 <title>Cellar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Shippori+Mincho+B1:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Shippori+Mincho+B1:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap">
 <!--
   Cellar v3（2026-10-10）。設計図 §14。v2 の画面は _v2_index.html に残してある。
   3つの層：
@@ -41,7 +41,7 @@ button, input, textarea { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
 .house { position: fixed; inset: 0; overflow: auto; transition: opacity 1.2s ease, visibility 0s linear 1.2s; opacity: 0; visibility: hidden; }
-body[data-house="work"] #work, body[data-house="private"] #private, body[data-house="room"] #room { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
+body[data-house="work"] #work, body[data-house="private"] #private, body[data-house="room"] #room, body[data-house="canvas"] #canvas { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
 
 /* ───────── 切り替え ───────── */
 .switch { position: fixed; z-index: 20; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
@@ -52,7 +52,7 @@ body[data-house="private"] .switch { background: rgba(0, 0, 0, .28); backdrop-fi
 body[data-house="private"] .switch button { color: var(--ivory-dim); }
 body[data-house="private"] .switch button[aria-pressed="true"] { background: rgba(239, 232, 218, .16); color: var(--ivory); }
 body.idle[data-house="private"] .switch, body.idle[data-house="private"] .pv-quiet { opacity: 0; }
-body[data-house="room"] .switch { display: none; }
+body[data-house="room"] .switch, body[data-house="canvas"] .switch { display: none; }
 
 /* ───────── 合言葉 ───────── */
 .gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--paper); padding: 16px; }
@@ -348,6 +348,62 @@ a.ev:hover .ttl { text-decoration: underline; }
 .glight .frame { width: min(520px, 86vw); cursor: zoom-out; }
 .glight .plate { font-size: 14px; }
 
+/* ───────── スマートキャンバス（常駐ボードの機能。2026-10-13）：天気と時間帯から描く色の場の上に、遠くから読める字だけ ───────── */
+#canvas { overflow: hidden; overflow: clip; background: #0B1220; color: #F5F7F8; }
+#cvScene { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cv { position: absolute; inset: 0; padding: max(30px, env(safe-area-inset-top)) clamp(20px, 4.5vw, 72px) max(26px, env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 14px 56px;
+  transition: transform 8s ease, padding-top .4s ease; text-shadow: 0 1px 2px rgba(0, 0, 0, .28), 0 2px 26px rgba(0, 0, 0, .38); }
+#canvas.sos .cv { padding-top: calc(max(30px, env(safe-area-inset-top)) + 64px); }
+.cv-time { grid-column: 1; grid-row: 1; }
+.cv-hm { font: 300 clamp(88px, 15vw, 220px)/.86 var(--gothic); letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.cv-hm i { font-style: normal; opacity: .5; }
+.cv-date { font: 400 clamp(15px, 1.5vw, 21px) var(--gothic); letter-spacing: .08em; opacity: .88; margin-top: 14px; }
+.cv-wx { grid-column: 2; grid-row: 1; justify-self: end; text-align: right; }
+.cv-wx .t { font: 300 clamp(44px, 5.4vw, 80px)/1 var(--gothic); letter-spacing: -.02em; }
+.cv-wx .t small { font-size: .4em; margin-left: 2px; }
+.cv-wx .d { font-size: clamp(14px, 1.2vw, 17px); opacity: .88; margin-top: 6px; }
+.cv-wx svg { display: block; width: min(300px, 38vw); height: 48px; margin: 10px 0 0 auto; overflow: visible; }
+.cv-next { grid-column: 1; grid-row: 3; align-self: end; }
+.cv-next .lb { font-size: 12px; letter-spacing: .28em; opacity: .75; }
+.cv-next .tt { font: 500 clamp(24px, 2.8vw, 40px)/1.3 var(--gothic); margin-top: 4px; }
+.cv-next .tm { font-size: clamp(15px, 1.4vw, 20px); opacity: .9; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.cv-next .cur { font-size: 14px; opacity: .78; margin-top: 10px; }
+.cv-side { grid-column: 2; grid-row: 2 / span 2; align-self: end; justify-self: end; width: min(380px, 100%); }
+.cv-side .grp + .grp { margin-top: 16px; }
+.cv-side h3 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 4px; font: 500 12px var(--gothic); letter-spacing: .24em; opacity: .78; }
+.cv-side h3 b { font: 300 26px/1 var(--gothic); letter-spacing: 0; opacity: 1; }
+.cv-side ul { list-style: none; margin: 0; padding: 0; }
+.cv-side li { font-size: 15px; line-height: 1.5; padding: 5px 0; border-top: 1px solid rgba(255, 255, 255, .16); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cv-side li small { opacity: .72; margin-right: 8px; }
+.cv-side .note { font-size: 12px; opacity: .7; }
+.cv-rail { grid-column: 1 / -1; grid-row: 4; position: relative; height: 44px; margin-top: 6px; }
+.cv-rail .ln { position: absolute; left: 0; right: 0; top: 16px; height: 1px; background: rgba(255, 255, 255, .38); }
+.cv-rail .seg { position: absolute; top: 12px; height: 9px; border-radius: 5px; background: rgba(255, 255, 255, .9); }
+.cv-rail .seg.ov { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .9); }
+.cv-rail .seg.past { opacity: .35; }
+.cv-rail .now { position: absolute; top: 4px; width: 2px; height: 25px; margin-left: -1px; background: #FFD58A; box-shadow: 0 0 14px 2px rgba(255, 213, 138, .8); }
+.cv-rail .hr { position: absolute; top: 26px; font-size: 11px; opacity: .65; transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+.cv-sos { position: absolute; z-index: 5; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 16px; padding: 16px clamp(20px, 4.5vw, 72px);
+  background: #C42A1E; color: #fff; font: 700 clamp(18px, 2vw, 28px) var(--gothic); letter-spacing: .04em; animation: cvbeat 1s steps(1, end) infinite; }
+.cv-sos.ack { background: #1E7A4E; animation: none; }
+.cv-sos .el { margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums; }
+@keyframes cvbeat { 50% { filter: brightness(.72); } }
+.cv-ctl { position: absolute; z-index: 6; right: clamp(16px, 3vw, 40px); bottom: max(80px, env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity .6s ease; }
+#canvas.ui .cv-ctl { opacity: 1; pointer-events: auto; }
+.cv-ctl button { border: 1px solid rgba(255, 255, 255, .4); background: rgba(10, 16, 28, .45); color: #fff; border-radius: 999px; padding: 7px 16px; font-size: 13px; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.cv-ctl button[aria-pressed="true"] { background: rgba(255, 255, 255, .9); color: #10161F; }
+@media (max-width: 760px) {
+  .cv { grid-template-columns: 1fr; grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: 14px; }
+  .cv-wx { grid-column: 1; grid-row: 2; justify-self: start; text-align: left; }
+  .cv-wx svg { margin-left: 0; width: min(300px, 100%); }
+  .cv-side { grid-column: 1; grid-row: 4; justify-self: stretch; width: auto; }
+  .cv-next { grid-row: 3; }
+  .cv-rail { grid-row: 5; }
+}
+@media (prefers-reduced-motion: reduce) { .cv-sos { animation: none; } .cv { transition: none; } }
+
 /* ───────── しらせ ───────── */
 #toast { position: fixed; z-index: 60; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--paper);
   padding: 8px 16px; border-radius: 8px; font-size: 14px; max-width: calc(100vw - 32px); transition: opacity .3s ease, transform .3s ease; }
@@ -370,6 +426,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 <nav class="switch" aria-label="ページの切り替え">
   <button type="button" data-go="work" aria-pressed="true">仕事</button>
   <button type="button" data-go="private" aria-pressed="false">プライベート</button>
+  <button type="button" data-go="canvas" aria-pressed="false">キャンバス</button>
 </nav>
 
 <div class="gate" id="gate" hidden>
@@ -477,6 +534,7 @@ a.ev:hover .ttl { text-decoration: underline; }
     <div class="pv-tools pv-quiet">
       <button type="button" id="writeBtn">書く</button>
       <button type="button" id="talksBtn">ためた話</button>
+      <button type="button" id="bgBtn" hidden>名画にする</button>
     </div>
   </div>
   <div class="glass sheet" id="sheet" role="dialog" aria-label="書く" aria-hidden="true">
@@ -539,6 +597,25 @@ a.ev:hover .ttl { text-decoration: underline; }
   <div class="glight" id="glight" hidden></div>
 </section>
 
+<!-- ───────── スマートキャンバス（国稀 常駐ボードの機能）。タブレットや2枚目の画面に開きっぱなしにする ───────── -->
+<section id="canvas" class="house" aria-label="キャンバス">
+  <canvas id="cvScene" aria-hidden="true"></canvas>
+  <div class="cv-sos" id="cvSos" role="status" aria-live="assertive" hidden><span id="cvSosWho"></span><span class="el" id="cvSosEl"></span></div>
+  <div class="cv" id="cv">
+    <div class="cv-time"><div class="cv-hm" id="cvHm"></div><div class="cv-date" id="cvDate"></div></div>
+    <div class="cv-wx" id="cvWx"></div>
+    <div class="cv-side" id="cvSide"></div>
+    <div class="cv-next" id="cvNext"></div>
+    <div class="cv-rail" id="cvRail" aria-hidden="true"></div>
+  </div>
+  <div class="cv-ctl" id="cvCtl">
+    <button type="button" id="cvChime" aria-pressed="false">SOS の音</button>
+    <button type="button" id="cvWake" aria-pressed="false">画面を点けたまま</button>
+    <button type="button" id="cvMail" aria-pressed="false">メールの件名</button>
+    <button type="button" id="cvBack">戻る</button>
+  </div>
+</section>
+
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -551,7 +628,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-10 v3';
+var BUILD = '2026-10-13 v3.3';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -862,6 +939,7 @@ function loadWork(quiet) {
 }
 function loadPrivate() {
   if (!token) return Promise.resolve();
+  loadScenes();
   return call('content').then(function (d) { S.content = d; renderTopics(); if (!triviaShown) renderTrivia(); }, function () {});
 }
 
@@ -872,6 +950,7 @@ function setHouse(hs, quiet) {
   document.body.setAttribute('data-house', hs);
   document.querySelectorAll('.switch button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-go') === hs)); });
   if (hs === 'private') { startMood(); renderClock(); } else stopMood();
+  if (hs === 'canvas') startCanvas(); else stopCanvas();
   if (hs !== 'room') { closeSecret(); dropRoom(); }
   if (hs !== 'private') { closeSheet(); closeDrawer(); }
   if (!quiet) poke();
@@ -920,7 +999,7 @@ function todayItems() {
     if (s == null) { allday.push(r); return; }
     var e = r.date.endTime && (r.date.end || r.date.start) === day ? hmOf(r.date.endTime) : null;
     if (e == null || e <= s) e = Math.min(24, s + 1);
-    timed.push({ s: s, e: e, t: r.title || '（無題）', url: safeUrl(r.url), k: evKind(r, src), who: src === 'overall' ? (r.company || r.visitor || '') : '' });
+    timed.push({ s: s, e: e, t: r.title || '（無題）', url: safeUrl(r.url), k: evKind(r, src), src: src, who: src === 'overall' ? (r.company || r.visitor || '') : '' });
   }
   (d.events || []).forEach(function (r) { add(r, 'self'); });
   (d.tasks || []).filter(function (r) { return r.date && r.date.time; }).forEach(function (r) { add(r, 'task'); });
@@ -1076,7 +1155,7 @@ function renderPulse() {
   nodes.push(h('span', { class: 'stamp' }, [(p ? 'サーバー ' + p.version + '・' : '') + '画面 ' + BUILD]));
   fill($('#pulse'), nodes);
 }
-function renderWork() { renderHead(); renderTimeline(); renderRail(); renderPulse(); }
+function renderWork() { renderHead(); renderTimeline(); renderRail(); renderPulse(); renderCanvas(); }
 
 /* ───────── 仕事：ページ（スケジュール／アイデア） ───────── */
 document.querySelectorAll('.w-nav [role=tab]').forEach(function (b) {
@@ -1460,8 +1539,10 @@ function renderClock() {
     lastPhase = ph;
     var st = $('#private').style; st.setProperty('--tint', look.tint); st.setProperty('--veil', look.veil);
     document.querySelectorAll('.art').forEach(function (a) { a.style.setProperty('--bri', look.bri); a.style.setProperty('--sat', look.sat); });
-    if (artI < 0) pickArt(false);
+    if (artI < 0 && !SC.shown) pickArt(false);
   }
+  // 時間帯が変わったら、その時間帯のシーンへ（昼→夜→夜更け）
+  if (house === 'private' && bgMode() === 'cam' && SC.list) { var want = scenePick(); if (want ? want.name !== SC.shown : SC.shown) pickArt(false, true); }
   mood.look = look; mood.phase = ph; mood.sunT = Math.max(0, Math.min(1, (hh - s.rise) / (s.set - s.rise)));
   var slot = lineKey(slotOf(hh));
   if (slot !== lastSlot) { lastSlot = slot; sayCam(); }
@@ -1493,13 +1574,60 @@ function renderTrivia() {
     el.classList.remove('fade');
   }, el.firstChild ? 900 : 0);
 }
+// 背景：カミーユのシーン（2026-10-13・本人の判断でプライベートに出す）か、名画。
+// シーンは Canva で背景を足して広げた姿の絵（Drive の Cellar/カミーユのシーン）。時間帯で選び、無い時間帯は名画。絵は端末に残さない（メモリだけ）
+var SC = { list: null, imgs: {}, shown: '' };
+function bgMode() { return load('pvbg') === 'art' ? 'art' : 'cam'; }
+function sceneSlot(hh) { return hh >= 6 && hh < 16 ? 'day' : hh >= 16 && hh < 22 ? 'night' : 'late'; }
+function scenePick() {
+  var l = SC.list || [], slot = sceneSlot(hourOf(jstNow()));
+  var order = slot === 'late' ? ['late', 'night'] : slot === 'night' ? ['night', 'late'] : ['day'];
+  for (var i = 0; i < order.length; i++) {
+    var c = l.filter(function (x) { return x.slot === order[i]; });
+    if (c.length) return c[dayIndex() % c.length];
+  }
+  return null;
+}
+function loadScenes() {
+  if (!token) return Promise.resolve();
+  return call('scenes').then(function (d) { SC.list = d.scenes || []; paintBgBtn(); if (house === 'private') pickArt(false, true); }, function () {});
+}
+function paintBgBtn() {
+  var b = $('#bgBtn'); b.hidden = !(SC.list && SC.list.length);
+  b.textContent = bgMode() === 'cam' ? '名画にする' : 'カミーユにする';
+}
+$('#bgBtn').addEventListener('click', function () { save('pvbg', bgMode() === 'cam' ? 'art' : null); paintBgBtn(); pickArt(false, true); });
+// 2枚の層を6秒かけて入れ替える（絵もシーンも同じ）
+var front = 'A';
+function showLayer(u, capNodes) {
+  var on = $('#art' + front), off = $('#art' + (front === 'A' ? 'B' : 'A'));
+  off.style.backgroundImage = 'url("' + u.replace(/"/g, '%22') + '")';
+  off.classList.add('on'); on.classList.remove('on');
+  front = front === 'A' ? 'B' : 'A';
+  var cap = $('#artcap'); cap.classList.remove('open');
+  fill(cap, capNodes || []);
+}
+function showScene(sc) {
+  SC.shown = sc.name;
+  var done = function (u) { if (u && SC.shown === sc.name) showLayer(u, []); };
+  if (SC.imgs[sc.name]) { done(SC.imgs[sc.name]); return; }
+  call('scene', { name: sc.name }).then(function (d) {
+    if (!d || !d.ready) { SC.shown = ''; pickArt(false, true, true); return; }
+    done(SC.imgs[sc.name] = d.url || 'data:' + d.mime + ';base64,' + d.data);
+  }, function () { SC.shown = ''; pickArt(false, true, true); });
+}
 // 絵：週替わり（content.arts）＋手持ち（ARTS）。20分ごとに6秒かけて入れ替える
-var artI = -1, front = 'A';
+var artI = -1;
 function artPool() { return ((S.content && S.content.arts) || []).concat(ARTS); }
-function pickArt(next) {
+function pickArt(next, force, artOnly) {
+  if (!artOnly && bgMode() === 'cam') {
+    var sc = scenePick();
+    if (sc) { if (force || sc.name !== SC.shown) showScene(sc); return; }
+  }
+  var wasScene = !!SC.shown; SC.shown = '';
   var pool = artPool(); if (!pool.length) return;
   var i = next ? (artI + 1) % pool.length : (dayIndex() * 7 + Math.floor(hourOf(jstNow()) * 3)) % pool.length;
-  if (i === artI) return;
+  if (i === artI && !force && !wasScene) return;
   artI = i;
   var a = pool[i], src = safeUrl(a.img); if (!src) return;
   var big = src.replace(/\/(\d{3,4})px-/, '/1920px-'), img = new Image();
@@ -1507,14 +1635,10 @@ function pickArt(next) {
   img.onerror = function () { show(src); };
   img.src = big;
   function show(u) {
-    var on = $('#art' + front), off = $('#art' + (front === 'A' ? 'B' : 'A'));
-    off.style.backgroundImage = 'url("' + u.replace(/"/g, '%22') + '")';
-    off.classList.add('on'); on.classList.remove('on');
-    front = front === 'A' ? 'B' : 'A';
-    var cap = $('#artcap'); cap.classList.remove('open');
-    var b = h('button', { type: 'button', 'aria-expanded': 'false' }, ['『' + a.title + '』 ' + a.who + (a.year ? '（' + a.year + '）' : '')]);
+    if (SC.shown) return;  // 読み込み中にシーンへ切り替わっていたら出さない
+    var cap = $('#artcap'), b = h('button', { type: 'button', 'aria-expanded': 'false' }, ['『' + a.title + '』 ' + a.who + (a.year ? '（' + a.year + '）' : '')]);
     b.addEventListener('click', function () { var o = cap.classList.toggle('open'); b.setAttribute('aria-expanded', String(o)); });
-    fill(cap, [b, h('div', { class: 'talk' }, [a.talk || ''])]);
+    showLayer(u, [b, h('div', { class: 'talk' }, [a.talk || ''])]);
   }
 }
 setInterval(function () { if (house === 'private') pickArt(true); }, 20 * 60e3);
@@ -1758,6 +1882,257 @@ function renderRoom(first) {
 }
 $('#rnext').addEventListener('click', function () { ROOM.n++; renderRoom(); });
 
+/* ───────── スマートキャンバス（2026-10-13）：国稀 常駐ボードの機能を、開きっぱなしの1枚の絵として ─────────
+   ・背景は天気と時間帯から描く色の場（晴れ＝日だまり、くもり＝灰の帯、雨＝細い筋、雪＝舞う粒、夜＝星）。20コマ/秒で静かに動く
+   ・前に出すのは、時刻／天気と今日の気温／次の予定／今日のタスク・持ち越し・メール／一日のレール（自分＝塗り、全体＝中抜き）
+   ・タクバンの SOS（help だけ）を6秒ごとにブラウザから直接読む。板の在りかは合言葉の内側（canvas）から。書き込みは一切しない
+   ・焼き付きよけに、3分ごとに字の位置を数 px ずらす。画面に触れると下に操作が出る（音・点けたまま・メールの件名・戻る）
+   URL に ?view=canvas を付けると、最初からキャンバスで開く（タブレットのホーム画面用） */
+var CV = { raf: 0, last: 0, W: 0, H: 0, DPR: 1, drops: [], flakes: [], stars: [], sosT: null, dataT: null, driftT: null, uiT: null,
+  sos: { raisedAt: {}, on: [], ackAt: 0, ackWho: '', err: 0, lastRing: 0 }, wake: null, actx: null };
+var CH = ['hall', 'kitchen'], CH_NAMES = { hall: 'ホール', kitchen: 'キッチン' };
+function cvPref(k) { return load('cv' + k) === '1'; }
+function startCanvas() {
+  cvSize(); CV.last = 0;
+  if (!CV.raf) CV.raf = requestAnimationFrame(cvFrame);
+  renderCanvas(); loadCanvas();
+  clearInterval(CV.dataT); CV.dataT = setInterval(function () { if (!document.hidden) { loadCanvas(); loadWork(true); } }, 5 * 60e3);
+  clearInterval(CV.sosT); CV.sosT = setInterval(sosPoll, 6000);
+  clearInterval(CV.driftT); CV.driftT = setInterval(function () {
+    $('#cv').style.transform = 'translate(' + Math.round(Math.random() * 16 - 8) + 'px,' + Math.round(Math.random() * 12 - 6) + 'px)';
+  }, 3 * 60e3);
+  if (cvPref('wake')) wakeOn();
+  paintCtl();
+}
+function stopCanvas() {
+  cancelAnimationFrame(CV.raf); CV.raf = 0;
+  clearInterval(CV.sosT); clearInterval(CV.dataT); clearInterval(CV.driftT);
+  if (CV.wake) { try { CV.wake.release(); } catch (e) {} CV.wake = null; }
+}
+function loadCanvas() {
+  if (!token) return Promise.resolve();
+  return call('canvas').then(function (d) { S.canvas = d; renderCanvas(); if (!CV.sos.polled) sosPoll(); }, function () {});
+}
+// 前に出す字
+function renderCanvas() {
+  if (house !== 'canvas') return;
+  var d = jstNow(), hh = hourOf(d), day = todayJst();
+  fill($('#cvHm'), [String(d.getUTCHours()), h('i', null, [':']), pad(d.getUTCMinutes())]);
+  $('#cvDate').textContent = (d.getUTCMonth() + 1) + '月' + d.getUTCDate() + '日　' + WD[d.getUTCDay()] + '曜日' + (isClosedDay(day) ? '　定休日' : '');
+  // 天気：いまの気温・空・最高最低・雨、今日の気温の線（いまの位置に点）
+  var w = S.weather, wx = $('#cvWx');
+  if (w) {
+    var pts = (w.day || []).filter(function (x) { return isFinite(x.t); }), svg = '';
+    if (pts.length > 1) {
+      var lo = Math.min.apply(null, pts.map(function (x) { return x.t; })), hi = Math.max.apply(null, pts.map(function (x) { return x.t; })), sp = Math.max(1, hi - lo);
+      var X = function (hr) { return (hr / 23 * 300).toFixed(1); }, Y = function (t) { return (6 + (1 - (t - lo) / sp) * 30).toFixed(1); };
+      var nowT = pts.reduce(function (a, b) { return Math.abs(b.h - hh) < Math.abs(a.h - hh) ? b : a; });
+      svg = '<svg viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">' +
+        pts.filter(function (x) { return x.p >= 30; }).map(function (x) { return '<rect x="' + (X(x.h) - 4) + '" y="' + (46 - x.p / 100 * 10).toFixed(1) + '" width="8" height="' + (x.p / 100 * 10).toFixed(1) + '" fill="rgba(160,200,255,.7)"/>'; }).join('') +
+        '<polyline points="' + pts.map(function (x) { return X(x.h) + ',' + Y(x.t); }).join(' ') + '" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
+        '<circle cx="' + X(hh) + '" cy="' + Y(nowT.t) + '" r="3.5" fill="#FFD58A"/></svg>';
+    }
+    wx.innerHTML = '';
+    fill(wx, [h('div', { class: 't' }, [String(w.temp), h('small', null, ['℃'])]),
+      h('div', { class: 'd' }, [[w.place, w.desc, '最高 ' + w.high + '°／最低 ' + w.low + '°', '雨 ' + w.rain + '%'].filter(Boolean).join('　')])]);
+    if (svg) wx.insertAdjacentHTML('beforeend', svg);
+  } else fill(wx, []);
+  // 次の予定（いま進んでいるものも小さく）
+  var nx = $('#cvNext');
+  if (!S.today) fill(nx, [h('div', { class: 'tm' }, [ERR.today ? '予定を読めませんでした' : '読み込み中…'])]);
+  else {
+    var evs = todayItems().timed.sort(function (a, b) { return a.s - b.s; });
+    var cur = evs.filter(function (e) { return e.s <= hh && e.e > hh; })[0], nxt = evs.filter(function (e) { return e.s > hh; })[0];
+    var left = function (m) { m = Math.max(0, Math.round(m * 60)); return m < 60 ? 'あと' + m + '分' : 'あと' + Math.floor(m / 60) + '時間' + (m % 60 ? m % 60 + '分' : ''); };
+    fill(nx, nxt ? [h('div', { class: 'lb' }, ['次は']), h('div', { class: 'tt' }, [nxt.t]),
+        h('div', { class: 'tm' }, [fmtH(nxt.s) + '–' + fmtH(nxt.e) + '　' + left(nxt.s - hh)]),
+        cur ? h('div', { class: 'cur' }, ['いま　' + cur.t + '（' + fmtH(cur.e) + 'まで）']) : null]
+      : [h('div', { class: 'lb' }, [cur ? 'いま' : '今日は']), h('div', { class: 'tt' }, [cur ? cur.t : '時刻の決まった予定はもうありません']),
+        cur ? h('div', { class: 'tm' }, [fmtH(cur.e) + 'まで']) : null]);
+  }
+  // 右：今日のタスク・持ち越し・メール
+  var tasks = ((S.today && S.today.tasks) || []).filter(function (r) { return !(r.date && r.date.time); });
+  var over = (S.overdue && S.overdue.rows) || [], other = over.filter(hasOther).length;
+  var cm = S.canvas && S.canvas.mail, showSub = cvPref('mail');
+  var grp = function (title, n, items, note) {
+    return h('div', { class: 'grp' }, [h('h3', null, [title, h('b', null, [n == null ? '–' : String(n)])]),
+      items && items.length ? h('ul', null, items) : null, note ? h('div', { class: 'note' }, [note]) : null]);
+  };
+  fill($('#cvSide'), [
+    grp('今日のタスク', S.today ? tasks.length : null, tasks.slice(0, 3).map(function (r) { return h('li', null, [r.title || '（無題）']); })),
+    grp('持ち越し', S.overdue ? over.length : null, null, other ? 'うち相手あり ' + other + '件' : ''),
+    grp('メール', cm ? cm.unread : null, cm && showSub ? cm.items.slice(0, 3).map(function (m) { return h('li', null, [h('small', null, [m.from]), m.subject]); }) : null,
+      S.canvas && S.canvas.mailErr ? S.canvas.mailErr : cm ? '未読・スター付き ' + cm.items.length + '件' : '')
+  ]);
+  // 一日のレール：自分の予定は塗り、全体スケジュールは中抜き。いまの位置に灯り
+  var rail = $('#cvRail'), h0 = 6, h1 = 24, pct = function (x) { return ((Math.min(h1, Math.max(h0, x)) - h0) / (h1 - h0) * 100) + '%'; }, nodes = [h('div', { class: 'ln' })];
+  [6, 9, 12, 15, 18, 21, 24].forEach(function (x) { nodes.push(h('span', { class: 'hr', style: 'left:' + pct(x) }, [String(x)])); });
+  if (S.today) todayItems().timed.forEach(function (e) {
+    if (e.e <= h0 || e.s >= h1) return;
+    nodes.push(h('div', { class: 'seg' + (e.src === 'overall' ? ' ov' : '') + (e.e <= hh ? ' past' : ''), title: e.t,
+      style: 'left:' + pct(e.s) + ';width:calc(' + pct(e.e) + ' - ' + pct(e.s) + ')' }));
+  });
+  if (hh >= h0) nodes.push(h('div', { class: 'now', style: 'left:' + pct(hh) }));
+  fill(rail, nodes);
+}
+
+// 背景：天気と時間帯の色の場
+var CV_PAL = {
+  night:  { top: '#0B1430', bot: '#1C2547', blobs: ['#2E3F86', '#4D2F6E', '#1D5C6E'] },
+  dawn:   { top: '#38406E', bot: '#E7A68E', blobs: ['#F2B6A0', '#9A88CA', '#F6D4A4'] },
+  day:    { top: '#4F8EC4', bot: '#BFD9E8', blobs: ['#8EC1E6', '#F2E2C2', '#6FB0C4'] },
+  golden: { top: '#4E64A0', bot: '#EFA963', blobs: ['#F5C078', '#E0785E', '#9A8AC6'] },
+  dusk:   { top: '#272B5A', bot: '#8B5A8C', blobs: ['#C27BA2', '#5A5AAA', '#EE9F7A'] }
+};
+function hexRgb(x) { var n = parseInt(x.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function mix(a, b, t) { var p = hexRgb(a), q = hexRgb(b); return [0, 1, 2].map(function (i) { return Math.round(p[i] + (q[i] - p[i]) * t); }); }
+function rgbS(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+function cvLook() {
+  var d = jstNow(), hh = hourOf(d), s = sunOf(d), ph = phaseOf(hh, s), P = CV_PAL[ph], icon = (S.weather && S.weather.icon) || 'sun';
+  var grey = icon === 'rain' ? .5 : icon === 'cloud' ? .42 : icon === 'snow' ? .3 : icon === 'partly' ? .18 : 0;
+  var tint = icon === 'snow' ? '#D8DEE6' : '#6E7682';
+  return { ph: ph, icon: icon, rain: (S.weather && S.weather.rain) || 0, sunT: Math.max(0, Math.min(1, (hh - s.rise) / (s.set - s.rise))),
+    top: mix(P.top, tint, grey), bot: mix(P.bot, tint, grey), blobs: P.blobs.map(function (b) { return mix(b, tint, grey * .8); }) };
+}
+function cvSize() {
+  var c = $('#cvScene'); CV.DPR = Math.min(1.5, window.devicePixelRatio || 1);
+  CV.W = c.clientWidth || innerWidth; CV.H = c.clientHeight || innerHeight;
+  c.width = CV.W * CV.DPR; c.height = CV.H * CV.DPR;
+  c.getContext('2d').setTransform(CV.DPR, 0, 0, CV.DPR, 0, 0);
+  CV.stars = []; for (var i = 0; i < 90; i++) CV.stars.push({ x: Math.random(), y: Math.random() * .6, r: Math.random() * 1.2 + .3, p: Math.random() * 6.3 });
+  CV.drops = []; CV.flakes = [];
+}
+window.addEventListener('resize', function () { if (house === 'canvas') cvSize(); });
+function cvFrame(t) {
+  CV.raf = requestAnimationFrame(cvFrame);
+  if (reduce && CV.last && t - CV.last < 60000) return;   // 動きを減らす設定なら1分に1回だけ描く
+  if (t - CV.last < 50) return;                            // 20コマ/秒
+  var dt = CV.last ? Math.min(.2, (t - CV.last) / 1000) : 0; CV.last = t;
+  var x = $('#cvScene').getContext('2d'), W = CV.W, H = CV.H, s = t / 1000, L = cvLook();
+  var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, rgbS(L.top, 1)); g.addColorStop(1, rgbS(L.bot, 1));
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  // 色の場：大きな3つのにじみが、何分もかけて漂う
+  L.blobs.forEach(function (c, i) {
+    var bx = W * (.15 + .7 * (.5 + .5 * Math.sin(s / (70 + i * 23) + i * 2.1))), by = H * (.2 + .6 * (.5 + .5 * Math.cos(s / (90 + i * 17) + i))), r = Math.max(W, H) * (.42 + .08 * i);
+    var rg = x.createRadialGradient(bx, by, 0, bx, by, r); rg.addColorStop(0, rgbS(c, .5)); rg.addColorStop(1, rgbS(c, 0));
+    x.fillStyle = rg; x.fillRect(0, 0, W, H);
+  });
+  // 晴れの日だまり／夜の星
+  if (L.ph !== 'night' && (L.icon === 'sun' || L.icon === 'partly')) {
+    var sx = W * (.1 + .8 * L.sunT), sy = H * (.75 - Math.sin(L.sunT * Math.PI) * .6), sr = Math.max(W, H) * .5;
+    var sg = x.createRadialGradient(sx, sy, 0, sx, sy, sr); sg.addColorStop(0, 'rgba(255,240,205,.55)'); sg.addColorStop(.3, 'rgba(255,225,170,.18)'); sg.addColorStop(1, 'rgba(255,225,170,0)');
+    x.fillStyle = sg; x.fillRect(0, 0, W, H);
+  }
+  if (L.ph === 'night' && L.icon !== 'rain' && L.icon !== 'snow') CV.stars.forEach(function (st) {
+    x.fillStyle = 'rgba(255,255,255,' + (.25 + .45 * (.5 + .5 * Math.sin(s * .8 + st.p))) * (L.icon === 'cloud' ? .3 : 1) + ')';
+    x.beginPath(); x.arc(st.x * W, st.y * H, st.r, 0, 6.283); x.fill();
+  });
+  // くもり：横に流れる灰の帯
+  if (L.icon === 'cloud' || L.icon === 'rain' || L.icon === 'partly') for (var k = 0; k < 3; k++) {
+    var cy = H * (.18 + k * .2), cx = ((s * (6 + k * 3) + k * 400) % (W + 900)) - 450, cr = W * .6;
+    x.save(); x.translate(cx, cy); x.scale(1, .22);
+    var cg = x.createRadialGradient(0, 0, 0, 0, 0, cr); cg.addColorStop(0, 'rgba(235,240,245,.16)'); cg.addColorStop(1, 'rgba(235,240,245,0)');
+    x.fillStyle = cg; x.fillRect(-cr, -cr, cr * 2, cr * 2); x.restore();
+  }
+  // 雨：細い筋（降水確率で本数）／雪：舞う粒
+  if (L.icon === 'rain') {
+    var nd = 40 + Math.round(L.rain * 1.4);
+    while (CV.drops.length < nd) CV.drops.push({ x: Math.random() * W, y: Math.random() * H, v: 380 + Math.random() * 260, l: 10 + Math.random() * 16 });
+    CV.drops.length = nd;
+    x.strokeStyle = 'rgba(220,232,245,.28)'; x.lineWidth = 1; x.beginPath();
+    CV.drops.forEach(function (dp) { dp.y += dp.v * dt; dp.x -= dp.v * dt * .18; if (dp.y > H) { dp.y = -dp.l; dp.x = Math.random() * (W + 100); } x.moveTo(dp.x, dp.y); x.lineTo(dp.x + dp.l * .18, dp.y - dp.l); });
+    x.stroke();
+  } else CV.drops.length = 0;
+  if (L.icon === 'snow') {
+    while (CV.flakes.length < 110) CV.flakes.push({ x: Math.random() * W, y: Math.random() * H, v: 18 + Math.random() * 30, r: 1 + Math.random() * 2.4, p: Math.random() * 6.3 });
+    x.fillStyle = 'rgba(255,255,255,.8)';
+    CV.flakes.forEach(function (f) { f.y += f.v * dt; f.x += Math.sin(s * .7 + f.p) * 12 * dt; if (f.y > H) { f.y = -4; f.x = Math.random() * W; } x.beginPath(); x.arc(f.x, f.y, f.r, 0, 6.283); x.fill(); });
+  } else CV.flakes.length = 0;
+  // 字を読みやすく：左上と下を少し沈める
+  var v1 = x.createLinearGradient(0, H, 0, H * .45); v1.addColorStop(0, 'rgba(5,8,16,.42)'); v1.addColorStop(1, 'rgba(5,8,16,0)'); x.fillStyle = v1; x.fillRect(0, 0, W, H);
+  var v2 = x.createRadialGradient(W * .15, H * .15, 0, W * .15, H * .15, W * .55); v2.addColorStop(0, 'rgba(5,8,16,.25)'); v2.addColorStop(1, 'rgba(5,8,16,0)'); x.fillStyle = v2; x.fillRect(0, 0, W, H);
+  // SOS のあいだは、赤い脈を重ねる
+  if (CV.sos.on.length) { x.fillStyle = 'rgba(200,30,20,' + (.18 + .12 * Math.sin(s * 4)) + ')'; x.fillRect(0, 0, W, H); }
+}
+
+// タクバンの SOS（help だけ）。常駐ボードと同じ読み方：板の at は端末の時計でずれるので6時間以内だけ使う。解除は on が落ちたのを見て判定
+function sosPoll() {
+  if (house !== 'canvas' || !S.canvas || !S.canvas.sos) return;
+  CV.sos.polled = true;
+  var src = S.canvas.sos, get = src.exec === 'mock'
+    ? Promise.resolve(JSON.stringify({ help: { hall: params.get('sos') === '1' ? { on: true, at: Date.now() - 95e3 } : false, kitchen: false } }))
+    : fetch(src.exec + '?id=' + encodeURIComponent(src.board) + '&key=state', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
+  get.then(function (txt) {
+    var j = txt && String(txt).trim() ? JSON.parse(txt) : null, hlp = (j && j.help) || {}, now = Date.now(), on = [], rising = false;
+    CH.forEach(function (c) {
+      var v = hlp[c], isOn = v === true || !!(v && typeof v === 'object' && v.on), at = v && typeof v === 'object' ? Number(v.at) || 0 : 0;
+      if (isOn) { on.push(c); if (!CV.sos.raisedAt[c]) { CV.sos.raisedAt[c] = at > 0 && now - at > 0 && now - at < 6 * 3600e3 ? at : now; rising = true; } }
+      else if (CV.sos.raisedAt[c]) { delete CV.sos.raisedAt[c]; CV.sos.ackAt = now; CV.sos.ackWho = CH_NAMES[c]; }
+    });
+    CV.sos.on = on; CV.sos.err = 0;
+    if (rising) { chime(); CV.sos.lastRing = now; } else if (!on.length) CV.sos.lastRing = 0;
+    renderSos();
+  }, function () { CV.sos.err++; });
+}
+function renderSos() {
+  var el = $('#cvSos'), now = Date.now(), cv = $('#canvas');
+  if (CV.sos.on.length) {
+    var from = Math.min.apply(null, CV.sos.on.map(function (c) { return CV.sos.raisedAt[c] || now; })), sec = Math.max(0, Math.round((now - from) / 1000));
+    $('#cvSosWho').textContent = 'SOS　' + CV.sos.on.map(function (c) { return CH_NAMES[c]; }).join('・') + 'が応援を呼んでいます';
+    $('#cvSosEl').textContent = Math.floor(sec / 60) + ':' + pad(sec % 60) + ' 経過';
+    el.className = 'cv-sos'; el.hidden = false; cv.classList.add('sos');
+    document.title = 'SOS ' + CV.sos.on.map(function (c) { return CH_NAMES[c]; }).join('・') + ' — Cellar';
+    if (now - CV.sos.lastRing > 30000) { chime(); CV.sos.lastRing = now; }
+    return;
+  }
+  document.title = 'Cellar';
+  if (CV.sos.ackAt && now - CV.sos.ackAt < 12000) {
+    $('#cvSosWho').textContent = CV.sos.ackWho + 'の応援は解除されました'; $('#cvSosEl').textContent = '対応済み';
+    el.className = 'cv-sos ack'; el.hidden = false; cv.classList.add('sos');
+  } else { el.hidden = true; cv.classList.remove('sos'); }
+}
+setInterval(function () { if (house === 'canvas' && (CV.sos.on.length || CV.sos.ackAt)) renderSos(); }, 1000);
+// 知らせの音（Android はふるえる）。ブラウザは最初の操作まで鳴らせないので、ボタンで入れる
+function chime() {
+  if (!cvPref('chime')) return;
+  try { if (navigator.vibrate) navigator.vibrate([180, 90, 180]); } catch (e) {}
+  try {
+    CV.actx = CV.actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (CV.actx.state === 'suspended') CV.actx.resume();
+    var t0 = CV.actx.currentTime;
+    [0, .3].forEach(function (d, i) {
+      var o = CV.actx.createOscillator(), gn = CV.actx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(i ? 1046 : 784, t0 + d);
+      gn.gain.setValueAtTime(.0001, t0 + d); gn.gain.exponentialRampToValueAtTime(.2, t0 + d + .02); gn.gain.exponentialRampToValueAtTime(.0001, t0 + d + .26);
+      o.connect(gn); gn.connect(CV.actx.destination); o.start(t0 + d); o.stop(t0 + d + .3);
+    });
+  } catch (e) {}
+}
+// 画面を点けたまま（対応していない端末・GAS の枠の中ではできないことがある）
+function wakeOn() {
+  if (!('wakeLock' in navigator)) { toast('この端末では、画面を点けたままにできません', true); save('cvwake', null); paintCtl(); return; }
+  navigator.wakeLock.request('screen').then(function (l) { CV.wake = l; l.addEventListener('release', function () { CV.wake = null; paintCtl(); }); paintCtl(); },
+    function () { toast('画面を点けたままにできませんでした（この開き方では許可が下りないことがあります）', true); save('cvwake', null); paintCtl(); });
+}
+document.addEventListener('visibilitychange', function () { if (!document.hidden && house === 'canvas' && cvPref('wake') && !CV.wake) wakeOn(); });
+function paintCtl() {
+  $('#cvChime').setAttribute('aria-pressed', String(cvPref('chime')));
+  $('#cvWake').setAttribute('aria-pressed', String(!!CV.wake || cvPref('wake')));
+  $('#cvMail').setAttribute('aria-pressed', String(cvPref('mail')));
+}
+$('#cvChime').addEventListener('click', function () { var on = !cvPref('chime'); save('cvchime', on ? '1' : null); paintCtl(); if (on) chime(); });
+$('#cvWake').addEventListener('click', function () {
+  if (cvPref('wake')) { save('cvwake', null); if (CV.wake) { try { CV.wake.release(); } catch (e) {} CV.wake = null; } paintCtl(); }
+  else { save('cvwake', '1'); wakeOn(); }
+});
+$('#cvMail').addEventListener('click', function () { save('cvmail', cvPref('mail') ? null : '1'); paintCtl(); renderCanvas(); });
+$('#cvBack').addEventListener('click', function () { setHouse('work'); });
+['pointerdown', 'pointermove', 'touchstart'].forEach(function (ev) {
+  $('#canvas').addEventListener(ev, function () {
+    $('#canvas').classList.add('ui'); clearTimeout(CV.uiT); CV.uiT = setTimeout(function () { $('#canvas').classList.remove('ui'); }, 5000);
+  }, { passive: true });
+});
+
 /* ───────── モック（?mock=1。Notion にも Drive にも触れず、サーバと同じ形で返す） ───────── */
 // 公開ページに載るので、人名・社名は架空。部屋の中身（姿の絵・夜の話）はモックにも置かない（見本の文だけ）
 var mockDB = null;
@@ -1812,7 +2187,11 @@ function mockRoute(p) {
     case 'overdue': return ok({ date: T, kinds: [], rows: open().filter(function (r) { return r.date.start < T; }) });
     case 'complete': { var r = db.sched.find(function (x) { return x.id === p.id; }); if (!r) return ng('そのタスクはありません'); r.done = true; return ok({ id: p.id }); }
     case 'move': { var m = db.sched.find(function (x) { return x.id === p.id; }); if (!m) return ng('そのタスクはありません'); m.date = { start: p.date, time: '', end: '', endTime: '' }; return ok({ id: p.id, date: p.date }); }
-    case 'weather': return ok({ place: '増毛', desc: 'くもり', icon: params.get('wx') || 'cloud', temp: 12, high: 14, low: 7, rain: 30, day: [] });
+    case 'weather': return ok({ place: '増毛', desc: { sun: '晴れ', partly: '晴れ時々くもり', cloud: 'くもり', rain: '雨', snow: '雪' }[params.get('wx') || 'cloud'], icon: params.get('wx') || 'cloud', temp: 12, high: 14, low: 7, rain: params.get('wx') === 'rain' ? 80 : 30,
+      day: Array.from({ length: 24 }, function (_, i) { return { h: i, t: Math.round(9 + 5 * Math.sin((i - 8) / 24 * 2 * Math.PI)), p: i >= 15 && i <= 19 ? 60 : 10 }; }) });
+    case 'canvas': return ok({ sos: { exec: 'mock', board: 'mock' }, mail: params.get('mail') === 'none' ? null : { unread: 4, items: [
+      { from: '佐藤', subject: '見積書の件（10月分）', at: T + 'T09:12', unread: true, starred: false }, { from: '資材メーカー', subject: '納品日のご案内', at: T + 'T08:40', unread: true, starred: true }] },
+      mailErr: params.get('mail') === 'none' ? 'Gmail の許可がまだです（エディタで authorizeMail を1回実行）' : '' });
     case 'content': return ok({ week: '', generated: '', trivia: [], health: [], arts: [], shop: [], songs: [], hobby: [], night: [], ideas: [] });
     case 'routines': case 'routinedone': {
       if (p.action === 'routinedone') { if (p.undo) delete db.routines[p.id]; else db.routines[p.id] = p.date || T; }
@@ -1845,6 +2224,9 @@ function mockRoute(p) {
     case 'room': return p.room === 'mock' ? ok({ defaults: MOCK_ROOM, figures: [], night: { generated: '', lines: [] }, content: { shop: [], songs: [], hobby: [], night: [] },
       music: { ready: false }, amazon: { ready: false }, gallery: db.gallery, err: {} }) : ng('room');
     case 'tasks': return ok({ date: T, rows: open() });
+    // シーンのモックは部屋の写真で代用（カミーユの絵は公開ページのモックに置かない）。?scenes=1 で出す
+    case 'scenes': return ok({ scenes: params.get('scenes') === '1' ? [{ name: 'scene-day-1', slot: 'day', up: 1 }, { name: 'scene-night-1', slot: 'night', up: 1 }] : [] });
+    case 'scene': return ok({ ready: true, name: p.name, url: IMG_BASE + (p.name === 'scene-day-1' ? 'deck' : 'fire') + '.jpg' });
     case 'notes': case 'noteadd': case 'notehead': {
       if (p.room !== 'mock') return ng('room');
       var book = function (n) { var b = db.notes.books[n] || { head: { owner: '', next: '', waiting: '' }, lines: [] }; return { name: n, head: b.head, lines: b.lines }; };
@@ -1891,10 +2273,11 @@ function mockPanel() {
 }
 
 /* ───────── 起動 ───────── */
-function tick() { renderHead(); renderTimeline(); if (house === 'private') renderClock(); }
+function tick() { renderHead(); renderTimeline(); if (house === 'private') renderClock(); if (house === 'canvas') renderCanvas(); }
 renderTrivia(); renderTopics(); renderWork();
 var first = params.get('house');
-setHouse(MOCK && (first === 'work' || first === 'private') ? first : autoHouse(), true);
+// ?view=canvas はタブレットのホーム画面用（最初からキャンバスで開く）
+setHouse(params.get('view') === 'canvas' ? 'canvas' : MOCK && (first === 'work' || first === 'private') ? first : autoHouse(), true);
 if (MOCK && params.get('tab') === 'ideas') showTab('ideas');
 renderClock();
 if (MOCK) mockPanel();
