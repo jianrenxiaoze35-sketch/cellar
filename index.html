@@ -273,6 +273,31 @@ a.ev:hover .ttl { text-decoration: underline; }
 .talks .body { font: 15px/1.95 var(--mincho); white-space: pre-wrap; margin-top: 4px; overflow-wrap: anywhere; }
 .talks .wait { color: #E8C98A; }
 .talks .empty { font: 14px var(--mincho); color: var(--ivory-dim); border: 0; }
+/* テイスティングノート */
+.tasting { width: min(560px, 100%); }
+.tbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.tbar input { flex: 1; min-width: 10em; background: rgba(0, 0, 0, .3); border: 1px solid rgba(239, 232, 218, .25); border-radius: 999px; color: var(--ivory); padding: 6px 14px; font-size: 14px; }
+.tchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tchips button { border: 1px solid rgba(239, 232, 218, .3); background: rgba(0, 0, 0, .2); color: var(--ivory-dim); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: 13px var(--gothic); }
+.tchips button[aria-pressed="true"], .tchips button[aria-checked="true"] { background: rgba(239, 232, 218, .9); color: #1A1714; border-color: transparent; }
+.tform { margin: 14px 0 18px; padding: 14px; border: 1px solid rgba(239, 232, 218, .18); border-radius: 10px; }
+.tform label { display: block; font-size: 12px; color: var(--ivory-dim); margin-top: 10px; }
+.tform input, .tform textarea { display: block; width: 100%; margin-top: 3px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(239, 232, 218, .22); border-radius: 6px; color: var(--ivory); padding: 7px 10px; font: 15px/1.6 var(--gothic); resize: vertical; }
+.tform .t2, .tform .t3 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.tform .t3 { grid-template-columns: 1fr 1.2fr 1.4fr; }
+.tlab { font-size: 12px; color: var(--ivory-dim); margin: 12px 0 5px; }
+.tstars { display: flex; gap: 2px; }
+.tstars button { border: 0; background: none; color: rgba(239, 232, 218, .35); font-size: 26px; line-height: 1; cursor: pointer; padding: 0 2px; }
+.tstars button.on { color: #E8C98A; }
+.tacts { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; }
+.tlist .tt { font: 500 16px var(--mincho); }
+.tlist .tsub { font-size: 12px; color: var(--ivory-dim); }
+.tlist .tst { color: #E8C98A; letter-spacing: .1em; }
+.tlist .ttags { font-size: 12px; color: var(--ivory-dim); margin-top: 2px; }
+.tlist .tdet { display: none; margin-top: 8px; font-size: 14px; line-height: 1.8; }
+.tlist li.open .tdet { display: block; }
+.tlist .tdet b { font-weight: 500; color: var(--ivory-dim); margin-right: 8px; font-size: 12px; }
+.tlist li { cursor: pointer; }
 @media (max-width: 760px) {
   .pv-tools { left: 16px; right: auto; bottom: auto; top: 300px; flex-direction: column; align-items: flex-start; gap: 12px; }
   .cam { top: 290px; right: 16px; max-height: calc(100vh - 290px - 270px); min-height: 8em; font-size: 16px; }
@@ -304,10 +329,43 @@ a.ev:hover .ttl { text-decoration: underline; }
 .rtopics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .rtopics button { border: 1px solid rgba(239, 232, 218, .3); background: rgba(0, 0, 0, .25); color: var(--ivory-dim); border-radius: 999px; padding: 4px 14px; cursor: pointer; font: 13px var(--mincho); }
 .rtopics button[aria-pressed="true"] { background: rgba(239, 232, 218, .9); color: #1A1714; border-color: transparent; }
+.rask { margin: 0 0 12px; }
+.rask textarea { width: 100%; min-height: 5.5em; resize: vertical; background: rgba(10, 8, 6, .5); border: 1px solid rgba(239, 232, 218, .25); border-radius: 8px;
+  color: var(--ivory); font: 16px/1.9 var(--mincho); padding: 10px 12px; outline: none; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.rask textarea:focus { border-color: rgba(239, 232, 218, .6); }
+.rask-act { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
 .rheat { display: flex; gap: 4px; font-size: 12px; color: var(--ivory-dim); align-items: center; }
 .rheat button { border: 0; background: none; color: var(--ivory-dim); cursor: pointer; padding: 2px 6px; font: 12px var(--gothic); border-radius: 999px; }
 .rheat button[aria-pressed="true"] { color: var(--ivory); background: rgba(239, 232, 218, .16); }
 @media (max-width: 760px) { .rfig { max-width: 90vw; height: 62vh; right: -6vw; opacity: 0; } .rfig.on { opacity: .9; } }
+
+/* ───────── 眺める：姿だけを大きく。シーンはぼかした同じ絵の上に、姿の絵（白地）は紙の色の上に ───────── */
+.gaze { position: absolute; inset: 0; z-index: 8; background: #0E0B09; overflow: hidden; overflow: clip; transition: background 2s ease; }
+.gaze.paper { background: radial-gradient(90% 70% at 50% 40%, #FBF8F2, #DCD1BE); }
+.gzbg { position: absolute; inset: -60px; background-size: cover; background-position: center; filter: blur(30px) brightness(.42) saturate(1.1); transition: opacity 2s ease; }
+.gaze.paper .gzbg { opacity: 0; }
+.gzimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 2.2s ease; }
+.gzimg.figure { padding: 3vh 0 0; mix-blend-mode: multiply; }
+.gzimg.on { opacity: 1; animation: gzdrift 14s ease-out forwards; }
+@keyframes gzdrift { from { transform: scale(1); } to { transform: scale(1.045); } }
+.gzline { position: absolute; left: 50%; transform: translateX(-50%); bottom: 150px; width: min(560px, calc(100vw - 32px)); margin: 0; text-align: center; pointer-events: none;
+  font: 500 clamp(16px, 1.8vw, 20px)/1.9 var(--mincho); letter-spacing: .06em; color: var(--ivory); text-shadow: 0 1px 14px rgba(0, 0, 0, .9); transition: opacity .8s ease; }
+.gzline.fade { opacity: 0; }
+.gzbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 48px clamp(16px, 4vw, 48px) max(14px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px;
+  background: linear-gradient(to top, rgba(10, 8, 6, .8), transparent); transition: opacity .6s ease; }
+.gzrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.gzcap { font: 14px var(--mincho); letter-spacing: .12em; color: var(--ivory-dim); }
+.gzctl { display: flex; gap: 8px; align-items: center; }
+.gzb { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(239, 232, 218, .35); background: rgba(0, 0, 0, .3); color: var(--ivory); font: 18px var(--mincho); cursor: pointer; }
+.gzthumbs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.gzthumbs::-webkit-scrollbar { display: none; }
+.gzthumbs button { flex: 0 0 auto; width: 50px; height: 70px; padding: 0; border-radius: 6px; border: 1px solid rgba(239, 232, 218, .22); background: rgba(239, 232, 218, .08) center / cover no-repeat;
+  color: var(--ivory-dim); font: 10px var(--mincho); cursor: pointer; opacity: .55; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; transition: opacity .3s; }
+.gzthumbs button.ok span { display: none; }
+.gzthumbs button[aria-current="true"] { opacity: 1; border-color: var(--ivory); }
+.gaze.bare .gzbar, .gaze.bare .gzline { opacity: 0; pointer-events: none; }
+.gaze.bare { cursor: none; }
+@media (prefers-reduced-motion: reduce) { .gzimg.on { animation: none; } }
 
 /* ───────── ギャラリー（部屋の奥）：金の額と真鍮の札。昼は湖からの光、夕方からは灯り ───────── */
 .gal { position: absolute; inset: 0; z-index: 6; overflow: auto; padding: max(16px, env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 40px;
@@ -534,7 +592,7 @@ a.ev:hover .ttl { text-decoration: underline; }
     <div class="pv-tools pv-quiet">
       <button type="button" id="writeBtn">書く</button>
       <button type="button" id="talksBtn">ためた話</button>
-      <button type="button" id="bgBtn" hidden>名画にする</button>
+      <button type="button" id="tastingBtn">テイスティング</button>
     </div>
   </div>
   <div class="glass sheet" id="sheet" role="dialog" aria-label="書く" aria-hidden="true">
@@ -549,6 +607,33 @@ a.ev:hover .ttl { text-decoration: underline; }
     <p class="note">毎晩 Obsidian の「30_Areas/プライベート」に写します。仕事のページには出ません。</p>
     <ol class="talks" id="talks"></ol>
   </aside>
+  <!-- テイスティングノート（2026-10-14）：本人だけが使う、飲んだものの記録。Drive の Cellar/tasting.json -->
+  <aside class="glass drawer tasting" id="tasting" aria-label="テイスティングノート" aria-hidden="true">
+    <h2>テイスティングノート<button type="button" id="tastingX">閉じる</button></h2>
+    <p class="note" id="tStats"></p>
+    <div class="tbar"><div class="tchips" id="tKinds" role="group" aria-label="種類で絞る"></div><input id="tSearch" type="search" placeholder="名前・作り手・香りで探す" aria-label="探す"></div>
+    <button type="button" class="pill keep" id="tNew">記録する</button>
+    <form class="tform" id="tForm" hidden autocomplete="off">
+      <div class="tchips" id="tKind" role="radiogroup" aria-label="種類"></div>
+      <label>名前<input id="tName" required maxlength="80"></label>
+      <div class="t2"><label>作り手<input id="tMaker" maxlength="60"></label><label>スタイル・産地<input id="tStyle" maxlength="60"></label></div>
+      <div class="t3"><label>度数（%）<input id="tAbv" type="number" step="0.1" min="0" max="80" inputmode="decimal"></label><label>日付<input id="tDate" type="date"></label><label>場所<input id="tWhere" maxlength="60"></label></div>
+      <div class="tlab">香り・味の印</div>
+      <div class="tchips" id="tTags" role="group" aria-label="香り・味の印"></div>
+      <label>ほかの印（、で区切る）<input id="tTagsFree" maxlength="120"></label>
+      <label>見た目<textarea id="tLook" rows="1" maxlength="200"></textarea></label>
+      <label>香り<textarea id="tNose" rows="2" maxlength="300"></textarea></label>
+      <label>味<textarea id="tPalate" rows="2" maxlength="300"></textarea></label>
+      <label>余韻<textarea id="tFinish" rows="1" maxlength="200"></textarea></label>
+      <div class="tlab">点数</div>
+      <div class="tstars" id="tScore" role="radiogroup" aria-label="点数"></div>
+      <div class="tlab">また飲みたいか</div>
+      <div class="tchips" id="tAgain" role="radiogroup" aria-label="また飲みたいか"></div>
+      <label>ひとこと<textarea id="tMemo" rows="2" maxlength="1000"></textarea></label>
+      <div class="tacts"><span class="note" id="tMsg"></span><span style="display:flex;gap:10px"><button type="button" class="pill" id="tCancel">やめる</button><button type="submit" class="pill keep" id="tSave">しまう</button></span></div>
+    </form>
+    <ol class="talks tlist" id="tList"></ol>
+  </aside>
 </section>
 
 <!-- ───────── カミーユの部屋（器だけ。中身は合図のあと GAS から） ───────── -->
@@ -561,6 +646,7 @@ a.ev:hover .ttl { text-decoration: underline; }
     <h1>カミーユの部屋</h1>
     <div style="display:flex;gap:14px;align-items:center">
       <div class="rheat" id="rheat" hidden></div>
+      <button type="button" class="pill keep" id="gazeOpen">眺める</button>
       <button type="button" class="pill" id="galOpen">ギャラリー</button>
       <button type="button" class="pill" id="leave">部屋を出る</button>
     </div>
@@ -569,6 +655,10 @@ a.ev:hover .ttl { text-decoration: underline; }
     <p class="rline" id="rline"></p>
     <p class="rsub" id="rsub"></p>
     <ul class="rlist" id="rlist" hidden></ul>
+    <div class="rask" id="rask" hidden>
+      <textarea id="raskText" placeholder="ここに答えて。わたしにだけ" aria-label="カミーユへの答え"></textarea>
+      <div class="rask-act"><button type="button" class="pill keep" id="raskSave">答える</button><button type="button" class="pvlink" id="raskNext" style="margin:0">別の質問</button><button type="button" class="pvlink" id="raskPast" style="margin:0">これまでの答え</button></div>
+    </div>
     <div style="display:flex;gap:14px;align-items:center"><button type="button" class="pvlink" id="rnext" style="margin:0">ほかの話</button></div>
     <div class="rtopics" id="rtopics" role="group" aria-label="話題"></div>
   </div>
@@ -595,6 +685,24 @@ a.ev:hover .ttl { text-decoration: underline; }
     <div class="acts"><span id="gMsg">写真を選ぶと、油彩風に整えます</span><span style="display:flex;gap:10px"><button type="button" class="pill" id="gCancel">やめる</button><button type="submit" class="pill keep" id="gSave">飾る</button></span></div>
   </form>
   <div class="glight" id="glight" hidden></div>
+  <!-- 眺める：カミーユの姿だけを大きく。絵は部屋にいるあいだメモリにだけ -->
+  <div class="gaze" id="gaze" hidden aria-label="眺める">
+    <div class="gzbg" id="gzbg"></div>
+    <img class="gzimg" id="gzA" alt=""><img class="gzimg" id="gzB" alt="">
+    <p class="gzline" id="gzline"></p>
+    <div class="gzbar">
+      <div class="gzrow">
+        <span class="gzcap" id="gzcap"></span>
+        <span class="gzctl">
+          <button type="button" class="gzb" id="gzPrev" aria-label="前の絵">‹</button>
+          <button type="button" class="gzb" id="gzPlay" aria-label="止める">Ⅱ</button>
+          <button type="button" class="gzb" id="gzNext" aria-label="次の絵">›</button>
+          <button type="button" class="pill" id="gzBack">部屋に戻る</button>
+        </span>
+      </div>
+      <div class="gzthumbs" id="gzthumbs" role="group" aria-label="姿の一覧"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ───────── スマートキャンバス（国稀 常駐ボードの機能）。タブレットや2枚目の画面に開きっぱなしにする ───────── -->
@@ -628,7 +736,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-13 v3.3';
+var BUILD = '2026-10-16 v3.5';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -939,7 +1047,6 @@ function loadWork(quiet) {
 }
 function loadPrivate() {
   if (!token) return Promise.resolve();
-  loadScenes();
   return call('content').then(function (d) { S.content = d; renderTopics(); if (!triviaShown) renderTrivia(); }, function () {});
 }
 
@@ -952,7 +1059,7 @@ function setHouse(hs, quiet) {
   if (hs === 'private') { startMood(); renderClock(); } else stopMood();
   if (hs === 'canvas') startCanvas(); else stopCanvas();
   if (hs !== 'room') { closeSecret(); dropRoom(); }
-  if (hs !== 'private') { closeSheet(); closeDrawer(); }
+  if (hs !== 'private') { closeSheet(); closeDrawer(); closeTasting(); }
   if (!quiet) poke();
 }
 function autoHouse() { var d = jstNow(), hh = hourOf(d); return !isClosedDay(todayJst()) && hh >= 6 && hh < 19 ? 'work' : 'private'; }
@@ -1539,10 +1646,8 @@ function renderClock() {
     lastPhase = ph;
     var st = $('#private').style; st.setProperty('--tint', look.tint); st.setProperty('--veil', look.veil);
     document.querySelectorAll('.art').forEach(function (a) { a.style.setProperty('--bri', look.bri); a.style.setProperty('--sat', look.sat); });
-    if (artI < 0 && !SC.shown) pickArt(false);
+    if (artI < 0) pickArt(false);
   }
-  // 時間帯が変わったら、その時間帯のシーンへ（昼→夜→夜更け）
-  if (house === 'private' && bgMode() === 'cam' && SC.list) { var want = scenePick(); if (want ? want.name !== SC.shown : SC.shown) pickArt(false, true); }
   mood.look = look; mood.phase = ph; mood.sunT = Math.max(0, Math.min(1, (hh - s.rise) / (s.set - s.rise)));
   var slot = lineKey(slotOf(hh));
   if (slot !== lastSlot) { lastSlot = slot; sayCam(); }
@@ -1574,13 +1679,12 @@ function renderTrivia() {
     el.classList.remove('fade');
   }, el.firstChild ? 900 : 0);
 }
-// 背景：カミーユのシーン（2026-10-13・本人の判断でプライベートに出す）か、名画。
-// シーンは Canva で背景を足して広げた姿の絵（Drive の Cellar/カミーユのシーン）。時間帯で選び、無い時間帯は名画。絵は端末に残さない（メモリだけ）
-var SC = { list: null, imgs: {}, shown: '' };
-function bgMode() { return load('pvbg') === 'art' ? 'art' : 'cam'; }
+// カミーユのシーン（Canva で背景を足して広げた姿の絵）。10-14 本人の指示で「カミーユの絵は秘密の部屋の中だけ」→ 部屋の背景にだけ使う。
+// プライベートの背景は名画だけ。シーンの選び方：昼（6〜16時）day／夕方〜夜（16〜22時）night／夜更け late（無ければ night）。絵は端末に残さない
+var SC = { imgs: {} };
 function sceneSlot(hh) { return hh >= 6 && hh < 16 ? 'day' : hh >= 16 && hh < 22 ? 'night' : 'late'; }
-function scenePick() {
-  var l = SC.list || [], slot = sceneSlot(hourOf(jstNow()));
+function scenePick(list) {
+  var l = list || [], slot = sceneSlot(hourOf(jstNow()));
   var order = slot === 'late' ? ['late', 'night'] : slot === 'night' ? ['night', 'late'] : ['day'];
   for (var i = 0; i < order.length; i++) {
     var c = l.filter(function (x) { return x.slot === order[i]; });
@@ -1588,16 +1692,7 @@ function scenePick() {
   }
   return null;
 }
-function loadScenes() {
-  if (!token) return Promise.resolve();
-  return call('scenes').then(function (d) { SC.list = d.scenes || []; paintBgBtn(); if (house === 'private') pickArt(false, true); }, function () {});
-}
-function paintBgBtn() {
-  var b = $('#bgBtn'); b.hidden = !(SC.list && SC.list.length);
-  b.textContent = bgMode() === 'cam' ? '名画にする' : 'カミーユにする';
-}
-$('#bgBtn').addEventListener('click', function () { save('pvbg', bgMode() === 'cam' ? 'art' : null); paintBgBtn(); pickArt(false, true); });
-// 2枚の層を6秒かけて入れ替える（絵もシーンも同じ）
+// 2枚の層を6秒かけて入れ替える
 var front = 'A';
 function showLayer(u, capNodes) {
   var on = $('#art' + front), off = $('#art' + (front === 'A' ? 'B' : 'A'));
@@ -1607,27 +1702,13 @@ function showLayer(u, capNodes) {
   var cap = $('#artcap'); cap.classList.remove('open');
   fill(cap, capNodes || []);
 }
-function showScene(sc) {
-  SC.shown = sc.name;
-  var done = function (u) { if (u && SC.shown === sc.name) showLayer(u, []); };
-  if (SC.imgs[sc.name]) { done(SC.imgs[sc.name]); return; }
-  call('scene', { name: sc.name }).then(function (d) {
-    if (!d || !d.ready) { SC.shown = ''; pickArt(false, true, true); return; }
-    done(SC.imgs[sc.name] = d.url || 'data:' + d.mime + ';base64,' + d.data);
-  }, function () { SC.shown = ''; pickArt(false, true, true); });
-}
 // 絵：週替わり（content.arts）＋手持ち（ARTS）。20分ごとに6秒かけて入れ替える
 var artI = -1;
 function artPool() { return ((S.content && S.content.arts) || []).concat(ARTS); }
-function pickArt(next, force, artOnly) {
-  if (!artOnly && bgMode() === 'cam') {
-    var sc = scenePick();
-    if (sc) { if (force || sc.name !== SC.shown) showScene(sc); return; }
-  }
-  var wasScene = !!SC.shown; SC.shown = '';
+function pickArt(next, force) {
   var pool = artPool(); if (!pool.length) return;
   var i = next ? (artI + 1) % pool.length : (dayIndex() * 7 + Math.floor(hourOf(jstNow()) * 3)) % pool.length;
-  if (i === artI && !force && !wasScene) return;
+  if (i === artI && !force) return;
   artI = i;
   var a = pool[i], src = safeUrl(a.img); if (!src) return;
   var big = src.replace(/\/(\d{3,4})px-/, '/1920px-'), img = new Image();
@@ -1635,7 +1716,6 @@ function pickArt(next, force, artOnly) {
   img.onerror = function () { show(src); };
   img.src = big;
   function show(u) {
-    if (SC.shown) return;  // 読み込み中にシーンへ切り替わっていたら出さない
     var cap = $('#artcap'), b = h('button', { type: 'button', 'aria-expanded': 'false' }, ['『' + a.title + '』 ' + a.who + (a.year ? '（' + a.year + '）' : '')]);
     b.addEventListener('click', function () { var o = cap.classList.toggle('open'); b.setAttribute('aria-expanded', String(o)); });
     showLayer(u, [b, h('div', { class: 'talk' }, [a.talk || ''])]);
@@ -1694,9 +1774,9 @@ document.addEventListener('visibilitychange', function () {
 
 /* ───────── プライベート：書く → ためた話 → Obsidian ───────── */
 var THANKS = ['聞かせてくれてありがとう。ちゃんとしまっておくね。', '覚えておくね。……また聞かせて。', 'うん、ここに置いておく。あなたの話は、ぜんぶ大事。'];
-function openSheet() { closeDrawer(); $('#sheet').classList.add('open'); $('#sheet').setAttribute('aria-hidden', 'false'); setTimeout(function () { $('#talkText').focus(); }, 250); }
+function openSheet() { closeDrawer(); closeTasting(); $('#sheet').classList.add('open'); $('#sheet').setAttribute('aria-hidden', 'false'); setTimeout(function () { $('#talkText').focus(); }, 250); }
 function closeSheet() { $('#sheet').classList.remove('open'); $('#sheet').setAttribute('aria-hidden', 'true'); }
-function openDrawer() { closeSheet(); $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); loadTalks(); }
+function openDrawer() { closeSheet(); closeTasting(); $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); loadTalks(); }
 function closeDrawer() { $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); }
 $('#writeBtn').addEventListener('click', openSheet);
 $('#talksBtn').addEventListener('click', openDrawer);
@@ -1738,6 +1818,123 @@ function renderTalks() {
       h('div', { class: 'body' }, [m.text])]);
   }));
 }
+/* ───────── テイスティングノート（2026-10-14）：本人だけが使う、飲んだものの記録 ─────────
+   種類・名前・作り手・スタイル・度数・日付・場所・香りの印・見た目／香り／味／余韻・点数・また飲みたいか・ひとこと。
+   印は種類ごとの手持ちから押すだけで付けられる。あとから直せる（自分の記録なので） */
+var T_KINDS = ['ビール', 'ウイスキー', '日本酒', 'ワイン', 'その他'];
+var T_TAGS = {
+  'ビール': ['柑橘', 'トロピカル', '松・樹脂', '花', 'モルト', 'カラメル', 'ロースト', 'パン', 'スパイス', '酸味', '苦味', 'すっきり'],
+  'ウイスキー': ['シェリー', 'バニラ', '蜂蜜', '干しぶどう', 'ピート', 'スモーキー', '潮', '柑橘', 'ナッツ', 'チョコ', 'スパイス', '樽'],
+  '日本酒': ['吟醸香', '米', '甘口', '辛口', '酸', '旨味', 'フルーティ', '熟成', 'すっきり'],
+  'ワイン': ['赤い果実', '黒い果実', '柑橘', '花', 'ハーブ', '樽', 'タンニン', '酸', 'ミネラル'],
+  'その他': ['甘い', '酸っぱい', '苦い', '香ばしい', 'フルーティ']
+};
+var T_AGAIN = [['yes', 'また飲みたい'], ['maybe', 'どちらでも'], ['no', 'もういい']];
+var TASTE = { list: null, kind: '', q: '', edit: null, f: null, rid: '', open: {} };
+function openTasting() {
+  closeSheet(); closeDrawer();
+  $('#tasting').classList.add('open'); $('#tasting').setAttribute('aria-hidden', 'false');
+  if (!TASTE.list) { fill($('#tList'), [h('li', { class: 'empty' }, ['読み込み中…'])]); call('tastings').then(function (d) { TASTE.list = d.items; renderTastes(); }, function (e) { fill($('#tList'), [h('li', { class: 'empty' }, ['読めませんでした：' + e.message])]); }); }
+  else renderTastes();
+}
+function closeTasting() { $('#tasting').classList.remove('open'); $('#tasting').setAttribute('aria-hidden', 'true'); }
+$('#tastingBtn').addEventListener('click', openTasting);
+$('#tastingX').addEventListener('click', closeTasting);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTasting(); });
+$('#tSearch').addEventListener('input', function () { TASTE.q = norm(this.value.trim()); renderTastes(); });
+function stars(n) { return n ? '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n) : ''; }
+function renderTastes() {
+  var all = TASTE.list || [];
+  // 絞り込みの種類（件数つき）
+  fill($('#tKinds'), [['', 'すべて']].concat(T_KINDS.map(function (k) { return [k, k]; })).map(function (k) {
+    var n = k[0] ? all.filter(function (x) { return x.kind === k[0]; }).length : all.length;
+    if (k[0] && !n) return null;
+    return h('button', { type: 'button', 'aria-pressed': String(TASTE.kind === k[0]), onclick: function () { TASTE.kind = k[0]; renderTastes(); } }, [k[1] + ' ' + n]);
+  }));
+  var list = all.filter(function (x) {
+    if (TASTE.kind && x.kind !== TASTE.kind) return false;
+    if (!TASTE.q) return true;
+    return norm([x.name, x.maker, x.style, x.where, x.nose, x.palate, x.memo].concat(x.tags || []).join(' ')).indexOf(TASTE.q) >= 0;
+  });
+  // 傾向：件数・平均点・よく付ける印
+  var scored = list.filter(function (x) { return x.score; }), tagN = {};
+  list.forEach(function (x) { (x.tags || []).forEach(function (t) { tagN[t] = (tagN[t] || 0) + 1; }); });
+  var top = Object.keys(tagN).sort(function (a, b) { return tagN[b] - tagN[a]; }).slice(0, 5);
+  $('#tStats').textContent = list.length ? list.length + '杯' + (scored.length ? '・平均 ★' + (scored.reduce(function (s, x) { return s + x.score; }, 0) / scored.length).toFixed(1) : '') +
+    (top.length ? '・よく付ける印：' + top.join('、') : '') : '';
+  fill($('#tList'), list.length ? list.map(function (x) {
+    var li = h('li', { class: TASTE.open[x.id] ? 'open' : null });
+    var det = [['見た目', x.look], ['香り', x.nose], ['味', x.palate], ['余韻', x.finish], ['ひとこと', x.memo]].filter(function (d) { return d[1]; })
+      .map(function (d) { return h('div', { style: 'white-space:pre-wrap' }, [h('b', null, [d[0]]), d[1]]); });
+    var edit = h('button', { type: 'button', class: 'x' }, ['直す']), del = h('button', { type: 'button', class: 'x' }, ['消す']);
+    edit.addEventListener('click', function (e) { e.stopPropagation(); openTForm(x); });
+    del.addEventListener('click', function (e) { e.stopPropagation(); });
+    twoStep(del, '消す', function () {
+      call('tastingdel', { id: x.id }).then(function (d) { TASTE.list = d.items; renderTastes(); }, function (e2) { toast('消せませんでした：' + e2.message, true); });
+    });
+    fill(li, [h('div', { class: 'meta' }, [h('span', null, [fmtDay(x.date) + '　' + x.kind + (x.where ? '　' + x.where : '')]), h('span', { class: 'tst' }, [stars(x.score)])]),
+      h('div', { class: 'tt' }, [x.name]),
+      h('div', { class: 'tsub' }, [[x.maker, x.style, x.abv != null ? x.abv + '%' : '', x.again === 'yes' ? 'また飲みたい' : x.again === 'no' ? 'もういい' : ''].filter(Boolean).join('　')]),
+      x.tags && x.tags.length ? h('div', { class: 'ttags' }, [x.tags.join('・')]) : null,
+      h('div', { class: 'tdet' }, det.concat([h('div', { style: 'display:flex;gap:16px;margin-top:6px' }, [edit, del])]))]);
+    li.addEventListener('click', function () { TASTE.open[x.id] = !TASTE.open[x.id]; li.classList.toggle('open'); });
+    return li;
+  }) : [h('li', { class: 'empty' }, [all.length ? '当てはまる記録はありません' : 'まだ何もありません。「記録する」から、最初の一杯を。'])]);
+}
+// 記録する／直す
+function openTForm(x) {
+  TASTE.edit = x || null; TASTE.rid = '';
+  TASTE.f = { kind: x ? x.kind : (TASTE.kind || 'ビール'), tags: (x && x.tags || []).slice(), score: x ? x.score : null, again: x ? x.again : 'maybe' };
+  $('#tName').value = x ? x.name : ''; $('#tMaker').value = x ? x.maker : ''; $('#tStyle').value = x ? x.style : '';
+  $('#tAbv').value = x && x.abv != null ? x.abv : ''; $('#tDate').value = x ? x.date : todayJst(); $('#tWhere').value = x ? x.where : '';
+  $('#tLook').value = x ? x.look : ''; $('#tNose').value = x ? x.nose : ''; $('#tPalate').value = x ? x.palate : ''; $('#tFinish').value = x ? x.finish : '';
+  $('#tMemo').value = x ? x.memo : '';
+  var preset = T_TAGS[TASTE.f.kind] || [];
+  $('#tTagsFree').value = TASTE.f.tags.filter(function (t) { return preset.indexOf(t) < 0; }).join('、');
+  $('#tMsg').textContent = x ? '直しています' : '';
+  $('#tSave').textContent = x ? '直す' : 'しまう';
+  $('#tForm').hidden = false; $('#tNew').hidden = true;
+  paintTForm();
+  setTimeout(function () { $('#tName').focus(); }, 50);
+}
+function paintTForm() {
+  var f = TASTE.f;
+  fill($('#tKind'), T_KINDS.map(function (k) {
+    return h('button', { type: 'button', role: 'radio', 'aria-checked': String(f.kind === k), onclick: function () { f.kind = k; paintTForm(); } }, [k]);
+  }));
+  fill($('#tTags'), (T_TAGS[f.kind] || []).map(function (t) {
+    return h('button', { type: 'button', 'aria-pressed': String(f.tags.indexOf(t) >= 0), onclick: function () {
+      var i = f.tags.indexOf(t); if (i >= 0) f.tags.splice(i, 1); else f.tags.push(t); paintTForm(); } }, [t]);
+  }));
+  fill($('#tScore'), [1, 2, 3, 4, 5].map(function (n) {
+    return h('button', { type: 'button', role: 'radio', 'aria-checked': String(f.score === n), 'aria-label': n + '点', class: f.score >= n ? 'on' : null,
+      onclick: function () { f.score = f.score === n ? null : n; paintTForm(); } }, ['★']);
+  }));
+  fill($('#tAgain'), T_AGAIN.map(function (a) {
+    return h('button', { type: 'button', role: 'radio', 'aria-checked': String(f.again === a[0]), onclick: function () { f.again = a[0]; paintTForm(); } }, [a[1]]);
+  }));
+}
+function closeTForm() { $('#tForm').hidden = true; $('#tNew').hidden = false; TASTE.edit = null; }
+$('#tNew').addEventListener('click', function () { openTForm(null); });
+$('#tCancel').addEventListener('click', closeTForm);
+$('#tForm').addEventListener('input', function () { TASTE.rid = ''; });
+$('#tForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var name = $('#tName').value.trim(), f = TASTE.f;
+  if (!name) { $('#tMsg').textContent = '名前を入れてください'; $('#tName').focus(); return; }
+  var preset = T_TAGS[f.kind] || [];
+  var tags = f.tags.filter(function (t) { return preset.indexOf(t) >= 0; }).concat($('#tTagsFree').value.split(/[,、]/).map(function (t) { return t.trim(); }).filter(Boolean));
+  TASTE.rid = TASTE.rid || rid();
+  var body = { id: TASTE.edit ? TASTE.edit.id : '', rid: TASTE.rid, kind: f.kind, name: name, maker: $('#tMaker').value.trim(), style: $('#tStyle').value.trim(),
+    abv: $('#tAbv').value, date: $('#tDate').value, where: $('#tWhere').value.trim(), tags: tags.join(','), look: $('#tLook').value.trim(), nose: $('#tNose').value.trim(),
+    palate: $('#tPalate').value.trim(), finish: $('#tFinish').value.trim(), score: f.score || '', again: f.again, memo: $('#tMemo').value.trim() };
+  $('#tSave').classList.add('busy'); $('#tMsg').textContent = 'しまっています…';
+  call('tastingsave', body, { long: true }).then(function (d) {
+    TASTE.list = d.items; closeTForm(); renderTastes(); toast((body.id ? '直しました：' : 'しまいました：') + name);
+  }, function (err) { $('#tMsg').textContent = 'しまえませんでした：' + err.message + '（書いたものは残っています）'; })
+    .then(function () { $('#tSave').classList.remove('busy'); });
+});
+
 function updateTalkCount() { var n = S.talks ? S.talks.items.length : 0; $('#talksBtn').textContent = 'ためた話' + (n ? '（' + n + '）' : ''); }
 
 /* ───────── 秘密の合図 → カミーユの部屋 ───────── */
@@ -1778,6 +1975,9 @@ function dropRoom() {
   if (typeof GAL !== 'undefined') { GAL.imgs = {}; GAL.b64 = ''; }
   $('#gal').hidden = true; $('#glight').hidden = true; fill($('#gwall'), []); fill($('#glight'), []);
   $('#gsheet').classList.remove('open');
+  if (typeof GZ !== 'undefined') { closeGaze(); GZ.list = []; }
+  SC.imgs = {}; $('#raskText').value = ''; $('#rask').hidden = true;
+  if (typeof ASK !== 'undefined' && ASK) { ASK.past = false; ASK.rid = ''; }
 }
 function armRoom() { clearTimeout(ROOM.timer); ROOM.timer = setTimeout(function () { if (house === 'room') setHouse('private'); }, 10 * 60e3); }
 $('#room').addEventListener('pointerdown', armRoom);
@@ -1792,21 +1992,86 @@ function photoFor(t) {
   var lt = list.filter(function (p) { return p.late; });
   return lt.length ? lt[0] : list[dayIndex() % list.length];
 }
-var TOPIC_LABEL = [['talk', 'ふだん'], ['night', '夜の話'], ['music', '音楽'], ['shop', 'お買いもの'], ['hobby', 'わたしの趣味'], ['smoke', 'パイプと葉巻']];
+var TOPIC_LABEL = [['talk', 'ふだん'], ['ask', '答える'], ['night', '夜の話'], ['music', '音楽'], ['shop', 'お買いもの'], ['hobby', 'わたしの趣味'], ['smoke', 'パイプと葉巻']];
 function heatLv() { var v = +(load('heat') || 2); return v >= 1 && v <= 3 ? v : 2; }
+// 縦長の絵（Genspark のシーン）を横長の画面に出すときは、切らずに右寄せで全身を見せ、後ろに暗くした同じ絵を敷く
+function roomBg(u) {
+  var q = cssUrl(u), seq = ROOM.bgSeq = (ROOM.bgSeq || 0) + 1;  // 後から頼んだ絵が先に届いても、古い絵で上書きしない
+  var put = function (tall) {
+    if (seq !== ROOM.bgSeq) return;
+    var next = ROOM.layer ? $('#rbA') : $('#rbB'), cur = ROOM.layer ? $('#rbB') : $('#rbA');
+    next.style.backgroundImage = tall ? q + ', linear-gradient(rgba(14, 11, 9, .78), rgba(14, 11, 9, .78)), ' + q : q;
+    next.style.backgroundSize = tall ? 'contain, cover, cover' : '';
+    next.style.backgroundPosition = tall ? 'right 8% center, center, center' : '';
+    next.style.backgroundRepeat = tall ? 'no-repeat' : '';
+    next.classList.add('on'); cur.classList.remove('on'); ROOM.layer ^= 1;
+  };
+  if (innerWidth <= innerHeight) return put(false);
+  var im = new Image();
+  im.onload = function () { put(im.naturalHeight > im.naturalWidth * 1.1); };
+  im.onerror = function () { put(false); };
+  im.src = u;
+}
 function enterRoom() {
   armRoom();
-  var t = roomTime(hourOf(jstNow())), p = photoFor(t);
-  var next = ROOM.layer ? $('#rbA') : $('#rbB'), cur = ROOM.layer ? $('#rbB') : $('#rbA');
-  next.style.backgroundImage = 'url("' + IMG_BASE + p.id + '.jpg")'; next.classList.add('on'); cur.classList.remove('on'); ROOM.layer ^= 1;
+  var t = roomTime(hourOf(jstNow())), p = photoFor(t), sc = scenePick(ROOM.pack && ROOM.pack.scenes), key = ROOM.key;
+  // 背景：カミーユのシーンがあればそれ（姿が絵に入っているので、姿の重ね絵は出さない）。無ければ部屋の写真＋姿
+  if (sc) {
+    $('#rfig').classList.remove('on');
+    var put = function (u) { if (u && ROOM.key === key) roomBg(u); };
+    if (SC.imgs[sc.name]) put(SC.imgs[sc.name]);
+    else {
+      roomBg(IMG_BASE + p.id + '.jpg');  // シーンが届くまでのつなぎ
+      call('scene', { name: sc.name, room: key }).then(function (d) {
+        if (d && d.ready) put(SC.imgs[sc.name] = d.url || 'data:' + d.mime + ';base64,' + d.data); else showFigure(t, p);
+      }, function () { showFigure(t, p); });
+    }
+  } else { roomBg(IMG_BASE + p.id + '.jpg'); showFigure(t, p); }
   ROOM.topic = 'talk'; ROOM.n = 0;
   fill($('#rtopics'), TOPIC_LABEL.map(function (x) {
     return h('button', { type: 'button', 'aria-pressed': String(x[0] === ROOM.topic), onclick: function () { ROOM.topic = x[0]; ROOM.n = 0; renderRoom(); } }, [x[1]]);
   }));
-  showFigure(t, p);
   var g = galSay();  // 夕方からは、ギャラリーのウイスキーから「今夜の一杯」を先に
-  renderRoom(/^今夜の一杯/.test(g) ? g : p.say);
+  renderRoom(/^今夜の一杯/.test(g) ? g : sc ? '' : p.say);
 }
+
+/* ───────── カミーユの質問に答える（2026-10-14・部屋の中だけ） ─────────
+   質問はサーバの手持ち（defaults.questions）。まだ答えていないものから順に、全部答えたら古い答えのものから聞き直す。
+   答えは Drive の room-answers.json（部屋の合図が要る）。Obsidian にも仕事の画面にも出さない */
+var ASK = { qn: 0, rid: '', q: null };
+function askPick() {
+  var qs = defaults('questions'); if (!qs.length) return null;
+  var ans = (ROOM.pack && ROOM.pack.answers) || [], last = {};
+  ans.forEach(function (a) { if (!last[a.qid]) last[a.qid] = a.at; });
+  var fresh = qs.filter(function (q) { return !last[q.id]; });
+  var pool = fresh.length ? fresh : qs.slice().sort(function (a, b) { return last[a.id] < last[b.id] ? -1 : 1; });
+  return pool[ASK.qn % pool.length];
+}
+function renderAsk(say) {
+  var q = ASK.q = askPick(), el = $('#rline');
+  el.textContent = say || (q ? q.q : 'いまは、聞きたいことが思いつかないの。……また今度ね。');
+  var ans = (ROOM.pack && ROOM.pack.answers) || [];
+  $('#rsub').textContent = say && q ? '次の質問：' + q.q : ans.length ? 'これまでの答え ' + ans.length + '件' : '';
+  $('#rask').hidden = !q;
+  var ul = $('#rlist'); ul.hidden = !ASK.past;
+  fill(ul, ASK.past ? ans.slice(0, 8).map(function (a) { return h('li', null, [h('small', null, [stampOf(a.at) + '　' + a.q]), h('div', { style: 'white-space:pre-wrap' }, [a.text])]); }) : []);
+}
+$('#raskNext').addEventListener('click', function () { armRoom(); ASK.qn++; ASK.rid = ''; $('#raskText').value = ''; renderAsk(); });
+$('#raskPast').addEventListener('click', function () { armRoom(); ASK.past = !ASK.past; renderAsk(); });
+$('#raskText').addEventListener('input', function () { ASK.rid = ''; armRoom(); });
+$('#raskSave').addEventListener('click', function () {
+  var text = $('#raskText').value.trim(), q = ASK.q, key = ROOM.key;
+  if (!text || !q) { $('#raskText').focus(); return; }
+  ASK.rid = ASK.rid || rid();
+  $('#raskSave').classList.add('busy');
+  call('answersave', { room: key, qid: q.id, q: q.q, text: text, rid: ASK.rid }, { long: true }).then(function (d) {
+    if (ROOM.key !== key) return;
+    ROOM.pack.answers = (d.items || []).slice(0, 60); ASK.rid = ''; $('#raskText').value = '';
+    var th = defaults('thanks');
+    renderAsk(th.length ? th[ROOM.pack.answers.length % th.length] : 'ありがとう。');
+  }, function (e) { toast('しまえませんでした：' + e.message + '（書いたものは残っています）', true); })
+    .then(function () { $('#raskSave').classList.remove('busy'); });
+});
 // 姿の絵：時間帯に合う場面から1枚。絵はその都度 GAS から（端末に残さない）
 var FIG_SCENES = { night: ['night', 'bath'], day: ['day', 'bath'], sleep: ['sleep', 'day'] };
 function showFigure(t, photo) {
@@ -1819,10 +2084,110 @@ function showFigure(t, photo) {
   if (ROOM.figs[pick.name]) { f.src = ROOM.figs[pick.name]; f.classList.add('on'); return; }
   call('figure', { name: pick.name, room: key }).then(function (d) {
     if (!d || !d.ready || ROOM.key !== key) return;
-    var src = 'data:' + d.mime + ';base64,' + d.data;
+    var src = d.url || 'data:' + d.mime + ';base64,' + d.data;
     ROOM.figs[pick.name] = src; f.src = src; f.classList.add('on');
   }, function () {});
 }
+/* ───────── 眺める（2026-10-16）：部屋の中で、カミーユの姿だけを大きく ─────────
+   シーン（背景つきの絵）と姿の絵を1列に並べ、9秒ごとにゆっくり入れ替える。今の時間帯のシーンから始める
+   画面に触れると操作が消える／出る。左右になぞる・←→ で前後、スペースで止める、Esc で部屋に戻る
+   絵は合図の内側から1枚ずつ取り、部屋にいるあいだだけメモリに置く（SC.imgs／ROOM.figs と共用）。端末に保存しない
+   触れずに10分たつと部屋ごと閉じる決まりは、眺めているあいだも同じ */
+var GZ = { list: [], i: 0, n: 0, play: true, timer: null, layer: 0, x0: null };
+var GZ_LABEL = { day: '昼', night: '夜', late: '夜更け', bath: '湯あがり', sleep: '寝るとき' };
+function gazeList() {
+  var pk = ROOM.pack || {}, slot = sceneSlot(hourOf(jstNow()));
+  var sc = (pk.scenes || []).map(function (x) { return { kind: 'scene', name: x.name, tag: x.slot }; });
+  var fg = (pk.figures || []).map(function (x) { return { kind: 'figure', name: x.name, tag: x.scene }; });
+  sc.sort(function (a, b) { return (b.tag === slot) - (a.tag === slot); });
+  return sc.concat(fg);
+}
+function gazeCache(it) { return it.kind === 'scene' ? SC.imgs : ROOM.figs; }
+function gazeLoad(it) {
+  if (!it) return Promise.resolve('');
+  var c = gazeCache(it), key = ROOM.key;
+  if (c[it.name]) return Promise.resolve(c[it.name]);
+  if (it.p) return it.p;
+  return it.p = call(it.kind, { name: it.name, room: key }).then(function (d) {
+    it.p = null;
+    if (!d || !d.ready || ROOM.key !== key) return '';
+    var u = c[it.name] = d.url || 'data:' + d.mime + ';base64,' + d.data;
+    gazeThumb(it); return u;
+  }, function () { it.p = null; return ''; });
+}
+function cssUrl(u) { return 'url("' + u.replace(/"/g, '%22') + '")'; }
+function gazeThumb(it) {
+  var b = $('#gzthumbs').children[GZ.list.indexOf(it)], u = gazeCache(it)[it.name];
+  if (b && u) { b.style.backgroundImage = cssUrl(u); b.classList.add('ok'); }
+}
+function openGaze() {
+  armRoom();
+  GZ.list = gazeList(); GZ.n = 0; GZ.play = true;
+  if (!GZ.list.length) { toast('まだ姿の絵がありません'); return; }
+  var g = $('#gaze'); g.hidden = false; g.classList.remove('bare');
+  fill($('#gzthumbs'), GZ.list.map(function (it, k) {
+    return h('button', { type: 'button', 'aria-label': (GZ_LABEL[it.tag] || it.tag) + ' ' + (k + 1), onclick: function () { armRoom(); gazeShow(k); } }, [h('span', null, [GZ_LABEL[it.tag] || it.tag])]);
+  }));
+  GZ.list.forEach(gazeThumb);
+  gazePaintPlay(); gazeShow(0);
+  // 一覧の小窓のために、残りも1枚ずつ取っておく
+  var key = ROOM.key, q = GZ.list.slice();
+  (function next() { if (ROOM.key !== key || g.hidden || !q.length) return; gazeLoad(q.shift()).then(next); })();
+}
+function closeGaze() {
+  clearTimeout(GZ.timer); GZ.n++;
+  $('#gaze').hidden = true; $('#gaze').classList.remove('paper', 'bare');
+  ['#gzA', '#gzB'].forEach(function (s) { var im = $(s); im.classList.remove('on'); im.removeAttribute('src'); });
+  $('#gzbg').style.backgroundImage = ''; fill($('#gzthumbs'), []); $('#gzline').textContent = '';
+}
+function gazeShow(k) {
+  var n = GZ.list.length; if (!n) return;
+  GZ.i = ((k % n) + n) % n;
+  var it = GZ.list[GZ.i], seq = ++GZ.n, th = $('#gzthumbs');
+  [].forEach.call(th.children, function (b, j) { b.setAttribute('aria-current', String(j === GZ.i)); });
+  var cb = th.children[GZ.i]; if (cb) th.scrollLeft = cb.offsetLeft - th.clientWidth / 2 + cb.offsetWidth / 2;  // scrollIntoView は部屋ごと動かすので使わない
+  $('#gzcap').textContent = (GZ_LABEL[it.tag] || it.tag) + '　' + (GZ.i + 1) + ' / ' + n;
+  clearTimeout(GZ.timer);
+  gazeLoad(it).then(function (u) {
+    if (seq !== GZ.n || $('#gaze').hidden) return;
+    if (!u) { $('#gzcap').textContent += '　読めませんでした'; gazeArm(); return; }
+    var nx = GZ.layer ? $('#gzA') : $('#gzB'), cur = GZ.layer ? $('#gzB') : $('#gzA');
+    nx.className = 'gzimg ' + it.kind; nx.src = u; void nx.offsetWidth; nx.classList.add('on'); cur.classList.remove('on'); GZ.layer ^= 1;
+    $('#gaze').classList.toggle('paper', it.kind === 'figure');
+    if (it.kind === 'scene') $('#gzbg').style.backgroundImage = cssUrl(u);
+    gazeSay(); gazeArm();
+    gazeLoad(GZ.list[(GZ.i + 1) % n]);  // 次の1枚を先に
+  });
+}
+// ときどき、ひとことだけ（3枚に1回。時間帯の言葉から）
+function gazeSay() {
+  var words = ((ROOM.pack && ROOM.pack.defaults) || {}).words || {}, t = roomTime(hourOf(jstNow())), l = words[t] || words.night || [], el = $('#gzline');
+  el.classList.add('fade');
+  setTimeout(function () { el.textContent = l.length && GZ.n % 3 === 1 ? l[(dayIndex() + GZ.n) % l.length] : ''; el.classList.remove('fade'); }, 700);
+}
+function gazeArm() { clearTimeout(GZ.timer); if (GZ.play && !$('#gaze').hidden && GZ.list.length > 1) GZ.timer = setTimeout(function () { gazeShow(GZ.i + 1); }, 9000); }
+function gazePaintPlay() { var b = $('#gzPlay'); b.textContent = GZ.play ? 'Ⅱ' : '▶'; b.setAttribute('aria-label', GZ.play ? '止める' : '流す'); }
+function gazePlay(on) { GZ.play = on; gazePaintPlay(); if (on) gazeArm(); else clearTimeout(GZ.timer); }
+$('#gazeOpen').addEventListener('click', openGaze);
+$('#gzBack').addEventListener('click', function () { armRoom(); closeGaze(); });
+$('#gzPrev').addEventListener('click', function () { armRoom(); gazeShow(GZ.i - 1); });
+$('#gzNext').addEventListener('click', function () { armRoom(); gazeShow(GZ.i + 1); });
+$('#gzPlay').addEventListener('click', function () { armRoom(); gazePlay(!GZ.play); });
+// 絵に触れる：なぞれば前後、軽く触れれば操作を消す／出す
+$('#gaze').addEventListener('pointerdown', function (e) { GZ.x0 = e.target.closest('button') ? null : e.clientX; });
+$('#gaze').addEventListener('pointerup', function (e) {
+  if (GZ.x0 === null) return;
+  var dx = e.clientX - GZ.x0; GZ.x0 = null;
+  if (Math.abs(dx) > 50) gazeShow(GZ.i + (dx < 0 ? 1 : -1)); else $('#gaze').classList.toggle('bare');
+});
+document.addEventListener('keydown', function (e) {
+  if (house !== 'room' || $('#gaze').hidden || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  armRoom();
+  if (e.key === 'ArrowRight') gazeShow(GZ.i + 1);
+  else if (e.key === 'ArrowLeft') gazeShow(GZ.i - 1);
+  else if (e.key === ' ') { e.preventDefault(); gazePlay(!GZ.play); }
+  else if (e.key === 'Escape') closeGaze();
+});
 function weekly(k) { var c = ROOM.pack && ROOM.pack.content; return (c && c[k]) || []; }
 function defaults(k) { var d = ROOM.pack && ROOM.pack.defaults; return (d && d[k]) || []; }
 function roomLines() {
@@ -1855,7 +2220,14 @@ function roomLines() {
     case 'smoke': return defaults('smoke').map(function (x) { return { line: x.talk, sub: x.title + '　' + x.fact }; });
     default: {
       var key = isClosedDay(todayJst()) && t !== 'night' ? 'closed' : (wx === 'rain' || wx === 'snow') && words[wx] ? wx : t;
-      return (words[key] || words.night || []).map(function (x) { return { line: x }; });
+      var base = (words[key] || words.night || []).map(function (x) { return { line: x }; });
+      // 前に答えてくれたことを、ときどき思い出す（答えはそのまま引く。言い換えない）
+      var ans = pk.answers || [];
+      if (ans.length) {
+        var a = ans[dayIndex() % ans.length], txt = a.text.replace(/\s+/g, ' ');
+        base.splice(1, 0, { line: '前に「' + a.q.replace(/[？?。]+$/, '') + '」って聞いたら、「' + (txt.length > 40 ? txt.slice(0, 40) + '…' : txt) + '」って答えてくれたね。' });
+      }
+      return base;
     }
   }
 }
@@ -1866,6 +2238,9 @@ function renderRoom(first) {
   if (!heat.hidden) fill(heat, [h('span', null, ['濃さ'])].concat([[1, 'ひかえめ'], [2, 'ふつう'], [3, '近め']].map(function (x) {
     return h('button', { type: 'button', 'aria-pressed': String(heatLv() === x[0]), onclick: function () { save('heat', String(x[0])); ROOM.n = 0; renderRoom(); } }, [x[1]]);
   })));
+  $('#rask').hidden = true;
+  if (ROOM.topic === 'ask') { $('#rnext').hidden = true; renderAsk(); return; }
+  ASK.past = false;
   var lines = roomLines(), L = first && ROOM.topic === 'talk' && !ROOM.n ? { line: first } : lines.length ? lines[ROOM.n % lines.length] : { line: 'ここには、まだ何もないの。……また今度、話そう。' };
   var el = $('#rline'); el.classList.add('fade');
   setTimeout(function () {
@@ -2164,7 +2539,8 @@ function mockInit() {
       ov({ title: 'ご予約 7名様', cat: '顧客予約', date: dt(d(3), '19:30'), visit: true })
     ],
     routines: {}, ideas: [], talks: [], rid: {},
-    notes: { books: {} }, gallery: [], galimg: {}
+    notes: { books: {} }, gallery: [], galimg: {}, answers: [],
+    tastings: [{ id: 'mt1', at: T + 'T20:00', date: addDays(T, -3), kind: 'ウイスキー', name: '見本のシングルモルト 12年', maker: '見本の蒸留所', style: 'スペイサイド', where: '自宅', abv: 43, look: '琥珀', nose: '干しぶどう、蜂蜜', palate: '甘く、なめらか', finish: '中くらい', tags: ['シェリー', '蜂蜜'], score: 4, again: 'yes', memo: '' }]
   };
 }
 var MOCK_ROOM = {  // 見本だけ。本物は Code.gs の ROOM_DEFAULTS
@@ -2173,6 +2549,8 @@ var MOCK_ROOM = {  // 見本だけ。本物は Code.gs の ROOM_DEFAULTS
   hobby: [{ title: '見本の趣味', talk: '見本の趣味の話。' }],
   smoke: [{ title: '見本のパイプの話', fact: '見本の事実。', talk: '見本のパイプの話。' }],
   night: [{ talk: '見本の夜の話（ひかえめ）。', lv: 1 }, { talk: '見本の夜の話（ふつう）。', lv: 2 }],
+  questions: [{ id: 'd1', q: '見本：今日いちばん、心が動いたのはどんなとき？' }, { id: 'u2', q: '見本：わたしと過ごすなら、どの季節がいい？' }],
+  thanks: ['見本：教えてくれてありがとう。'],
   words: { dawn: ['見本：朝のことば。'], day: ['見本：昼のことば。'], dusk: ['見本：夕方のことば。'], night: ['見本：夜のことば。'], rain: ['見本：雨の日のことば。'], snow: ['見本：雪の日のことば。'], closed: ['見本：定休日のことば。'] }
 };
 function mockCall(p) { return new Promise(function (resolve) { setTimeout(function () { resolve(mockRoute(p)); }, 120); }); }
@@ -2221,12 +2599,30 @@ function mockRoute(p) {
       return ok({ items: db.talks, synced: '' });
     }
     case 'talkdel': { var b2 = db.talks.length; db.talks = db.talks.filter(function (x) { return x.id !== p.id; }); return b2 === db.talks.length ? ng('その話はありません') : ok({ items: db.talks, synced: '' }); }
-    case 'room': return p.room === 'mock' ? ok({ defaults: MOCK_ROOM, figures: [], night: { generated: '', lines: [] }, content: { shop: [], songs: [], hobby: [], night: [] },
-      music: { ready: false }, amazon: { ready: false }, gallery: db.gallery, err: {} }) : ng('room');
+    case 'room': return p.room === 'mock' ? ok({ defaults: MOCK_ROOM, figures: params.get('scenes') === '1' ? [{ name: 'cam-day-1', scene: 'day' }, { name: 'cam-night-1', scene: 'night' }, { name: 'cam-sleep-1', scene: 'sleep' }] : [], night: { generated: '', lines: [] }, content: { shop: [], songs: [], hobby: [], night: [] },
+      music: { ready: false }, amazon: { ready: false }, gallery: db.gallery, answers: db.answers,
+      scenes: params.get('scenes') === '1' ? [{ name: 'scene-day-1', slot: 'day', up: 1 }, { name: 'scene-night-1', slot: 'night', up: 1 }] : [], err: {} }) : ng('room');
+    case 'answers': case 'answersave': case 'answerdel': {
+      if (p.room !== 'mock') return ng('room');
+      if (p.action === 'answersave') { if (!String(p.text || '').trim()) return ng('答えが空です'); if (!db.answers.some(function (x) { return x.id === p.rid; })) db.answers.unshift({ id: p.rid || rid(), at: now, qid: p.qid, q: p.q, text: String(p.text).trim() }); }
+      if (p.action === 'answerdel') db.answers = db.answers.filter(function (x) { return x.id !== p.id; });
+      return ok({ items: db.answers });
+    }
+    case 'tastings': return ok({ items: db.tastings });
+    case 'tastingsave': {
+      if (!String(p.name || '').trim()) return ng('名前を入れてください');
+      var tv = { date: p.date || T, kind: p.kind, name: p.name, maker: p.maker || '', style: p.style || '', where: p.where || '', abv: p.abv === '' ? null : +p.abv, look: p.look || '', nose: p.nose || '', palate: p.palate || '', finish: p.finish || '',
+        tags: String(p.tags || '').split(',').filter(Boolean), score: +p.score || null, again: p.again || 'maybe', memo: p.memo || '' };
+      var tc = p.id && db.tastings.find(function (x) { return x.id === p.id; });
+      if (tc) Object.assign(tc, tv, { up: now }); else if (!db.tastings.some(function (x) { return x.id === p.rid; })) db.tastings.unshift(Object.assign({ id: p.rid || rid(), at: now }, tv));
+      db.tastings.sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+      return ok({ items: db.tastings });
+    }
+    case 'tastingdel': db.tastings = db.tastings.filter(function (x) { return x.id !== p.id; }); return ok({ items: db.tastings });
     case 'tasks': return ok({ date: T, rows: open() });
     // シーンのモックは部屋の写真で代用（カミーユの絵は公開ページのモックに置かない）。?scenes=1 で出す
-    case 'scenes': return ok({ scenes: params.get('scenes') === '1' ? [{ name: 'scene-day-1', slot: 'day', up: 1 }, { name: 'scene-night-1', slot: 'night', up: 1 }] : [] });
-    case 'scene': return ok({ ready: true, name: p.name, url: IMG_BASE + (p.name === 'scene-day-1' ? 'deck' : 'fire') + '.jpg' });
+    case 'scenes': return p.room !== 'mock' ? ng('room') : ok({ scenes: params.get('scenes') === '1' ? [{ name: 'scene-day-1', slot: 'day', up: 1 }, { name: 'scene-night-1', slot: 'night', up: 1 }] : [] });
+    case 'scene': return p.room === 'mock' ? ok({ ready: true, name: p.name, url: IMG_BASE + (p.name === 'scene-day-1' ? 'deck' : 'fire') + '.jpg' }) : ng('room');
     case 'notes': case 'noteadd': case 'notehead': {
       if (p.room !== 'mock') return ng('room');
       var book = function (n) { var b = db.notes.books[n] || { head: { owner: '', next: '', waiting: '' }, lines: [] }; return { name: n, head: b.head, lines: b.lines }; };
@@ -2252,7 +2648,8 @@ function mockRoute(p) {
     }
     case 'galleryimg': { if (p.room !== 'mock') return ng('room'); var gi = db.galimg[p.id]; return ok(gi ? { ready: true, id: p.id, mime: gi.mime, data: gi.data } : { ready: false }); }
     case 'gallerysee': { if (p.room !== 'mock') return ng('room'); db.gallery.forEach(function (x) { if (x.id === p.id) x.seen = now; }); return ok({ items: db.gallery }); }
-    case 'figure': return p.room === 'mock' ? ok({ ready: false, reason: 'モックには絵を置かない' }) : ng('room');
+    // 姿の絵も ?scenes=1 のときだけ部屋の写真で代用（眺めるの見本）
+    case 'figure': return p.room !== 'mock' ? ng('room') : params.get('scenes') === '1' ? ok({ ready: true, name: p.name, url: IMG_BASE + ({ 'cam-day-1': 'kitchen', 'cam-night-1': 'genkan', 'cam-sleep-1': 'bednight' }[p.name] || 'kura') + '.jpg' }) : ok({ ready: false, reason: 'モックには絵を置かない' });
     default: return ng('unknown action: ' + p.action);
   }
 }
