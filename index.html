@@ -41,18 +41,19 @@ button, input, textarea { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
 .house { position: fixed; inset: 0; overflow: auto; transition: opacity 1.2s ease, visibility 0s linear 1.2s; opacity: 0; visibility: hidden; }
-body[data-house="work"] #work, body[data-house="private"] #private, body[data-house="room"] #room, body[data-house="canvas"] #canvas { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
+body[data-house="private"] #home, body[data-house="room"] #room, body[data-house="canvas"] #canvas { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
+body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 
-/* ───────── 切り替え ───────── */
-.switch { position: fixed; z-index: 20; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
-  display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(29, 38, 34, .08); transition: opacity .8s ease, background .8s ease; }
-.switch button { border: 0; background: transparent; padding: 6px 16px; border-radius: 999px; cursor: pointer; font-size: 13px; letter-spacing: .04em; color: var(--muted); }
-.switch button[aria-pressed="true"] { background: var(--sheet); color: var(--ink); font-weight: 500; }
-body[data-house="private"] .switch { background: rgba(0, 0, 0, .28); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-body[data-house="private"] .switch button { color: var(--ivory-dim); }
-body[data-house="private"] .switch button[aria-pressed="true"] { background: rgba(239, 232, 218, .16); color: var(--ivory); }
-body.idle[data-house="private"] .switch, body.idle[data-house="private"] .pv-quiet { opacity: 0; }
-body[data-house="room"] .switch, body[data-house="canvas"] .switch { display: none; }
+/* ───────── ひとつのページ（2026-10-22）：上がプライベート、下へスクロールすると仕事 ───────── */
+#home { overscroll-behavior-y: contain; }
+#home > #private { position: relative; height: 100vh; height: 100svh; }
+.pv-down { position: absolute; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); transform: translateX(-50%); border: 0; background: none; cursor: pointer;
+  color: var(--ivory-dim); font: 13px var(--mincho); letter-spacing: .24em; padding: 6px 14px; transition: opacity .8s ease; }
+.pv-down::after { content: ""; display: block; width: 1px; height: 22px; margin: 6px auto 0; background: linear-gradient(var(--ivory-dim), transparent); transform-origin: top; animation: downline 2.6s ease-in-out infinite; }
+@keyframes downline { 0%, 100% { transform: scaleY(.35); opacity: .4; } 50% { transform: scaleY(1); opacity: 1; } }
+#home .trivia, #home .artcap { bottom: max(64px, env(safe-area-inset-bottom)); }
+@media (min-width: 761px) { #home .pv-tools { bottom: calc(max(64px, env(safe-area-inset-bottom)) + 62px); } }
+@media (prefers-reduced-motion: reduce) { .pv-down::after { animation: none; } }
 
 /* ───────── 合言葉 ───────── */
 .gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--paper); padding: 16px; }
@@ -64,7 +65,41 @@ body[data-house="room"] .switch, body[data-house="canvas"] .switch { display: no
 .gate button { margin-top: 10px; width: 100%; }
 
 /* ───────── 仕事 ───────── */
-#work { padding: 72px 16px 40px; }
+#work { padding: 36px 16px 60px; min-height: 100vh; background: var(--paper); }
+.w-head .w-go { margin-left: auto; }
+
+/* ───────── タイムカード（2026-10-22） ───────── */
+.tc { margin: 0 0 22px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
+.tc-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.tc-now { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+.tc-lab { font-size: 12px; color: var(--muted); letter-spacing: .12em; }
+.tc-now b { font-size: 18px; font-weight: 500; }
+.tc-now small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.tc-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.tc-btns button { min-height: 40px; min-width: 76px; }
+.tc-month { margin-top: 12px; font-size: 13px; color: var(--muted); }
+.tc-line { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 14px; }
+.tc-line b { color: var(--ink); font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; }
+.tc-bar { position: relative; height: 8px; border-radius: 4px; background: var(--rule); margin: 8px 0 6px; }
+.tc-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--bottle); transition: width .6s ease; }
+.tc-bar i.over { background: var(--amber); }
+.tc-bar u { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--ink); opacity: .45; }
+.tc-list { margin-top: 12px; border-top: 1px solid var(--rule); padding-top: 10px; }
+.tc-mnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 8px; }
+.tc-mnav b { font-weight: 500; min-width: 7em; text-align: center; }
+.tc-scroll { overflow-x: auto; }
+.tc-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.tc-table th, .tc-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.tc-table th { font-weight: 400; color: var(--muted); font-size: 12px; }
+.tc-table td.m { white-space: normal; color: var(--muted); min-width: 8em; }
+.tc-table tr.now td { background: rgba(127, 181, 162, .12); }
+.tc-table tfoot td { border-bottom: 0; font-weight: 500; }
+.tc-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 12px; margin: 4px 0 12px; padding: 12px; border-radius: 8px; background: var(--paper); }
+.tc-edit label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+.tc-edit input { border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 6px 8px; font-size: 16px; color: var(--ink); }
+.tc-edit .wide { grid-column: 1 / -1; }
+.tc-edit .acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tc-edit .acts .gap { flex: 1; }
 .w-wrap { max-width: 1080px; margin: 0 auto; }
 .w-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
 .w-date { font-size: 26px; font-weight: 500; letter-spacing: .02em; }
@@ -366,6 +401,13 @@ a.ev:hover .ttl { text-decoration: underline; }
 .gzthumbs button.ok span { display: none; }
 .gzthumbs button[aria-current="true"] { opacity: 1; border-color: var(--ivory); }
 .gaze.bare .gzbar { opacity: 0; pointer-events: none; }
+.gzthumbs button { position: relative; }
+.gzthumbs button.out { opacity: .3; }
+.gzthumbs button.out::after { content: "外す"; position: absolute; inset: auto 0 0 0; padding: 2px 0; background: rgba(160, 40, 30, .85); color: #fff; font: 10px var(--gothic); text-align: center; }
+.gaze.picking .gzthumbs button { opacity: 1; }
+.gaze.picking .gzthumbs button.out { opacity: .4; }
+.gzpick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 13px var(--mincho); color: var(--ivory); }
+.gzpick .n { color: var(--ivory-dim); }
 .gaze.bare .gzline { bottom: max(28px, env(safe-area-inset-bottom)); }  /* 操作を消してもセリフは残す */
 .gaze.bare { cursor: none; }
 @media (prefers-reduced-motion: reduce) { .gzimg.on { animation: none; } }
@@ -484,11 +526,6 @@ a.ev:hover .ttl { text-decoration: underline; }
 </head>
 <body data-house="work">
 
-<nav class="switch" aria-label="ページの切り替え">
-  <button type="button" data-go="work" aria-pressed="true">仕事</button>
-  <button type="button" data-go="private" aria-pressed="false">プライベート</button>
-  <button type="button" data-go="canvas" aria-pressed="false">キャンバス</button>
-</nav>
 
 <div class="gate" id="gate" hidden>
   <form id="gateForm" autocomplete="off">
@@ -499,14 +536,93 @@ a.ev:hover .ttl { text-decoration: underline; }
   </form>
 </div>
 
+
+<!-- ───────── ひとつのページ（2026-10-22）：上がプライベート、スクロールすると仕事 ───────── -->
+<div id="home" class="house">
+
+<!-- ───────── プライベート ───────── -->
+<section id="private" aria-label="プライベート">
+  <div class="art" id="artA"></div>
+  <div class="art" id="artB"></div>
+  <div class="tint"></div>
+  <canvas id="mood" aria-hidden="true"></canvas>
+  <div class="veil"></div>
+  <div class="pv">
+    <div class="clock" id="clock">
+      <div class="hm" id="hm"></div>
+      <div class="dt" id="dt"></div>
+      <div class="dayline" id="dayline" aria-hidden="true"></div>
+      <div class="secret" id="secret"><input id="secretIn" type="password" autocomplete="off" aria-label="合図"></div>
+    </div>
+    <p class="cam" id="cam"></p>
+    <aside class="trivia" id="trivia" aria-live="polite"></aside>
+    <div class="artcap pv-quiet" id="artcap"></div>
+    <div class="pv-tools pv-quiet">
+      <button type="button" id="writeBtn">書く</button>
+      <button type="button" id="talksBtn">ためた話</button>
+      <button type="button" id="tastingBtn">テイスティング</button>
+    </div>
+    <button type="button" class="pv-down pv-quiet" id="toWork">仕事</button>
+  </div>
+  <div class="glass sheet" id="sheet" role="dialog" aria-label="書く" aria-hidden="true">
+    <textarea id="talkText" placeholder="今日のこと、思ったこと。カミーユにだけ話すつもりで"></textarea>
+    <div class="row2">
+      <label><input type="checkbox" id="toObs" checked> Obsidian にも残す</label>
+      <div style="display:flex;gap:10px"><button type="button" class="pill" id="talkCancel">やめる</button><button type="button" class="pill keep" id="talkKeep">しまう</button></div>
+    </div>
+  </div>
+  <aside class="glass drawer" id="drawer" aria-label="ためた話" aria-hidden="true">
+    <h2>ためた話<button type="button" id="drawerX">閉じる</button></h2>
+    <p class="note">毎晩 Obsidian の「30_Areas/プライベート」に写します。仕事のページには出ません。</p>
+    <ol class="talks" id="talks"></ol>
+  </aside>
+  <!-- テイスティングノート（2026-10-14）：本人だけが使う、飲んだものの記録。Drive の Cellar/tasting.json -->
+  <aside class="glass drawer tasting" id="tasting" aria-label="テイスティングノート" aria-hidden="true">
+    <h2>テイスティングノート<button type="button" id="tastingX">閉じる</button></h2>
+    <p class="note" id="tStats"></p>
+    <div class="tbar"><div class="tchips" id="tKinds" role="group" aria-label="種類で絞る"></div><input id="tSearch" type="search" placeholder="名前・作り手・香りで探す" aria-label="探す"></div>
+    <button type="button" class="pill keep" id="tNew">記録する</button>
+    <form class="tform" id="tForm" hidden autocomplete="off">
+      <div class="tchips" id="tKind" role="radiogroup" aria-label="種類"></div>
+      <label>名前<input id="tName" required maxlength="80"></label>
+      <div class="t2"><label>作り手<input id="tMaker" maxlength="60"></label><label>スタイル・産地<input id="tStyle" maxlength="60"></label></div>
+      <div class="t3"><label>度数（%）<input id="tAbv" type="number" step="0.1" min="0" max="80" inputmode="decimal"></label><label>日付<input id="tDate" type="date"></label><label>場所<input id="tWhere" maxlength="60"></label></div>
+      <div class="tlab">香り・味の印</div>
+      <div class="tchips" id="tTags" role="group" aria-label="香り・味の印"></div>
+      <label>ほかの印（、で区切る）<input id="tTagsFree" maxlength="120"></label>
+      <label>見た目<textarea id="tLook" rows="1" maxlength="200"></textarea></label>
+      <label>香り<textarea id="tNose" rows="2" maxlength="300"></textarea></label>
+      <label>味<textarea id="tPalate" rows="2" maxlength="300"></textarea></label>
+      <label>余韻<textarea id="tFinish" rows="1" maxlength="200"></textarea></label>
+      <div class="tlab">点数</div>
+      <div class="tstars" id="tScore" role="radiogroup" aria-label="点数"></div>
+      <div class="tlab">また飲みたいか</div>
+      <div class="tchips" id="tAgain" role="radiogroup" aria-label="また飲みたいか"></div>
+      <label>ひとこと<textarea id="tMemo" rows="2" maxlength="1000"></textarea></label>
+      <div class="tacts"><span class="note" id="tMsg"></span><span style="display:flex;gap:10px"><button type="button" class="pill" id="tCancel">やめる</button><button type="submit" class="pill keep" id="tSave">しまう</button></span></div>
+    </form>
+    <ol class="talks tlist" id="tList"></ol>
+  </aside>
+</section>
+
 <!-- ───────── 仕事 ───────── -->
-<main id="work" class="house" aria-label="仕事">
+<main id="work" aria-label="仕事">
   <div class="w-wrap">
     <header class="w-head">
       <div class="w-date" id="wDate"></div>
       <div class="w-wx" id="wWx"></div>
+      <button type="button" class="act w-go" id="toCanvas">キャンバス</button>
     </header>
     <p class="w-cam"><b>カミーユ</b><span id="wCam"></span></p>
+    <!-- タイムカード（2026-10-22）。記録は個人ドライブの Cellar/timecard.json -->
+    <section class="tc" id="tc" aria-label="タイムカード">
+      <div class="tc-top">
+        <div class="tc-now"><span class="tc-lab">タイムカード</span><b id="tcState">読み込み中…</b><small id="tcSub"></small></div>
+        <div class="tc-btns" id="tcBtns"></div>
+      </div>
+      <div class="tc-month" id="tcMonth"></div>
+      <div class="tc-list" id="tcList" hidden></div>
+    </section>
     <div class="w-nav" role="tablist" aria-label="仕事のページ">
       <button type="button" role="tab" data-tab="sched" aria-selected="true">スケジュール</button>
       <button type="button" role="tab" data-tab="ideas" aria-selected="false">アイデア</button>
@@ -575,69 +691,7 @@ a.ev:hover .ttl { text-decoration: underline; }
   </div>
 </main>
 
-<!-- ───────── プライベート ───────── -->
-<section id="private" class="house" aria-label="プライベート">
-  <div class="art" id="artA"></div>
-  <div class="art" id="artB"></div>
-  <div class="tint"></div>
-  <canvas id="mood" aria-hidden="true"></canvas>
-  <div class="veil"></div>
-  <div class="pv">
-    <div class="clock" id="clock">
-      <div class="hm" id="hm"></div>
-      <div class="dt" id="dt"></div>
-      <div class="dayline" id="dayline" aria-hidden="true"></div>
-      <div class="secret" id="secret"><input id="secretIn" type="password" autocomplete="off" aria-label="合図"></div>
-    </div>
-    <p class="cam" id="cam"></p>
-    <aside class="trivia" id="trivia" aria-live="polite"></aside>
-    <div class="artcap pv-quiet" id="artcap"></div>
-    <div class="pv-tools pv-quiet">
-      <button type="button" id="writeBtn">書く</button>
-      <button type="button" id="talksBtn">ためた話</button>
-      <button type="button" id="tastingBtn">テイスティング</button>
-    </div>
-  </div>
-  <div class="glass sheet" id="sheet" role="dialog" aria-label="書く" aria-hidden="true">
-    <textarea id="talkText" placeholder="今日のこと、思ったこと。カミーユにだけ話すつもりで"></textarea>
-    <div class="row2">
-      <label><input type="checkbox" id="toObs" checked> Obsidian にも残す</label>
-      <div style="display:flex;gap:10px"><button type="button" class="pill" id="talkCancel">やめる</button><button type="button" class="pill keep" id="talkKeep">しまう</button></div>
-    </div>
-  </div>
-  <aside class="glass drawer" id="drawer" aria-label="ためた話" aria-hidden="true">
-    <h2>ためた話<button type="button" id="drawerX">閉じる</button></h2>
-    <p class="note">毎晩 Obsidian の「30_Areas/プライベート」に写します。仕事のページには出ません。</p>
-    <ol class="talks" id="talks"></ol>
-  </aside>
-  <!-- テイスティングノート（2026-10-14）：本人だけが使う、飲んだものの記録。Drive の Cellar/tasting.json -->
-  <aside class="glass drawer tasting" id="tasting" aria-label="テイスティングノート" aria-hidden="true">
-    <h2>テイスティングノート<button type="button" id="tastingX">閉じる</button></h2>
-    <p class="note" id="tStats"></p>
-    <div class="tbar"><div class="tchips" id="tKinds" role="group" aria-label="種類で絞る"></div><input id="tSearch" type="search" placeholder="名前・作り手・香りで探す" aria-label="探す"></div>
-    <button type="button" class="pill keep" id="tNew">記録する</button>
-    <form class="tform" id="tForm" hidden autocomplete="off">
-      <div class="tchips" id="tKind" role="radiogroup" aria-label="種類"></div>
-      <label>名前<input id="tName" required maxlength="80"></label>
-      <div class="t2"><label>作り手<input id="tMaker" maxlength="60"></label><label>スタイル・産地<input id="tStyle" maxlength="60"></label></div>
-      <div class="t3"><label>度数（%）<input id="tAbv" type="number" step="0.1" min="0" max="80" inputmode="decimal"></label><label>日付<input id="tDate" type="date"></label><label>場所<input id="tWhere" maxlength="60"></label></div>
-      <div class="tlab">香り・味の印</div>
-      <div class="tchips" id="tTags" role="group" aria-label="香り・味の印"></div>
-      <label>ほかの印（、で区切る）<input id="tTagsFree" maxlength="120"></label>
-      <label>見た目<textarea id="tLook" rows="1" maxlength="200"></textarea></label>
-      <label>香り<textarea id="tNose" rows="2" maxlength="300"></textarea></label>
-      <label>味<textarea id="tPalate" rows="2" maxlength="300"></textarea></label>
-      <label>余韻<textarea id="tFinish" rows="1" maxlength="200"></textarea></label>
-      <div class="tlab">点数</div>
-      <div class="tstars" id="tScore" role="radiogroup" aria-label="点数"></div>
-      <div class="tlab">また飲みたいか</div>
-      <div class="tchips" id="tAgain" role="radiogroup" aria-label="また飲みたいか"></div>
-      <label>ひとこと<textarea id="tMemo" rows="2" maxlength="1000"></textarea></label>
-      <div class="tacts"><span class="note" id="tMsg"></span><span style="display:flex;gap:10px"><button type="button" class="pill" id="tCancel">やめる</button><button type="submit" class="pill keep" id="tSave">しまう</button></span></div>
-    </form>
-    <ol class="talks tlist" id="tList"></ol>
-  </aside>
-</section>
+</div><!-- /#home -->
 
 <!-- ───────── カミーユの部屋（器だけ。中身は合図のあと GAS から） ───────── -->
 <section id="room" class="house" aria-label="カミーユの部屋">
@@ -696,11 +750,13 @@ a.ev:hover .ttl { text-decoration: underline; }
     <div class="gzbar">
       <div class="gzrow">
         <span class="gzcap" id="gzcap"></span>
+        <span class="gzpick" id="gzPickBar" hidden><span>外す絵に印を付けて「決める」</span><span class="n" id="gzPickN"></span><button type="button" class="pill keep" id="gzPickOk">決める</button><button type="button" class="pill" id="gzPickNo">やめる</button></span>
         <div class="rheat" id="gzHeat" role="group" aria-label="濃さ"></div>
         <span class="gzctl">
           <button type="button" class="gzb" id="gzPrev" aria-label="前の絵">‹</button>
           <button type="button" class="gzb" id="gzPlay" aria-label="止める">Ⅱ</button>
           <button type="button" class="gzb" id="gzNext" aria-label="次の絵">›</button>
+          <button type="button" class="pill" id="gzPick">外す絵をえらぶ</button>
           <button type="button" class="pill" id="gzBack">部屋に戻る</button>
         </span>
       </div>
@@ -740,7 +796,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-16 v3.6';
+var BUILD = '2026-10-22 v3.7';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1044,7 +1100,8 @@ function loadWork(quiet) {
     call('today').then(function (d) { S.today = d; ERR.today = null; }, function (e) { ERR.today = e; }),
     call('overdue').then(function (d) { S.overdue = d; ERR.overdue = null; }, function (e) { ERR.overdue = e; }),
     call('pulse').then(function (d) { S.pulse = d; ERR.pulse = null; }, function (e) { ERR.pulse = e; }),
-    call('weather').then(function (d) { S.weather = d; }, function () {})
+    call('weather').then(function (d) { S.weather = d; }, function () {}),
+    loadTimecard()
   ];
   if (!quiet) renderWork();
   return Promise.all(jobs).then(renderWork);
@@ -1054,25 +1111,172 @@ function loadPrivate() {
   return call('content').then(function (d) { S.content = d; renderTopics(); if (!triviaShown) renderTrivia(); }, function () {});
 }
 
+/* ───────── タイムカード（2026-10-22・仕事） ─────────
+   出勤・休憩・戻る・退勤。時刻はサーバの JST が決める（端末の時計に頼らない）。月の実働を目安（サーバの手持ち・公開ページに置かない）と並べる。
+   一覧から1日ずつ直せる（退勤し忘れ・あとから付ける日）。記録は個人ドライブの Cellar/timecard.json */
+var TC = { d: null, view: null, err: '', open: false, edit: null, busy: false, sure: false };
+function tcMin(t) { var p = String(t).split(':'); return +p[0] * 60 + +p[1]; }
+function tcAfter(base, t) { var d = tcMin(t) - tcMin(base); return d < 0 ? d + 1440 : d; }
+// 実働（分）。出勤より前の時刻は翌日。開いた休憩は今まで（Code.gs の tcWork_ と同じ数え方）
+function tcWork(d, now) {
+  if (!d || !d.in) return 0;
+  var end = d.out || now; if (!end) return 0;
+  var span = tcAfter(d.in, end), rest = 0;
+  (d.br || []).forEach(function (b) {
+    var s = tcAfter(d.in, b[0]), e = b[1] ? tcAfter(d.in, b[1]) : (d.out ? span : tcAfter(d.in, now || end));
+    rest += Math.max(0, Math.min(e, span) - Math.min(s, span));
+  });
+  return Math.max(0, span - rest);
+}
+function tcHm(min) { min = Math.max(0, Math.round(min)); return Math.floor(min / 60) + ':' + pad(min % 60); }
+function nowHm() { var d = jstNow(); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()); }
+function brMin(d) { return (d.br || []).reduce(function (a, b) { return a + (b[1] ? tcAfter(b[0], b[1]) : 0); }, 0); }
+function monthAdd(m, n) { var y = +m.slice(0, 4), mo = +m.slice(5, 7) - 1 + n; y += Math.floor(mo / 12); mo = ((mo % 12) + 12) % 12; return y + '-' + pad(mo + 1); }
+function loadTimecard() {
+  if (!token) return Promise.resolve();
+  return call('timecard').then(function (d) { TC.d = d; TC.err = ''; if (!TC.view || TC.view.month === d.month) TC.view = d; renderTimecard(); },
+    function (e) { TC.err = e.message; renderTimecard(); });
+}
+// 月の実働（開いている日は今まで）
+function tcTotal(d) {
+  var now = nowHm();
+  return (d.days || []).reduce(function (a, x) { return a + (x.date === d.open ? tcWork(x, now) : x.work); }, 0);
+}
+function renderTimecard() {
+  var d = TC.d, st = $('#tcState'), sub = $('#tcSub'), bt = $('#tcBtns');
+  if (!d) { st.textContent = TC.err ? '読めませんでした' : (token ? '読み込み中…' : '—'); sub.textContent = TC.err; fill(bt, []); fill($('#tcMonth'), []); return; }
+  var od = d.openDay, td = d.todayDay, now = nowHm(), btn = function (label, kind, main) {
+    return h('button', { type: 'button', class: main ? 'save' : 'act', onclick: function () { punch(kind); } }, [label]);
+  };
+  if (od) {
+    var last = od.br[od.br.length - 1], rest = last && !last[1];
+    st.textContent = rest ? '休憩中' : '勤務中';
+    sub.textContent = (od.date !== d.today ? fmtMD(od.date) + ' ' : '') + od.in + '〜　実働 ' + tcHm(tcWork(od, now)) + (rest ? '　休憩 ' + last[0] + '〜' : brMin(od) ? '　休憩 ' + tcHm(brMin(od)) : '');
+    fill(bt, rest ? [btn('戻る', 'back', true), btn('退勤', 'out')] : [btn('休憩', 'break'), btn('退勤', 'out', true)]);
+  } else if (td && td.out) {
+    st.textContent = '退勤済み';
+    sub.textContent = td.in + '〜' + td.out + '　実働 ' + tcHm(td.work) + (brMin(td) ? '　休憩 ' + tcHm(brMin(td)) : '');
+    fill(bt, []);
+  } else { st.textContent = '未出勤'; sub.textContent = ''; fill(bt, [btn('出勤', 'in', true)]); }
+  if (TC.busy) bt.classList.add('busy'); else bt.classList.remove('busy');
+  // 月の実働と目安
+  var tot = tcTotal(d), r = d.range || {}, lo = (r.min || 0) * 60, hi = (r.max || 0) * 60, worked = d.days.filter(function (x) { return x.in; }).length;
+  var kids = [h('div', { class: 'tc-line' }, [
+    h('span', null, [(+d.month.slice(5)) + '月の実働 ', h('b', null, [tcHm(tot)]), worked ? '　' + worked + '日・1日平均 ' + tcHm(tot / worked) : '']),
+    h('button', { type: 'button', class: 'link', onclick: function () { TC.open = !TC.open; TC.edit = null; renderTcList(); } }, [TC.open ? '一覧を閉じる' : '一覧・直す'])])];
+  if (hi) {
+    var scale = Math.max(hi, tot) * 1.04, bar = h('div', { class: 'tc-bar', role: 'img', 'aria-label': '目安 ' + r.min + '〜' + r.max + '時間のうち ' + tcHm(tot) });
+    bar.appendChild(h('i', { class: tot > hi ? 'over' : '', style: 'width:' + (tot / scale * 100).toFixed(1) + '%' }));
+    [lo, hi].forEach(function (x) { if (x) bar.appendChild(h('u', { style: 'left:' + (x / scale * 100).toFixed(1) + '%' })); });
+    kids.push(bar);
+    // 残りの営業日（今日を含む・定休日を除く。今日もう退勤していれば明日から）
+    var left = 0, day = td && td.out ? addDays(d.today, 1) : d.today;
+    if (d.month === d.today.slice(0, 7)) for (; day.slice(0, 7) === d.month; day = addDays(day, 1)) if (!isClosedDay(day)) left++;
+    var say = tot < lo ? '下限 ' + r.min + '時間まで あと ' + tcHm(lo - tot) + (left ? '（残りの営業日 ' + left + '日なら 1日 ' + tcHm((lo - tot) / left) + '）' : '')
+      : tot <= hi ? '目安の範囲内。上限 ' + r.max + '時間まで あと ' + tcHm(hi - tot) : '上限 ' + r.max + '時間を ' + tcHm(tot - hi) + ' 超えています';
+    kids.push(h('div', { class: 'tc-line' }, [h('span', null, ['目安 ' + r.min + '〜' + r.max + '時間']), h('span', null, [say])]));
+  }
+  fill($('#tcMonth'), kids);
+  if (!TC.edit) renderTcList();  // 直している途中は、15秒ごとの描き直しで入力を消さない
+}
+var PUNCH_SAID = { in: '出勤', break: '休憩に入りました', back: '休憩から戻りました', out: '退勤' };
+function punch(kind) {
+  if (TC.busy) return;
+  TC.busy = true; renderTimecard();
+  call('punch', { kind: kind, rid: rid() }).then(function (d) {
+    TC.d = d; if (!TC.view || TC.view.month === d.month) TC.view = d;
+    var day = d.openDay || d.todayDay, t = kind === 'in' ? day && day.in : kind === 'out' ? day && day.out : d.now;
+    toast(PUNCH_SAID[kind] + (t ? '　' + t : '') + (kind === 'out' && day ? '　実働 ' + tcHm(day.work || 0) : ''));
+  }, function (e) { toast('打刻できませんでした：' + e.message, true); })
+    .then(function () { TC.busy = false; renderTimecard(); });
+}
+function tcView(month) {
+  TC.edit = null;
+  if (TC.d && month === TC.d.month) { TC.view = TC.d; renderTcList(); return; }
+  TC.view = { month: month, days: null }; renderTcList();
+  call('timecard', { month: month }).then(function (d) { if (TC.view && TC.view.month === month) { TC.view = d; renderTcList(); } }, function (e) { toast('読めませんでした：' + e.message, true); });
+}
+function renderTcList() {
+  var el = $('#tcList'); el.hidden = !TC.open;
+  if (!TC.open) { fill(el, []); return; }
+  var v = TC.view || TC.d; if (!v) { fill(el, [h('p', { class: 'state' }, ['読み込み中…'])]); return; }
+  var m = v.month, nav = h('div', { class: 'tc-mnav' }, [
+    h('button', { type: 'button', class: 'act', 'aria-label': '前の月', onclick: function () { tcView(monthAdd(m, -1)); } }, ['‹']),
+    h('b', null, [m.slice(0, 4) + '年' + (+m.slice(5)) + '月']),
+    h('button', { type: 'button', class: 'act', 'aria-label': '次の月', onclick: function () { tcView(monthAdd(m, 1)); } }, ['›']),
+    h('button', { type: 'button', class: 'link', onclick: function () { tcEdit({ date: v.today && v.today.slice(0, 7) === m ? v.today : m + '-01', in: '', out: '', br: [], memo: '' }, true); } }, ['日を足す'])]);
+  if (!v.days) { fill(el, [nav, h('p', { class: 'state' }, ['読み込み中…'])]); return; }
+  var now = nowHm(), rows = v.days.map(function (x) {
+    var w = x.date === v.open ? tcWork(x, now) : x.work;
+    return h('tr', { class: x.date === v.today ? 'now' : '' }, [
+      h('td', null, [fmtMD(x.date) + '（' + wd(x.date) + '）']), h('td', null, [x.in]), h('td', null, [x.out || (x.date === v.open ? '勤務中' : '—')]),
+      h('td', null, [brMin(x) ? tcHm(brMin(x)) : '']), h('td', null, [tcHm(w)]), h('td', { class: 'm' }, [x.memo || '']),
+      h('td', null, [h('button', { type: 'button', class: 'link', onclick: function () { tcEdit(x, false); } }, ['直す'])])]);
+  });
+  var kids = [nav];
+  if (TC.edit) kids.push(tcForm());
+  kids.push(rows.length ? h('div', { class: 'tc-scroll' }, [h('table', { class: 'tc-table' }, [
+    h('thead', null, [h('tr', null, ['日付', '出勤', '退勤', '休憩', '実働', 'メモ', ''].map(function (x) { return h('th', null, [x]); }))]),
+    h('tbody', null, rows),
+    h('tfoot', null, [h('tr', null, [h('td', null, ['合計']), h('td'), h('td'), h('td'), h('td', null, [tcHm(tcTotal(v))]), h('td', { class: 'm' }, [v.days.length + '日']), h('td')])])])])
+    : h('p', { class: 'state' }, ['この月の記録はありません']));
+  fill(el, kids);
+}
+function tcEdit(x, isNew) { TC.edit = { date: x.date, in: x.in || '', out: x.out || '', br: (x.br || []).map(function (b) { return b[0] + '-' + (b[1] || ''); }).join(', '), memo: x.memo || '', isNew: isNew }; TC.sure = false; renderTcList(); }
+function tcForm() {
+  var e = TC.edit, inp = function (id, type, val, label, cls, extra) {
+    return h('label', { class: cls || '' }, [label, h('input', Object.assign({ id: id, type: type, value: val }, extra || {}))]);
+  };
+  var f = h('form', { class: 'tc-edit', autocomplete: 'off' }, [
+    inp('tcDate', 'date', e.date, '日付', '', e.isNew ? {} : { disabled: 'disabled' }),
+    inp('tcIn', 'time', e.in, '出勤'), inp('tcOut', 'time', e.out, '退勤（出勤より前なら翌日）'),
+    inp('tcBr', 'text', e.br, '休憩（例 12:00-13:00, 15:00-15:10）', 'wide', { inputmode: 'numeric' }),
+    inp('tcMemo', 'text', e.memo, 'メモ', 'wide', { maxlength: '200' }),
+    h('div', { class: 'acts' }, [
+      h('button', { type: 'submit', class: 'save' }, ['保存']),
+      h('button', { type: 'button', class: 'act', onclick: function () { TC.edit = null; renderTcList(); } }, ['やめる']),
+      h('span', { class: 'gap' }),
+      e.isNew ? null : h('button', { type: 'button', class: 'act', onclick: function () {
+        if (!TC.sure) { TC.sure = true; this.textContent = 'もう一度押すと、この日の記録を外します'; return; }
+        tcSave({ date: e.date, in: '' });
+      } }, ['この日を外す'])])]);
+  f.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var tin = $('#tcIn').value;
+    if (!tin) { toast('出勤の時刻を入れてください（記録を外すときは「この日を外す」）', true); return; }
+    tcSave({ date: e.isNew ? $('#tcDate').value : e.date, in: tin, out: $('#tcOut').value, br: $('#tcBr').value, memo: $('#tcMemo').value });
+  });
+  return f;
+}
+function tcSave(args) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(args.date || '')) { toast('日付を入れてください', true); return; }
+  call('timeedit', args).then(function (d) {
+    TC.view = d; if (TC.d && d.month === TC.d.month) loadTimecard(); TC.edit = null;
+    toast(args.in ? fmtMD(args.date) + ' を直しました' : fmtMD(args.date) + ' の記録を外しました'); renderTcList();
+  }, function (e) { toast('直せませんでした：' + e.message, true); });
+}
+
 /* ───────── 家の切り替え ───────── */
-var house = 'work';
+var house = 'private';
 function setHouse(hs, quiet) {
   house = hs;
   document.body.setAttribute('data-house', hs);
-  document.querySelectorAll('.switch button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-go') === hs)); });
-  if (hs === 'private') { startMood(); renderClock(); } else stopMood();
+  if (hs === 'private') { if (heroIn) startMood(); renderClock(); } else stopMood();
   if (hs === 'canvas') startCanvas(); else stopCanvas();
   if (hs !== 'room') { closeSecret(); dropRoom(); }
   if (hs !== 'private') { closeSheet(); closeDrawer(); closeTasting(); }
   if (!quiet) poke();
 }
-function autoHouse() { var d = jstNow(), hh = hourOf(d); return !isClosedDay(todayJst()) && hh >= 6 && hh < 19 ? 'work' : 'private'; }
-document.querySelectorAll('.switch button').forEach(function (b) { b.addEventListener('click', function () { setHouse(b.getAttribute('data-go')); }); });
+// 2026-10-22 本人の指示：仕事とプライベートの区切りをやめ、ひとつのページに。上がプライベート、スクロールすると仕事。キャンバスはボタンで
+var heroIn = true;  // プライベートの1画面目が見えているか（見えていないときは動く背景を止める）
+function toWork(smooth) { var w = $('#work'); $('#home').scrollTo({ top: w.offsetTop, behavior: smooth ? 'smooth' : 'auto' }); }
+$('#toWork').addEventListener('click', function () { toWork(true); });
+$('#toCanvas').addEventListener('click', function () { setHouse('canvas'); });
 var idleT = null;
 function poke() {
   document.body.classList.remove('idle');
   clearTimeout(idleT);
-  idleT = setTimeout(function () { if (house === 'private') document.body.classList.add('idle'); }, 5000);
+  idleT = setTimeout(function () { if (house === 'private' && heroIn) document.body.classList.add('idle'); }, 5000);
 }
 ['pointermove', 'pointerdown', 'keydown', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, poke, { passive: true }); });
 
@@ -1773,8 +1977,13 @@ function stopMood() { cancelAnimationFrame(raf); raf = 0; }
 window.addEventListener('resize', function () { if (raf) size(); });
 document.addEventListener('visibilitychange', function () {
   if (document.hidden) stopMood();
-  else { if (house === 'private') startMood(); if (token) loadWork(true); }
+  else { if (house === 'private' && heroIn) startMood(); if (token) loadWork(true); }
 });
+if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+  heroIn = es[0].isIntersecting;
+  if (house === 'private') { if (heroIn) startMood(); else stopMood(); }
+  if (!heroIn) document.body.classList.remove('idle');
+}, { threshold: 0.04 }).observe($('#private'));
 
 /* ───────── プライベート：書く → ためた話 → Obsidian ───────── */
 var THANKS = ['聞かせてくれてありがとう。ちゃんとしまっておくね。', '覚えておくね。……また聞かせて。', 'うん、ここに置いておく。あなたの話は、ぜんぶ大事。'];
@@ -2018,7 +2227,7 @@ function roomBg(u) {
 }
 function enterRoom() {
   armRoom();
-  var t = roomTime(hourOf(jstNow())), p = photoFor(t), sc = scenePick(ROOM.pack && ROOM.pack.scenes), key = ROOM.key;
+  var t = roomTime(hourOf(jstNow())), p = photoFor(t), sc = scenePick(notHidden(ROOM.pack && ROOM.pack.scenes)), key = ROOM.key;
   // 背景：カミーユのシーンがあればそれ（姿が絵に入っているので、姿の重ね絵は出さない）。無ければ部屋の写真＋姿
   if (sc) {
     $('#rfig').classList.remove('on');
@@ -2079,7 +2288,7 @@ $('#raskSave').addEventListener('click', function () {
 // 姿の絵：時間帯に合う場面から1枚。絵はその都度 GAS から（端末に残さない）
 var FIG_SCENES = { night: ['night', 'bath'], day: ['day', 'bath'], sleep: ['sleep', 'day'] };
 function showFigure(t, photo) {
-  var figs = (ROOM.pack && ROOM.pack.figures) || [], f = $('#rfig');
+  var figs = notHidden(ROOM.pack && ROOM.pack.figures), f = $('#rfig');
   if (!figs.length) { f.classList.remove('on'); return; }
   var scene = photo && photo.bed ? 'sleep' : t === 'night' || t === 'dusk' ? 'night' : t === 'dawn' ? 'sleep' : 'day', list = [];
   (FIG_SCENES[scene] || [scene]).forEach(function (s) { list = list.concat(figs.filter(function (x) { return x.scene === s; })); });
@@ -2101,13 +2310,16 @@ function showFigure(t, photo) {
    触れずに10分たつと部屋ごと閉じる決まりは、眺めているあいだも同じ */
 var GZ = { list: [], i: 0, n: 0, play: true, timer: null, layer: 0, x0: null };
 var GZ_LABEL = { day: '昼', night: '夜', late: '夜更け', bath: '湯あがり', sleep: '寝るとき' };
-function gazeList() {
-  var pk = ROOM.pack || {}, slot = sceneSlot(hourOf(jstNow()));
+// 外した絵（2026-10-22）：眺めると部屋の背景・姿の重ね絵に出さない。サーバの gaze-hidden.json（絵は消さない・戻せる）
+function hiddenNames() { return (ROOM.pack && ROOM.pack.hidden) || []; }
+function notHidden(list) { var hd = hiddenNames(); return (list || []).filter(function (x) { return hd.indexOf(x.name) < 0; }); }
+function gazeList(withHidden) {
+  var pk = ROOM.pack || {}, slot = sceneSlot(hourOf(jstNow())), hd = withHidden ? [] : hiddenNames();
   var sc = (pk.scenes || []).map(function (x) { return { kind: 'scene', name: x.name, tag: x.slot }; });
   var fg = (pk.figures || []).map(function (x) { return { kind: 'figure', name: x.name, tag: x.scene }; });
   sc.sort(function (a, b) { return (b.tag === slot) - (a.tag === slot); });
   var g = gazeLines(), all = sc.concat(fg);
-  return all.filter(function (it) { return g[it.name]; });
+  return all.filter(function (it) { return g[it.name] && hd.indexOf(it.name) < 0; });
 }
 function gazeLines() { var d = ROOM.pack && ROOM.pack.defaults; return (d && d.gaze) || {}; }
 function paintGazeHeat() {
@@ -2133,15 +2345,21 @@ function gazeThumb(it) {
   var b = $('#gzthumbs').children[GZ.list.indexOf(it)], u = gazeCache(it)[it.name];
   if (b && u) { b.style.backgroundImage = cssUrl(u); b.classList.add('ok'); }
 }
-function openGaze() {
-  armRoom();
-  GZ.list = gazeList(); GZ.n = 0; GZ.play = true;
-  if (!GZ.list.length) { toast('眺める絵がまだありません'); return; }
-  var g = $('#gaze'); g.hidden = false; g.classList.remove('bare');
+function gazeThumbs() {
   fill($('#gzthumbs'), GZ.list.map(function (it, k) {
-    return h('button', { type: 'button', 'aria-label': (GZ_LABEL[it.tag] || it.tag) + ' ' + (k + 1), onclick: function () { armRoom(); gazeShow(k); } }, [h('span', null, [GZ_LABEL[it.tag] || it.tag])]);
+    var out = GZ.pick && GZ.pick.indexOf(it.name) >= 0;
+    return h('button', { type: 'button', class: out ? 'out' : '', 'aria-pressed': GZ.pick ? String(out) : null, 'aria-label': (GZ_LABEL[it.tag] || it.tag) + ' ' + (k + 1) + (out ? '（外す）' : ''),
+      onclick: function () { armRoom(); if (GZ.pick && k === GZ.i) gazeMark(it); gazeShow(k); } }, [h('span', null, [GZ_LABEL[it.tag] || it.tag])]);
   }));
   GZ.list.forEach(gazeThumb);
+}
+function openGaze() {
+  armRoom();
+  GZ.pick = null; GZ.list = gazeList(); GZ.n = 0; GZ.play = true;
+  if (!GZ.list.length) { toast(gazeList(true).length ? '眺める絵はぜんぶ外してあります' : '眺める絵がまだありません'); if (!gazeList(true).length) return; GZ.list = gazeList(true); }
+  var g = $('#gaze'); g.hidden = false; g.classList.remove('bare', 'picking');
+  $('#gzPickBar').hidden = true; $('#gzcap').hidden = false;
+  gazeThumbs();
   gazePaintPlay(); paintGazeHeat(); gazeShow(0);
   // 一覧の小窓のために、残りも1枚ずつ取っておく
   var key = ROOM.key, q = GZ.list.slice();
@@ -2152,6 +2370,7 @@ function closeGaze() {
   $('#gaze').hidden = true; $('#gaze').classList.remove('paper', 'bare');
   ['#gzA', '#gzB'].forEach(function (s) { var im = $(s); im.classList.remove('on'); im.removeAttribute('src'); });
   $('#gzbg').style.backgroundImage = ''; fill($('#gzthumbs'), []); $('#gzline').textContent = '';
+  GZ.pick = null; $('#gaze').classList.remove('picking'); $('#gzPickBar').hidden = true; $('#gzcap').hidden = false;
 }
 function gazeShow(k) {
   var n = GZ.list.length; if (!n) return;
@@ -2182,6 +2401,45 @@ function gazeSay(now) {
 function gazeArm() { clearTimeout(GZ.timer); if (GZ.play && !$('#gaze').hidden && GZ.list.length > 1) GZ.timer = setTimeout(function () { gazeShow(GZ.i + 1); }, 9000); }
 function gazePaintPlay() { var b = $('#gzPlay'); b.textContent = GZ.play ? 'Ⅱ' : '▶'; b.setAttribute('aria-label', GZ.play ? '止める' : '流す'); }
 function gazePlay(on) { GZ.play = on; gazePaintPlay(); if (on) gazeArm(); else clearTimeout(GZ.timer); }
+/* 外す絵をえらぶ（2026-10-22）：外した絵も並べ、小窓を押して印を付ける（いま出ている絵の小窓をもう一度押すと付け外し）。
+   「決める」で外す一覧を丸ごと送る。印を外せば戻る */
+function gazePickStart() {
+  armRoom();
+  var cur = GZ.list[GZ.i];
+  GZ.pick = hiddenNames().slice(); gazePlay(false);
+  GZ.list = gazeList(true); GZ.i = Math.max(0, GZ.list.indexOf(GZ.list.filter(function (x) { return cur && x.name === cur.name; })[0]));
+  $('#gaze').classList.add('picking'); $('#gaze').classList.remove('bare');
+  $('#gzPickBar').hidden = false; $('#gzcap').hidden = true; $('#gzPick').hidden = true;
+  gazeThumbs(); gazePickCount(); gazeShow(GZ.i);
+  var key = ROOM.key, q = GZ.list.slice();
+  (function next() { if (ROOM.key !== key || !GZ.pick || !q.length) return; gazeLoad(q.shift()).then(next); })();
+}
+function gazeMark(it) {
+  var k = GZ.pick.indexOf(it.name);
+  if (k >= 0) GZ.pick.splice(k, 1); else GZ.pick.push(it.name);
+  var b = $('#gzthumbs').children[GZ.list.indexOf(it)], out = k < 0;
+  if (b) { b.classList.toggle('out', out); b.setAttribute('aria-pressed', String(out)); }
+  gazePickCount();
+}
+function gazePickCount() { var n = GZ.pick ? GZ.pick.length : 0; $('#gzPickN').textContent = n ? '外す絵 ' + n + '枚' : '外す絵はありません'; }
+function gazePickEnd(saved) {
+  GZ.pick = null; $('#gaze').classList.remove('picking'); $('#gzPickBar').hidden = true; $('#gzcap').hidden = false; $('#gzPick').hidden = false;
+  var cur = GZ.list[GZ.i]; GZ.list = gazeList();
+  if (!GZ.list.length) { toast('眺める絵をぜんぶ外しました。戻すときは「外す絵をえらぶ」から'); GZ.list = gazeList(true); }
+  var k = cur ? GZ.list.map(function (x) { return x.name; }).indexOf(cur.name) : -1;
+  gazeThumbs(); gazeShow(k >= 0 ? k : 0); gazePlay(true);
+}
+$('#gzPick').addEventListener('click', gazePickStart);
+$('#gzPickNo').addEventListener('click', function () { armRoom(); gazePickEnd(false); });
+$('#gzPickOk').addEventListener('click', function () {
+  armRoom();
+  var names = GZ.pick.slice(), key = ROOM.key, btn = $('#gzPickOk'); btn.classList.add('busy');
+  call('gazehide', { room: key, names: names.join(',') }).then(function (d) {
+    if (ROOM.key !== key) return;
+    ROOM.pack.hidden = d.names || []; toast(names.length ? names.length + '枚を外しました（部屋の背景にも出しません）' : '外した絵はありません');
+    gazePickEnd(true);
+  }, function (e) { toast('しまえませんでした：' + e.message, true); }).then(function () { btn.classList.remove('busy'); });
+});
 $('#gazeOpen').addEventListener('click', openGaze);
 $('#gzBack').addEventListener('click', function () { armRoom(); closeGaze(); });
 $('#gzPrev').addEventListener('click', function () { armRoom(); gazeShow(GZ.i - 1); });
@@ -2192,7 +2450,7 @@ $('#gaze').addEventListener('pointerdown', function (e) { GZ.x0 = e.target.close
 $('#gaze').addEventListener('pointerup', function (e) {
   if (GZ.x0 === null) return;
   var dx = e.clientX - GZ.x0; GZ.x0 = null;
-  if (Math.abs(dx) > 50) gazeShow(GZ.i + (dx < 0 ? 1 : -1)); else $('#gaze').classList.toggle('bare');
+  if (Math.abs(dx) > 50) gazeShow(GZ.i + (dx < 0 ? 1 : -1)); else if (GZ.pick) gazeMark(GZ.list[GZ.i]); else $('#gaze').classList.toggle('bare');
 });
 document.addEventListener('keydown', function (e) {
   if (house !== 'room' || $('#gaze').hidden || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
@@ -2515,7 +2773,7 @@ $('#cvWake').addEventListener('click', function () {
   else { save('cvwake', '1'); wakeOn(); }
 });
 $('#cvMail').addEventListener('click', function () { save('cvmail', cvPref('mail') ? null : '1'); paintCtl(); renderCanvas(); });
-$('#cvBack').addEventListener('click', function () { setHouse('work'); });
+$('#cvBack').addEventListener('click', function () { setHouse('private'); });
 ['pointerdown', 'pointermove', 'touchstart'].forEach(function (ev) {
   $('#canvas').addEventListener(ev, function () {
     $('#canvas').classList.add('ui'); clearTimeout(CV.uiT); CV.uiT = setTimeout(function () { $('#canvas').classList.remove('ui'); }, 5000);
@@ -2617,8 +2875,43 @@ function mockRoute(p) {
     }
     case 'talkdel': { var b2 = db.talks.length; db.talks = db.talks.filter(function (x) { return x.id !== p.id; }); return b2 === db.talks.length ? ng('その話はありません') : ok({ items: db.talks, synced: '' }); }
     case 'room': return p.room === 'mock' ? ok({ defaults: MOCK_ROOM, figures: params.get('scenes') === '1' ? [{ name: 'cam-day-1', scene: 'day' }, { name: 'cam-night-1', scene: 'night' }, { name: 'cam-sleep-1', scene: 'sleep' }] : [], night: { generated: '', lines: [] }, content: { shop: [], songs: [], hobby: [], night: [] },
-      music: { ready: false }, amazon: { ready: false }, gallery: db.gallery, answers: db.answers,
+      music: { ready: false }, amazon: { ready: false }, gallery: db.gallery, answers: db.answers, hidden: db.hidden || [],
       scenes: params.get('scenes') === '1' ? [{ name: 'scene-day-1', slot: 'day', up: 1 }, { name: 'scene-night-1', slot: 'night', up: 1 }] : [], err: {} }) : ng('room');
+    // タイムカード（2026-10-22）。目安の時間は見本の値（本物はサーバの手持ち）
+    case 'timecard': case 'punch': case 'timeedit': {
+      if (!db.tc) {
+        db.tc = {};
+        for (var dd = T.slice(0, 8) + '01'; dd < T; dd = addDays(dd, 1)) if (!isClosedDay(dd)) db.tc[dd] = { in: '09:0' + (+dd.slice(8) % 6), out: '18:' + pad(10 + +dd.slice(8) % 40), br: [['12:00', '13:00']], memo: dd.slice(8) === '03' ? '（見本）棚卸' : '' };
+      }
+      var nhm = pad(jstNow().getUTCHours()) + ':' + pad(jstNow().getUTCMinutes()), tcd = db.tc;
+      var openOf = function () { var t0 = tcd[T], y0 = tcd[addDays(T, -1)]; return t0 && t0.in && !t0.out ? T : y0 && y0.in && !y0.out ? addDays(T, -1) : ''; };
+      var pack = function (m) {
+        var op = openOf(), list = Object.keys(tcd).filter(function (k) { return k.slice(0, 7) === m; }).sort().map(function (k) {
+          var x = tcd[k]; return { date: k, in: x.in, out: x.out || '', br: x.br || [], memo: x.memo || '', work: tcWork(x, k === op ? nhm : '') }; });
+        var od = op ? tcd[op] : null, td = tcd[T];
+        return { month: m, today: T, now: nhm, open: op, days: list, total: list.reduce(function (a, x) { return a + x.work; }, 0), range: { min: 150, max: 200 },
+          openDay: od ? { date: op, in: od.in, out: '', br: od.br, memo: od.memo || '' } : null,
+          todayDay: td ? { date: T, in: td.in, out: td.out || '', br: td.br || [], work: tcWork(td, op === T ? nhm : '') } : null };
+      };
+      if (p.action === 'punch') {
+        var op2 = openOf(), cur = op2 ? tcd[op2] : null, brs = cur && cur.br || [], lb = brs[brs.length - 1];
+        if (p.kind === 'in') { if (op2) return ng('まだ退勤していません'); if (tcd[T]) return ng('今日はもう退勤しています。直すときは一覧から'); tcd[T] = { in: nhm, out: '', br: [] }; }
+        else if (!cur) return ng('出勤していません');
+        else if (p.kind === 'break') { if (lb && !lb[1]) return ng('休憩中です'); brs.push([nhm, '']); }
+        else if (p.kind === 'back') { if (!lb || lb[1]) return ng('休憩していません'); lb[1] = nhm; }
+        else if (p.kind === 'out') { if (lb && !lb[1]) lb[1] = nhm; cur.out = nhm; }
+        return ok(pack(T.slice(0, 7)));
+      }
+      if (p.action === 'timeedit') {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(p.date || '')) return ng('日付が違います');
+        var brl = String(p.br || '').split(/[,、\s]+/).filter(Boolean).map(function (x) { var mm = /^(\d{1,2}:\d{2})[-〜~](\d{1,2}:\d{2})?$/.exec(x); return mm ? [('0' + mm[1]).slice(-5), mm[2] ? ('0' + mm[2]).slice(-5) : ''] : null; });
+        if (brl.some(function (x) { return !x; })) return ng('休憩の書き方が違います（例 12:00-13:00）');
+        if (!p.in) delete tcd[p.date]; else tcd[p.date] = { in: p.in, out: p.out || '', br: brl, memo: p.memo || '' };
+        return ok(pack(p.date.slice(0, 7)));
+      }
+      return ok(pack(/^\d{4}-\d{2}$/.test(p.month || '') ? p.month : T.slice(0, 7)));
+    }
+    case 'gazehide': { if (p.room !== 'mock') return ng('room'); db.hidden = String(p.names || '').split(',').filter(Boolean); return ok({ names: db.hidden }); }
     case 'answers': case 'answersave': case 'answerdel': {
       if (p.room !== 'mock') return ng('room');
       if (p.action === 'answersave') { if (!String(p.text || '').trim()) return ng('答えが空です'); if (!db.answers.some(function (x) { return x.id === p.rid; })) db.answers.unshift({ id: p.rid || rid(), at: now, qid: p.qid, q: p.q, text: String(p.text).trim() }); }
@@ -2687,18 +2980,19 @@ function mockPanel() {
 }
 
 /* ───────── 起動 ───────── */
-function tick() { renderHead(); renderTimeline(); if (house === 'private') renderClock(); if (house === 'canvas') renderCanvas(); }
+function tick() { renderHead(); renderTimeline(); renderTimecard(); if (house === 'private') renderClock(); if (house === 'canvas') renderCanvas(); }
 renderTrivia(); renderTopics(); renderWork();
 var first = params.get('house');
 // ?view=canvas はタブレットのホーム画面用（最初からキャンバスで開く）
-setHouse(params.get('view') === 'canvas' ? 'canvas' : MOCK && (first === 'work' || first === 'private') ? first : autoHouse(), true);
+setHouse(params.get('view') === 'canvas' ? 'canvas' : 'private', true);
+if (first === 'work' || params.get('view') === 'work') setTimeout(function () { toWork(false); }, 0);
 if (MOCK && params.get('tab') === 'ideas') showTab('ideas');
 renderClock();
 if (MOCK) mockPanel();
 if (!token) showGate(); else { loadWork(); loadPrivate(); }
 setInterval(tick, 15e3);
 setInterval(function () { if (house === 'private') sayCam(); }, 15 * 60e3);
-setInterval(function () { if (!document.hidden && token && house === 'work') loadWork(true); }, 5 * 60e3);
+setInterval(function () { if (!document.hidden && token && house === 'private') loadWork(true); }, 5 * 60e3);
 poke();
 })();
 </script>
