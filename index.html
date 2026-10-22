@@ -100,6 +100,13 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .tc-edit .wide { grid-column: 1 / -1; }
 .tc-edit .acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .tc-edit .acts .gap { flex: 1; }
+#tcFix .tc-edit { margin: 12px 0 0; }
+.tc-etitle { font-size: 13px; font-weight: 500; color: var(--ink); }
+.tc-brs { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.tc-blab { font-size: 12px; color: var(--muted); }
+.tc-br { display: flex; align-items: center; gap: 6px; }
+.tc-br input { border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 6px 8px; font-size: 16px; color: var(--ink); }
+.tc-btns .link { align-self: center; }
 .w-wrap { max-width: 1080px; margin: 0 auto; }
 .w-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
 .w-date { font-size: 26px; font-weight: 500; letter-spacing: .02em; }
@@ -620,6 +627,7 @@ a.ev:hover .ttl { text-decoration: underline; }
         <div class="tc-now"><span class="tc-lab">タイムカード</span><b id="tcState">読み込み中…</b><small id="tcSub"></small></div>
         <div class="tc-btns" id="tcBtns"></div>
       </div>
+      <div id="tcFix" hidden></div>
       <div class="tc-month" id="tcMonth"></div>
       <div class="tc-list" id="tcList" hidden></div>
     </section>
@@ -796,7 +804,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-22 v3.7';
+var BUILD = '2026-10-22 v3.7.1';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1158,12 +1166,18 @@ function renderTimecard() {
     sub.textContent = td.in + '〜' + td.out + '　実働 ' + tcHm(td.work) + (brMin(td) ? '　休憩 ' + tcHm(brMin(td)) : '');
     fill(bt, []);
   } else { st.textContent = '未出勤'; sub.textContent = ''; fill(bt, [btn('出勤', 'in', true)]); }
+  // 打ち忘れ・押し遅れをその場で直す（2026-10-22）。開いている日→今日→今日をあとから付ける の順
+  var fixDay = od || td, rec = fixDay && (d.days.filter(function (x) { return x.date === fixDay.date; })[0] || fixDay);
+  bt.appendChild(h('button', { type: 'button', class: 'link', 'aria-expanded': String(!!(TC.edit && TC.edit.where === 'top')), onclick: function () {
+    if (TC.edit && TC.edit.where === 'top') { tcClose(); return; }
+    tcEdit(rec || { date: d.today, in: '', out: '', br: [], memo: '' }, !rec, 'top');
+  } }, [TC.edit && TC.edit.where === 'top' ? '閉じる' : rec ? '時間を直す' : 'あとから付ける']));
   if (TC.busy) bt.classList.add('busy'); else bt.classList.remove('busy');
   // 月の実働と目安
   var tot = tcTotal(d), r = d.range || {}, lo = (r.min || 0) * 60, hi = (r.max || 0) * 60, worked = d.days.filter(function (x) { return x.in; }).length;
   var kids = [h('div', { class: 'tc-line' }, [
     h('span', null, [(+d.month.slice(5)) + '月の実働 ', h('b', null, [tcHm(tot)]), worked ? '　' + worked + '日・1日平均 ' + tcHm(tot / worked) : '']),
-    h('button', { type: 'button', class: 'link', onclick: function () { TC.open = !TC.open; TC.edit = null; renderTcList(); } }, [TC.open ? '一覧を閉じる' : '一覧・直す'])])];
+    h('button', { type: 'button', class: 'link', onclick: function () { TC.open = !TC.open; if (TC.edit && TC.edit.where === 'list') TC.edit = null; renderTcList(); renderTimecard(); } }, [TC.open ? '一覧を閉じる' : '一覧'])])];
   if (hi) {
     var scale = Math.max(hi, tot) * 1.04, bar = h('div', { class: 'tc-bar', role: 'img', 'aria-label': '目安 ' + r.min + '〜' + r.max + '時間のうち ' + tcHm(tot) });
     bar.appendChild(h('i', { class: tot > hi ? 'over' : '', style: 'width:' + (tot / scale * 100).toFixed(1) + '%' }));
@@ -1177,7 +1191,7 @@ function renderTimecard() {
     kids.push(h('div', { class: 'tc-line' }, [h('span', null, ['目安 ' + r.min + '〜' + r.max + '時間']), h('span', null, [say])]));
   }
   fill($('#tcMonth'), kids);
-  if (!TC.edit) renderTcList();  // 直している途中は、15秒ごとの描き直しで入力を消さない
+  if (!TC.edit || TC.edit.where !== 'list') renderTcList();  // 直している途中は、15秒ごとの描き直しで入力を消さない
 }
 var PUNCH_SAID = { in: '出勤', break: '休憩に入りました', back: '休憩から戻りました', out: '退勤' };
 function punch(kind) {
@@ -1204,17 +1218,17 @@ function renderTcList() {
     h('button', { type: 'button', class: 'act', 'aria-label': '前の月', onclick: function () { tcView(monthAdd(m, -1)); } }, ['‹']),
     h('b', null, [m.slice(0, 4) + '年' + (+m.slice(5)) + '月']),
     h('button', { type: 'button', class: 'act', 'aria-label': '次の月', onclick: function () { tcView(monthAdd(m, 1)); } }, ['›']),
-    h('button', { type: 'button', class: 'link', onclick: function () { tcEdit({ date: v.today && v.today.slice(0, 7) === m ? v.today : m + '-01', in: '', out: '', br: [], memo: '' }, true); } }, ['日を足す'])]);
+    h('button', { type: 'button', class: 'link', onclick: function () { tcEdit({ date: v.today && v.today.slice(0, 7) === m ? v.today : m + '-01', in: '', out: '', br: [], memo: '' }, true, 'list'); } }, ['日を足す'])]);
   if (!v.days) { fill(el, [nav, h('p', { class: 'state' }, ['読み込み中…'])]); return; }
   var now = nowHm(), rows = v.days.map(function (x) {
     var w = x.date === v.open ? tcWork(x, now) : x.work;
     return h('tr', { class: x.date === v.today ? 'now' : '' }, [
       h('td', null, [fmtMD(x.date) + '（' + wd(x.date) + '）']), h('td', null, [x.in]), h('td', null, [x.out || (x.date === v.open ? '勤務中' : '—')]),
       h('td', null, [brMin(x) ? tcHm(brMin(x)) : '']), h('td', null, [tcHm(w)]), h('td', { class: 'm' }, [x.memo || '']),
-      h('td', null, [h('button', { type: 'button', class: 'link', onclick: function () { tcEdit(x, false); } }, ['直す'])])]);
+      h('td', null, [h('button', { type: 'button', class: 'link', onclick: function () { tcEdit(x, false, 'list'); } }, ['直す'])])]);
   });
   var kids = [nav];
-  if (TC.edit) kids.push(tcForm());
+  if (TC.edit && TC.edit.where === 'list') kids.push(tcForm());
   kids.push(rows.length ? h('div', { class: 'tc-scroll' }, [h('table', { class: 'tc-table' }, [
     h('thead', null, [h('tr', null, ['日付', '出勤', '退勤', '休憩', '実働', 'メモ', ''].map(function (x) { return h('th', null, [x]); }))]),
     h('tbody', null, rows),
@@ -1222,37 +1236,60 @@ function renderTcList() {
     : h('p', { class: 'state' }, ['この月の記録はありません']));
   fill(el, kids);
 }
-function tcEdit(x, isNew) { TC.edit = { date: x.date, in: x.in || '', out: x.out || '', br: (x.br || []).map(function (b) { return b[0] + '-' + (b[1] || ''); }).join(', '), memo: x.memo || '', isNew: isNew }; TC.sure = false; renderTcList(); }
+// 直す欄。where＝'top'（今日のカードの下）か 'list'（一覧の上）。休憩は1行ずつ時刻で選ぶ
+function tcEdit(x, isNew, where) {
+  TC.edit = { date: x.date, in: x.in || '', out: x.out || '', br: (x.br || []).map(function (b) { return [b[0], b[1] || '']; }), memo: x.memo || '', isNew: isNew, where: where || 'list' };
+  TC.sure = false; renderTcFix(); renderTcList(); renderTimecard();
+}
+function renderTcFix() { var el = $('#tcFix'), on = !!(TC.edit && TC.edit.where === 'top'); el.hidden = !on; fill(el, on ? [tcForm()] : []); }
+function tcRedraw() { if (!TC.edit) return; if (TC.edit.where === 'top') renderTcFix(); else renderTcList(); }
+function tcClose() { var w = TC.edit && TC.edit.where; TC.edit = null; if (w === 'top') renderTcFix(); else renderTcList(); renderTimecard(); }
+// 描き直す前に、いま入っている値を拾っておく
+function tcGrab() {
+  var e = TC.edit; if (!e) return;
+  [['tcIn', 'in'], ['tcOut', 'out'], ['tcMemo', 'memo'], ['tcDate', 'date']].forEach(function (k) { var el = $('#' + k[0]); if (el && !el.disabled) e[k[1]] = el.value; });
+  e.br = [].map.call(document.querySelectorAll('.tc-br'), function (r) { var t = r.querySelectorAll('input'); return [t[0].value, t[1].value]; });
+}
 function tcForm() {
   var e = TC.edit, inp = function (id, type, val, label, cls, extra) {
     return h('label', { class: cls || '' }, [label, h('input', Object.assign({ id: id, type: type, value: val }, extra || {}))]);
   };
+  var brs = e.br.map(function (b, i) {
+    return h('div', { class: 'tc-br' }, [
+      h('input', { type: 'time', value: b[0], 'aria-label': '休憩' + (i + 1) + 'の始め' }), h('span', null, ['〜']),
+      h('input', { type: 'time', value: b[1], 'aria-label': '休憩' + (i + 1) + 'の終わり（空なら休憩中）' }),
+      h('button', { type: 'button', class: 'act', 'aria-label': '休憩' + (i + 1) + 'を消す', onclick: function () { tcGrab(); e.br.splice(i, 1); tcRedraw(); } }, ['×'])]);
+  });
   var f = h('form', { class: 'tc-edit', autocomplete: 'off' }, [
+    h('div', { class: 'wide tc-etitle' }, [e.isNew ? '記録を付ける' : fmtMD(e.date) + '（' + wd(e.date) + '）の時間を直す']),
     inp('tcDate', 'date', e.date, '日付', '', e.isNew ? {} : { disabled: 'disabled' }),
-    inp('tcIn', 'time', e.in, '出勤'), inp('tcOut', 'time', e.out, '退勤（出勤より前なら翌日）'),
-    inp('tcBr', 'text', e.br, '休憩（例 12:00-13:00, 15:00-15:10）', 'wide', { inputmode: 'numeric' }),
+    inp('tcIn', 'time', e.in, '出勤'), inp('tcOut', 'time', e.out, '退勤（空なら勤務中・出勤より前なら翌日）'),
+    h('div', { class: 'wide tc-brs' }, [h('span', { class: 'tc-blab' }, ['休憩（終わりが空なら休憩中）'])].concat(brs).concat([
+      h('button', { type: 'button', class: 'link', onclick: function () { tcGrab(); e.br.push(['', '']); tcRedraw(); } }, ['＋ 休憩を足す'])])),
     inp('tcMemo', 'text', e.memo, 'メモ', 'wide', { maxlength: '200' }),
     h('div', { class: 'acts' }, [
       h('button', { type: 'submit', class: 'save' }, ['保存']),
-      h('button', { type: 'button', class: 'act', onclick: function () { TC.edit = null; renderTcList(); } }, ['やめる']),
+      h('button', { type: 'button', class: 'act', onclick: tcClose }, ['やめる']),
       h('span', { class: 'gap' }),
       e.isNew ? null : h('button', { type: 'button', class: 'act', onclick: function () {
         if (!TC.sure) { TC.sure = true; this.textContent = 'もう一度押すと、この日の記録を外します'; return; }
         tcSave({ date: e.date, in: '' });
       } }, ['この日を外す'])])]);
   f.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    var tin = $('#tcIn').value;
-    if (!tin) { toast('出勤の時刻を入れてください（記録を外すときは「この日を外す」）', true); return; }
-    tcSave({ date: e.isNew ? $('#tcDate').value : e.date, in: tin, out: $('#tcOut').value, br: $('#tcBr').value, memo: $('#tcMemo').value });
+    ev.preventDefault(); tcGrab();
+    if (!e.in) { toast('出勤の時刻を入れてください（記録を外すときは「この日を外す」）', true); return; }
+    if (e.br.some(function (b) { return !b[0] && b[1]; })) { toast('休憩の始めの時刻を入れてください', true); return; }
+    tcSave({ date: e.date, in: e.in, out: e.out, br: e.br.filter(function (b) { return b[0]; }).map(function (b) { return b[0] + '-' + b[1]; }).join(', '), memo: e.memo });
   });
   return f;
 }
 function tcSave(args) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(args.date || '')) { toast('日付を入れてください', true); return; }
   call('timeedit', args).then(function (d) {
-    TC.view = d; if (TC.d && d.month === TC.d.month) loadTimecard(); TC.edit = null;
-    toast(args.in ? fmtMD(args.date) + ' を直しました' : fmtMD(args.date) + ' の記録を外しました'); renderTcList();
+    TC.view = d; var w = TC.edit && TC.edit.where; TC.edit = null;
+    if (TC.d && d.month === TC.d.month) { TC.d = d; loadTimecard(); }
+    toast(args.in ? fmtMD(args.date) + ' の時間を直しました' : fmtMD(args.date) + ' の記録を外しました');
+    if (w === 'top') renderTcFix(); renderTcList(); renderTimecard();
   }, function (e) { toast('直せませんでした：' + e.message, true); });
 }
 
