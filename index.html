@@ -759,7 +759,7 @@ a.ev:hover .ttl { text-decoration: underline; }
       <div class="gzrow">
         <span class="gzcap" id="gzcap"></span>
         <span class="gzpick" id="gzPickBar" hidden><span>外す絵に印を付けて「決める」</span><span class="n" id="gzPickN"></span><button type="button" class="pill keep" id="gzPickOk">決める</button><button type="button" class="pill" id="gzPickNo">やめる</button></span>
-        <div class="rheat" id="gzHeat" role="group" aria-label="濃さ"></div>
+        <div class="rheat" id="gzHeat" role="group" aria-label="理性"></div>
         <div class="rheat" id="gzTone" role="group" aria-label="調子" hidden></div>
         <span class="gzctl">
           <button type="button" class="gzb" id="gzPrev" aria-label="前の絵">‹</button>
@@ -805,7 +805,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-24 v3.8';
+var BUILD = '2026-10-25 v3.9';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -2372,8 +2372,9 @@ function paintGazeTone() {
     return h('button', { type: 'button', title: x[2], 'aria-label': x[2], 'aria-pressed': String(gazeTone() === x[0]), onclick: function () { armRoom(); save('gazeTone', x[0]); paintGazeTone(); gazeSay(true); } }, [x[1]]);
   }));
 }
+// 2026-10-25：眺めるの3段は「理性 あり／ゆらぐ／なし」（中身は濃さと同じ段・部屋の夜の話の濃さとも共通）
 function paintGazeHeat() {
-  fill($('#gzHeat'), [h('span', null, ['濃さ'])].concat([[1, 'ひかえめ'], [2, 'ふつう'], [3, '近め']].map(function (x) {
+  fill($('#gzHeat'), [h('span', null, ['理性'])].concat([[1, 'あり'], [2, 'ゆらぐ'], [3, 'なし']].map(function (x) {
     return h('button', { type: 'button', 'aria-pressed': String(heatLv() === x[0]), onclick: function () { armRoom(); save('heat', String(x[0])); paintGazeHeat(); gazeSay(true); } }, [x[1]]);
   })));
 }
