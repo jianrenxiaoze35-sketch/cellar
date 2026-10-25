@@ -760,6 +760,7 @@ a.ev:hover .ttl { text-decoration: underline; }
         <span class="gzcap" id="gzcap"></span>
         <span class="gzpick" id="gzPickBar" hidden><span>外す絵に印を付けて「決める」</span><span class="n" id="gzPickN"></span><button type="button" class="pill keep" id="gzPickOk">決める</button><button type="button" class="pill" id="gzPickNo">やめる</button></span>
         <div class="rheat" id="gzHeat" role="group" aria-label="濃さ"></div>
+        <div class="rheat" id="gzTone" role="group" aria-label="調子" hidden></div>
         <span class="gzctl">
           <button type="button" class="gzb" id="gzPrev" aria-label="前の絵">‹</button>
           <button type="button" class="gzb" id="gzPlay" aria-label="止める">Ⅱ</button>
@@ -804,7 +805,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-22 v3.7.1';
+var BUILD = '2026-10-24 v3.8';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -2358,7 +2359,19 @@ function gazeList(withHidden) {
   var g = gazeLines(), all = sc.concat(fg);
   return all.filter(function (it) { return g[it.name] && hd.indexOf(it.name) < 0; });
 }
-function gazeLines() { var d = ROOM.pack && ROOM.pack.defaults; return (d && d.gaze) || {}; }
+// 2026-10-24：セリフの調子を S（サディスティック）／M（マゾヒスティック）で切り替える。組はサーバの defaults.gazeSets。端末に覚える
+function gazeTone() { var t = load('gazeTone'); return t === 'sado' || t === 'maso' ? t : 'maso'; }
+function gazeLines() {
+  var d = (ROOM.pack && ROOM.pack.defaults) || {}, base = d.gaze || {}, set = d.gazeSets && d.gazeSets[gazeTone()];
+  return set && Object.keys(set).length ? Object.assign({}, base, set) : base;
+}
+function paintGazeTone() {
+  var d = (ROOM.pack && ROOM.pack.defaults) || {}, sets = d.gazeSets || {}, el = $('#gzTone');
+  el.hidden = !(sets.sado || sets.maso);
+  fill(el, el.hidden ? [] : [['sado', 'S', 'サディスティック'], ['maso', 'M', 'マゾヒスティック']].map(function (x) {
+    return h('button', { type: 'button', title: x[2], 'aria-label': x[2], 'aria-pressed': String(gazeTone() === x[0]), onclick: function () { armRoom(); save('gazeTone', x[0]); paintGazeTone(); gazeSay(true); } }, [x[1]]);
+  }));
+}
 function paintGazeHeat() {
   fill($('#gzHeat'), [h('span', null, ['濃さ'])].concat([[1, 'ひかえめ'], [2, 'ふつう'], [3, '近め']].map(function (x) {
     return h('button', { type: 'button', 'aria-pressed': String(heatLv() === x[0]), onclick: function () { armRoom(); save('heat', String(x[0])); paintGazeHeat(); gazeSay(true); } }, [x[1]]);
@@ -2397,7 +2410,7 @@ function openGaze() {
   var g = $('#gaze'); g.hidden = false; g.classList.remove('bare', 'picking');
   $('#gzPickBar').hidden = true; $('#gzcap').hidden = false;
   gazeThumbs();
-  gazePaintPlay(); paintGazeHeat(); gazeShow(0);
+  gazePaintPlay(); paintGazeHeat(); paintGazeTone(); gazeShow(0);
   // 一覧の小窓のために、残りも1枚ずつ取っておく
   var key = ROOM.key, q = GZ.list.slice();
   (function next() { if (ROOM.key !== key || g.hidden || !q.length) return; gazeLoad(q.shift()).then(next); })();
@@ -2854,6 +2867,7 @@ function mockInit() {
 }
 var MOCK_ROOM = {  // 見本だけ。本物は Code.gs の ROOM_DEFAULTS
   // 眺めるのセリフの見本（本物の文は公開ページに置かない）。名前があるものだけが眺めるに出る
+  gazeSets: { sado: { 'scene-night-1': ['（見本）S・ひかえめ', '（見本）S・ふつう', '（見本）S・近め'] }, maso: { 'scene-night-1': ['（見本）M・ひかえめ', '（見本）M・ふつう', '（見本）M・近め'] } },
   gaze: { 'scene-night-1': ['（見本）ひかえめの一言', '（見本）ふつうの一言', '（見本）近めの一言'],
     'cam-night-1': ['（見本）ひかえめ', '（見本）ふつう', '（見本）近め'], 'cam-sleep-1': ['（見本）ひかえめ・寝室', '（見本）ふつう・寝室', '（見本）近め・寝室'] },
   shop: [{ title: '見本の品', why: 'モックの見本', talk: '見本のお買いものの話。', q: '見本' }],
