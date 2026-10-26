@@ -20,17 +20,19 @@
 -->
 <style>
 :root {
-  --paper: #EEF1EE; --sheet: #F8FAF8; --ink: #1D2622; --muted: #5F6C66; --rule: #CDD5D0;
-  --bottle: #2E5A4C; --amber: #A86A12; --late: #9A3B2E; --steel: #4A6FA5; --plum: #8A5A86;
+  /* 2026-10-26 本人の指示：テーマカラーは 仕事＝青／プライベート＝クリーム／秘密の部屋＝ピンク。--bottle は仕事の差し色（名前は昔のまま） */
+  --paper: #EEF2F8; --sheet: #F8FAFD; --ink: #1B2431; --muted: #5A6577; --rule: #CAD3E0;
+  --bottle: #2C5C9E; --amber: #A86A12; --late: #9A3B2E; --steel: #4A6FA5; --plum: #8A5A86;
   --ivory: #EFE8DA; --ivory-dim: rgba(239, 232, 218, .72);
+  --cream: #F3E2B9; --cream-ink: #2A2113; --pink: #F4B6C8; --pink-ink: #2B1219;
   --gothic: "Zen Kaku Gothic New", system-ui, sans-serif;
   --mincho: "Shippori Mincho B1", "Yu Mincho", serif;
   --numeral: "Cormorant Garamond", "Shippori Mincho B1", serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #161B19; --sheet: #1D2421; --ink: #E3E8E5; --muted: #98A39E; --rule: #334039;
-    --bottle: #7FB5A2; --amber: #D9A24A; --late: #E08B7D; --steel: #8DAAD6; --plum: #C49BC0;
+    --paper: #131922; --sheet: #1A2230; --ink: #E2E8F1; --muted: #96A2B4; --rule: #2E3A4C;
+    --bottle: #8CB4EA; --amber: #D9A24A; --late: #E08B7D; --steel: #8DAAD6; --plum: #C49BC0;
   }
 }
 * { box-sizing: border-box; }
@@ -69,6 +71,33 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .w-head .w-go { margin-left: auto; }
 
 /* ───────── タイムカード（2026-10-22） ───────── */
+/* ───────── 今日の設計と気になること（2026-10-26） ───────── */
+.ai { margin: 0 0 22px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
+.ai-head { display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; margin: 4px 0 6px; }
+.ai-head + .ai-head, #aiRe + .ai-head { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.ai-head b { font-size: 15px; font-weight: 500; }
+.ai-head small { color: var(--muted); font-size: 12px; }
+.ai-head .gap { flex: 1; }
+.ai-sum { margin: 0 0 8px; font-size: 14px; }
+.ai-blocks { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.ai-blocks li { display: grid; grid-template-columns: 7.5em 3.5em 1fr; gap: 2px 8px; padding: 5px 0; border-top: 1px dashed var(--rule); }
+.ai-blocks li:first-child { border-top: 0; }
+.ai-blocks .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+.ai-blocks .k { font-size: 12px; color: var(--muted); }
+.ai-blocks .k.task { color: var(--bottle); }
+.ai-blocks .w { grid-column: 3; font-size: 12px; color: var(--muted); }
+.ai-sub { margin: 10px 0 4px; font-size: 12px; color: var(--muted); }
+.ai-defer, .ai-warn, .ai-fix { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.ai-defer li, .ai-fix > li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 6px 0; border-top: 1px dashed var(--rule); }
+.ai-defer li span, .ai-fix .body { flex: 1; min-width: 12em; }
+.ai-warn li::before { content: "・"; color: var(--amber); }
+.ai-fix .lv { font-size: 11px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); }
+.ai-fix .lv.urgent { color: var(--late); border-color: var(--late); }
+.ai-fix .why { display: block; font-size: 12px; color: var(--muted); }
+.ai-fix ol { margin: 4px 0 0; padding-left: 1.4em; font-size: 13px; }
+.ai-re { display: flex; gap: 8px; margin-top: 10px; }
+.ai-re input { flex: 1; min-width: 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); padding: 6px 10px; font-size: 16px; color: var(--ink); }
+.ai-err { color: var(--late); font-size: 13px; margin: 4px 0; }
 .tc { margin: 0 0 22px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
 .tc-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
 .tc-now { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
@@ -198,7 +227,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .memo-act { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
 .memo-act .hint { font-size: 12px; color: var(--muted); }
 .save { border: 0; background: var(--bottle); color: #fff; border-radius: 6px; padding: 7px 18px; cursor: pointer; font-weight: 500; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .save { color: #10201A; } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .save { color: #0E1A2C; } }
 .memos { list-style: none; margin: 22px 0 0; padding: 0; }
 .memos li { padding: 12px 0; border-top: 1px solid var(--rule); }
 .memos .meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
@@ -247,7 +276,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .pulse .stamp::before { display: none; }
 
 /* ───────── プライベート ───────── */
-#private { overflow: hidden; overflow: clip; background: #0E0D0C; color: var(--ivory); }
+#private { overflow: hidden; overflow: clip; background: #0E0D0C; color: var(--ivory); --on: var(--cream); --on-ink: var(--cream-ink); --on-line: rgba(243, 226, 185, .5); }
 .art { position: absolute; inset: -4%; background-size: cover; background-position: center; opacity: 0; transition: opacity 6s ease;
   animation: drift 150s ease-in-out infinite alternate; will-change: transform, opacity; filter: saturate(var(--sat, .9)) brightness(var(--bri, .8)); }
 .art.on { opacity: 1; }
@@ -292,7 +321,8 @@ a.ev:hover .ttl { text-decoration: underline; }
 .artcap .talk { display: none; margin-top: 8px; color: var(--ivory); line-height: 1.85; text-align: left; }
 .artcap.open .talk { display: block; }
 .pv-tools { position: absolute; right: clamp(16px, 5vw, 64px); bottom: calc(max(34px, env(safe-area-inset-bottom)) + 62px); display: flex; gap: 18px; transition: opacity .8s ease; }
-.pv-tools button { border: 0; background: none; padding: 4px 0; cursor: pointer; color: var(--ivory); font: 15px var(--mincho); letter-spacing: .1em; border-bottom: 1px solid rgba(239, 232, 218, .45); }
+.pv-tools button { border: 0; background: none; padding: 4px 0; cursor: pointer; color: var(--cream); font: 15px var(--mincho); letter-spacing: .1em; border-bottom: 1px solid var(--on-line, rgba(239, 232, 218, .45)); }
+#private .cam .who, #private .trivia h3, #private .pv-down { color: var(--cream); }
 .glass { position: fixed; z-index: 30; visibility: hidden; background: rgba(14, 12, 10, .62); backdrop-filter: blur(18px) saturate(.9); -webkit-backdrop-filter: blur(18px) saturate(.9); color: var(--ivory);
   transition: transform .6s cubic-bezier(.2, .7, .2, 1), opacity .6s ease, visibility 0s linear .6s; }
 .glass.open { visibility: visible; transition: transform .6s cubic-bezier(.2, .7, .2, 1), opacity .6s ease, visibility 0s; }
@@ -303,7 +333,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .sheet .row2 { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; font-size: 13px; color: var(--ivory-dim); }
 .sheet label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 .pill { border: 1px solid rgba(239, 232, 218, .35); background: none; color: var(--ivory); border-radius: 999px; padding: 6px 18px; cursor: pointer; font: 14px var(--mincho); }
-.pill.keep { background: rgba(239, 232, 218, .9); color: #1A1714; border-color: transparent; }
+.pill.keep { background: var(--on, rgba(239, 232, 218, .9)); color: var(--on-ink, #1A1714); border-color: transparent; }
 .drawer { top: 0; right: 0; bottom: 0; width: min(420px, 100%); transform: translateX(100%); opacity: 0; padding: max(64px, env(safe-area-inset-top)) 24px 24px; overflow: auto; }
 .drawer.open { transform: none; opacity: 1; }
 .drawer h2 { font: 500 18px var(--mincho); letter-spacing: .12em; margin: 0 0 4px; display: flex; justify-content: space-between; align-items: baseline; }
@@ -321,7 +351,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .tbar input { flex: 1; min-width: 10em; background: rgba(0, 0, 0, .3); border: 1px solid rgba(239, 232, 218, .25); border-radius: 999px; color: var(--ivory); padding: 6px 14px; font-size: 14px; }
 .tchips { display: flex; flex-wrap: wrap; gap: 6px; }
 .tchips button { border: 1px solid rgba(239, 232, 218, .3); background: rgba(0, 0, 0, .2); color: var(--ivory-dim); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: 13px var(--gothic); }
-.tchips button[aria-pressed="true"], .tchips button[aria-checked="true"] { background: rgba(239, 232, 218, .9); color: #1A1714; border-color: transparent; }
+.tchips button[aria-pressed="true"], .tchips button[aria-checked="true"] { background: var(--on, rgba(239, 232, 218, .9)); color: var(--on-ink, #1A1714); border-color: transparent; }
 .tform { margin: 14px 0 18px; padding: 14px; border: 1px solid rgba(239, 232, 218, .18); border-radius: 10px; }
 .tform label { display: block; font-size: 12px; color: var(--ivory-dim); margin-top: 10px; }
 .tform input, .tform textarea { display: block; width: 100%; margin-top: 3px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(239, 232, 218, .22); border-radius: 6px; color: var(--ivory); padding: 7px 10px; font: 15px/1.6 var(--gothic); resize: vertical; }
@@ -352,10 +382,12 @@ a.ev:hover .ttl { text-decoration: underline; }
 }
 
 /* ───────── カミーユの部屋（中身は GAS から。ここは器だけ） ───────── */
-#room { overflow: hidden; overflow: clip; background: #17110D; color: var(--ivory); }
+#room { overflow: hidden; overflow: clip; background: #17110D; color: var(--ivory); --on: var(--pink); --on-ink: var(--pink-ink); --on-line: rgba(244, 182, 200, .55); }
+#room .rtop h1 { color: var(--pink); }
+#room .pill:not(.keep) { border-color: var(--on-line); }
 .rbg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 3s ease; filter: brightness(.82); }
 .rbg.on { opacity: 1; }
-.rshade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 8, 6, .82), rgba(10, 8, 6, .1) 55%), linear-gradient(to right, rgba(10, 8, 6, .55), transparent 60%); pointer-events: none; }
+.rshade { position: absolute; inset: 0; background: radial-gradient(90% 60% at 0% 100%, rgba(244, 182, 200, .12), transparent 70%), linear-gradient(to top, rgba(10, 8, 6, .82), rgba(10, 8, 6, .1) 55%), linear-gradient(to right, rgba(10, 8, 6, .55), transparent 60%); pointer-events: none; }
 .rfig { position: absolute; right: clamp(0px, 4vw, 60px); bottom: 0; height: min(82vh, 760px); max-width: 52vw; object-fit: contain; object-position: bottom; opacity: 0; transition: opacity 1.6s ease; filter: drop-shadow(0 10px 40px rgba(0, 0, 0, .5)); }
 .rfig.on { opacity: 1; }
 .rtop { position: absolute; top: max(16px, env(safe-area-inset-top)); left: clamp(16px, 4vw, 48px); right: clamp(16px, 4vw, 48px); display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 2; }
@@ -370,7 +402,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .rlist a { color: var(--ivory); }
 .rtopics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .rtopics button { border: 1px solid rgba(239, 232, 218, .3); background: rgba(0, 0, 0, .25); color: var(--ivory-dim); border-radius: 999px; padding: 4px 14px; cursor: pointer; font: 13px var(--mincho); }
-.rtopics button[aria-pressed="true"] { background: rgba(239, 232, 218, .9); color: #1A1714; border-color: transparent; }
+.rtopics button[aria-pressed="true"] { background: var(--on, rgba(239, 232, 218, .9)); color: var(--on-ink, #1A1714); border-color: transparent; }
 .rask { margin: 0 0 12px; }
 .rask textarea { width: 100%; min-height: 5.5em; resize: vertical; background: rgba(10, 8, 6, .5); border: 1px solid rgba(239, 232, 218, .25); border-radius: 8px;
   color: var(--ivory); font: 16px/1.9 var(--mincho); padding: 10px 12px; outline: none; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
@@ -378,7 +410,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .rask-act { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
 .rheat { display: flex; gap: 4px; font-size: 12px; color: var(--ivory-dim); align-items: center; }
 .rheat button { border: 0; background: none; color: var(--ivory-dim); cursor: pointer; padding: 2px 6px; font: 12px var(--gothic); border-radius: 999px; }
-.rheat button[aria-pressed="true"] { color: var(--ivory); background: rgba(239, 232, 218, .16); }
+.rheat button[aria-pressed="true"] { color: var(--on-ink, var(--ivory)); background: var(--on, rgba(239, 232, 218, .16)); }
 @media (max-width: 760px) { .rfig { max-width: 90vw; height: 62vh; right: -6vw; opacity: 0; } .rfig.on { opacity: .9; } }
 
 /* ───────── 眺める：姿だけを大きく。シーンはぼかした同じ絵の上に、姿の絵（白地）は紙の色の上に ───────── */
@@ -406,7 +438,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .gzthumbs button { flex: 0 0 auto; width: 50px; height: 70px; padding: 0; border-radius: 6px; border: 1px solid rgba(239, 232, 218, .22); background: rgba(239, 232, 218, .08) center / cover no-repeat;
   color: var(--ivory-dim); font: 10px var(--mincho); cursor: pointer; opacity: .55; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; transition: opacity .3s; }
 .gzthumbs button.ok span { display: none; }
-.gzthumbs button[aria-current="true"] { opacity: 1; border-color: var(--ivory); }
+.gzthumbs button[aria-current="true"] { opacity: 1; border-color: var(--on, var(--ivory)); box-shadow: 0 0 0 1px var(--on, transparent); }
 .gaze.bare .gzbar { opacity: 0; pointer-events: none; }
 .gzthumbs button { position: relative; }
 .gzthumbs button.out { opacity: .3; }
@@ -427,7 +459,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .gtop h2 { font: 500 18px var(--mincho); letter-spacing: .2em; margin: 0 auto 0 0; }
 .grooms { display: flex; flex-wrap: wrap; gap: 6px; }
 .grooms button { border: 1px solid rgba(239, 232, 218, .3); background: rgba(0, 0, 0, .2); color: var(--ivory-dim); border-radius: 999px; padding: 4px 14px; cursor: pointer; font: 13px var(--mincho); }
-.grooms button[aria-pressed="true"] { background: rgba(239, 232, 218, .9); color: #1A1714; }
+.grooms button[aria-pressed="true"] { background: var(--on, rgba(239, 232, 218, .9)); color: var(--on-ink, #1A1714); }
 .gcam { font: 15px/1.9 var(--mincho); margin: 16px 0 6px; min-height: 1.9em; }
 .gwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 40px 34px; margin-top: 22px; }
 .gitem { position: relative; text-align: center; }
@@ -631,6 +663,17 @@ a.ev:hover .ttl { text-decoration: underline; }
       <div class="tc-month" id="tcMonth"></div>
       <div class="tc-list" id="tcList" hidden></div>
     </section>
+    <!-- カミーユの設計と提案（2026-10-26・Claude API）。毎朝 6:30 と 12:30 に GAS が作った案を読むだけ。押したときだけ書き込む -->
+    <section class="ai" id="ai" aria-label="今日の設計と気になること" hidden>
+      <div class="ai-head"><b>今日の設計</b><small id="aiPlanAt"></small><span class="gap"></span><small id="aiUse"></small></div>
+      <div id="aiPlan"></div>
+      <form class="ai-re" id="aiRe" autocomplete="off">
+        <input id="aiNote" maxlength="300" placeholder="組み直す理由（例：会議が30分延びた）" aria-label="組み直す理由">
+        <button type="submit" class="act" id="aiReBtn">組み直す</button>
+      </form>
+      <div class="ai-head"><b>気になること</b><small id="aiFixAt"></small><span class="gap"></span><button type="button" class="link" id="aiFixRe">見直す</button></div>
+      <div id="aiFix"></div>
+    </section>
     <div class="w-nav" role="tablist" aria-label="仕事のページ">
       <button type="button" role="tab" data-tab="sched" aria-selected="true">スケジュール</button>
       <button type="button" role="tab" data-tab="ideas" aria-selected="false">アイデア</button>
@@ -805,17 +848,17 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-25 v3.9';
+var BUILD = '2026-10-26 v3.10';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
 function save(k, v) { try { if (v == null) localStorage.removeItem('cellar.' + k); else localStorage.setItem('cellar.' + k, v); } catch (e) {} }
 var token = MOCK ? 'mock' : (load('token') || '');
 
-function transport(payload, long) {
+function transport(payload, long, wait) {
   if (MOCK) return mockCall(payload);
   if (IS_GAS) return gasRun(payload);
-  return long && urlLength(payload) > 6000 ? postApi(payload) : jsonp(payload);
+  return long && urlLength(payload) > 6000 ? postApi(payload) : jsonp(payload, wait);
 }
 // しばらく使っていないと Apps Script の起動に数十秒かかる。7秒を超えたら一言知らせ、通信の失敗は1回だけ送り直す
 // （書き込みは rid で二重にならない）
@@ -826,9 +869,10 @@ function call(action, args, opt) {
   var slow = setTimeout(function () {
     if (Date.now() - slowSaidAt > 30000) { slowSaidAt = Date.now(); toast('Apps Script を起こしています…（しばらく使っていないと、最初だけ時間がかかります）'); }
   }, 7000);
-  var p = transport(payload, long).catch(function (e) {
-    if (!e || !e.transient) throw e;
-    return new Promise(function (r) { setTimeout(r, 1500); }).then(function () { return transport(payload, long); });
+  var wait = opt && opt.wait, once = !!(opt && opt.once);   // AI の作り直しは時間がかかり、送り直すと料金が二重になる（2026-10-26）
+  var p = transport(payload, long, wait).catch(function (e) {
+    if (!e || !e.transient || once) throw e;
+    return new Promise(function (r) { setTimeout(r, 1500); }).then(function () { return transport(payload, long, wait); });
   });
   return p.then(function (res) {
     clearTimeout(slow);
@@ -854,12 +898,12 @@ function qsOf(payload) {
 }
 function urlLength(payload) { return GAS_URL.length + qsOf(payload).length + 40; }
 var jsonpSeq = 0;
-function jsonp(payload) {
+function jsonp(payload, wait) {
   return new Promise(function (resolve, reject) {
     var cb = '__cellar' + (++jsonpSeq) + '_' + Date.now().toString(36);
     var s = document.createElement('script');
     var fail = function (msg) { var e = new Error(msg); e.transient = true; return e; };
-    var timer = setTimeout(function () { done(); reject(fail('応答がありません（60秒）')); }, 60000);
+    var ms = wait || 60000, timer = setTimeout(function () { done(); reject(fail('応答がありません（' + Math.round(ms / 1000) + '秒）')); }, ms);
     function done() { clearTimeout(timer); window[cb] = function () {}; if (s.parentNode) s.parentNode.removeChild(s); }
     window[cb] = function (res) { done(); resolve(res); };
     s.onerror = function () { done(); reject(fail('GAS に届きませんでした')); };
@@ -1110,7 +1154,8 @@ function loadWork(quiet) {
     call('overdue').then(function (d) { S.overdue = d; ERR.overdue = null; }, function (e) { ERR.overdue = e; }),
     call('pulse').then(function (d) { S.pulse = d; ERR.pulse = null; }, function (e) { ERR.pulse = e; }),
     call('weather').then(function (d) { S.weather = d; }, function () {}),
-    loadTimecard()
+    loadTimecard(),
+    loadAi()
   ];
   if (!quiet) renderWork();
   return Promise.all(jobs).then(renderWork);
@@ -1293,6 +1338,91 @@ function tcSave(args) {
     if (w === 'top') renderTcFix(); renderTcList(); renderTimecard();
   }, function (e) { toast('直せませんでした：' + e.message, true); });
 }
+
+/* ───────── 今日の設計と気になること（2026-10-26・Claude API） ─────────
+   毎朝 6:30（設計と提案）と 12:30（提案）に GAS が作った案を読むだけ。「組み直す」「見直す」は本人が押したときだけ API を呼ぶ（1〜2分）。
+   書き込みは押したボタンのぶんだけ、既存の move／create で。開くは新しいタブ */
+var AI = { d: null, err: '', busy: '' };
+function loadAi() {
+  if (!token) return Promise.resolve();
+  return call('ai').then(function (d) { AI.d = d; AI.err = ''; renderAi(); }, function (e) { AI.err = e.message; renderAi(); });
+}
+function aiStamp(at) { return at ? String(at).slice(11, 16) + ' 作成' : ''; }
+function renderAi() {
+  var d = AI.d, box = $('#ai');
+  box.hidden = !d && !AI.err;
+  if (box.hidden) return;
+  if (!d) { fill($('#aiPlan'), [h('p', { class: 'ai-err' }, ['読めませんでした：' + AI.err])]); fill($('#aiFix'), []); return; }
+  var u = d.usage || {};
+  $('#aiUse').textContent = d.ready ? '今月 $' + (u.usd || 0).toFixed(2) + '／上限 $' + u.cap + (u.capped ? '（自動は停止中）' : '') : '';
+  $('#aiPlanAt').textContent = d.plan ? aiStamp(d.plan.at) + (d.plan.note ? '・' + d.plan.note : '') : '';
+  $('#aiFixAt').textContent = d.fixes ? aiStamp(d.fixes.at) : '';
+  var err = d.err || {};
+  // 今日の設計
+  var pk = [];
+  if (!d.ready) pk.push(h('p', { class: 'ai-err' }, ['ANTHROPIC_API_KEY が未設定です（GAS のスクリプト プロパティ）']));
+  if (err.plan) pk.push(h('p', { class: 'ai-err' }, [err.plan]));
+  if (AI.busy === 'plan') pk.push(h('p', { class: 'state' }, ['組み直しています…（1〜2分）']));
+  var p = d.plan;
+  if (p) {
+    if (p.summary) pk.push(h('p', { class: 'ai-sum' }, [p.summary]));
+    pk.push(h('ol', { class: 'ai-blocks' }, (p.blocks || []).map(function (b) {
+      return h('li', null, [h('span', { class: 't' }, [b.start + '–' + b.end]), h('span', { class: 'k' + (b.kind === 'タスク' ? ' task' : '') }, [b.kind]),
+        h('span', null, [b.title]), b.why ? h('span', { class: 'w' }, [b.why]) : null]);
+    })));
+    if ((p.defer || []).length) {
+      pk.push(h('p', { class: 'ai-sub' }, ['回す案']));
+      pk.push(h('ul', { class: 'ai-defer' }, p.defer.map(function (x) {
+        var btn = h('button', { type: 'button', class: 'act', onclick: function () { aiMove(btn, x.taskId, x.to, x.title); } }, [fmtDay(x.to) + ' へ']);
+        return h('li', null, [h('span', null, [x.title, h('small', { class: 'why' }, ['　' + x.why])]), btn]);
+      })));
+    }
+    if ((p.warn || []).length) {
+      pk.push(h('p', { class: 'ai-sub' }, ['気をつけること']));
+      pk.push(h('ul', { class: 'ai-warn' }, p.warn.map(function (w) { return h('li', null, [w]); })));
+    }
+  } else if (d.ready && !err.plan && AI.busy !== 'plan') pk.push(h('p', { class: 'state' }, ['今日の案はまだありません。6:30 に作ります（いま作るなら「組み直す」）']));
+  fill($('#aiPlan'), pk);
+  $('#aiReBtn').disabled = !d.ready || !!AI.busy;
+  // 気になること
+  var fk = [];
+  if (err.fixes) fk.push(h('p', { class: 'ai-err' }, [err.fixes]));
+  if (AI.busy === 'fix') fk.push(h('p', { class: 'state' }, ['見直しています…（1〜2分）']));
+  var f = d.fixes;
+  if (f && (f.items || []).length) fk.push(h('ul', { class: 'ai-fix' }, f.items.map(function (it) {
+    var a = it.action || {}, btn = null;
+    if (a.type === 'task_move') btn = h('button', { type: 'button', class: 'act', onclick: function () { aiMove(btn, a.taskId, a.date, it.what); } }, [fmtDay(a.date) + ' へ移す']);
+    if (a.type === 'task_create') btn = h('button', { type: 'button', class: 'act', onclick: function () { aiCreate(btn, a.title, a.date); } }, ['タスクにする']);
+    if (a.type === 'open_url') btn = h('a', { class: 'act', href: a.url, target: '_blank', rel: 'noopener' }, ['開く']);
+    return h('li', null, [h('span', { class: 'lv' + (it.level === '急ぎ' ? ' urgent' : '') }, [it.level]),
+      h('span', { class: 'body' }, [h('b', null, [it.what]), h('span', { class: 'why' }, [it.why]),
+        (it.steps || []).length ? h('ol', null, it.steps.map(function (s) { return h('li', null, [s]); })) : null]), btn]);
+  })));
+  else if (f && d.ready) fk.push(h('p', { class: 'state' }, ['いま気になることはありません']));
+  else if (d.ready && !err.fixes && AI.busy !== 'fix') fk.push(h('p', { class: 'state' }, ['まだ見ていません。6:30 と 12:30 に見ます']));
+  fill($('#aiFix'), fk);
+  $('#aiFixRe').disabled = !d.ready || !!AI.busy;
+}
+function aiMove(btn, id, date, title) {
+  btn.classList.add('busy');
+  call('move', { id: id, date: date }).then(function () { btn.textContent = '移しました'; btn.disabled = true; toast(fmtDay(date) + ' へ移しました：' + title); loadWork(true); },
+    function (e) { toast('移せませんでした：' + e.message, true); }).then(function () { btn.classList.remove('busy'); });
+}
+function aiCreate(btn, title, date) {
+  btn.classList.add('busy');
+  call('create', { title: title, date: date, rid: rid() }).then(function () { btn.textContent = '作りました'; btn.disabled = true; toast('タスクにしました：' + title); loadWork(true); },
+    function (e) { toast('作れませんでした：' + e.message, true); }).then(function () { btn.classList.remove('busy'); });
+}
+function aiRun(kind, args) {
+  if (AI.busy) return;
+  AI.busy = kind; renderAi();
+  call(kind === 'plan' ? 'aiplan' : 'aifix', args || {}, { wait: 200000, once: true })
+    .then(function (d) { AI.d = d; var e = (d.err || {})[kind === 'plan' ? 'plan' : 'fixes']; if (e) toast('作れませんでした：' + e, true); },
+      function (e) { toast('作れませんでした：' + e.message, true); })
+    .then(function () { AI.busy = ''; renderAi(); });
+}
+$('#aiRe').addEventListener('submit', function (ev) { ev.preventDefault(); aiRun('plan', { note: $('#aiNote').value.trim() }); $('#aiNote').value = ''; });
+$('#aiFixRe').addEventListener('click', function () { aiRun('fix'); });
 
 /* ───────── 家の切り替え ───────── */
 var house = 'private';
@@ -2891,6 +3021,27 @@ function mockRoute(p) {
       tasks: db.sched.filter(function (r) { return r.sel === 'タスク' && !r.done && r.date.start === T; }), overall: db.overall.filter(function (r) { return r.date.start >= T && r.date.start <= addDays(T, 3); }), logs: [], bin: null });
     case 'overdue': return ok({ date: T, kinds: [], rows: open().filter(function (r) { return r.date.start < T; }) });
     case 'complete': { var r = db.sched.find(function (x) { return x.id === p.id; }); if (!r) return ng('そのタスクはありません'); r.done = true; return ok({ id: p.id }); }
+    case 'create': { if (!String(p.title || '').trim()) return ng('題名が空です'); if (!db.sched.some(function (x) { return x.id === p.rid; })) db.sched.push({ id: p.rid || rid(), url: '', title: p.title, sel: 'タスク', done: false, date: { start: p.date || T, time: '', end: '', endTime: '' } }); return ok({ id: p.rid }); }
+    // 今日の設計と気になること（2026-10-26）。見本の案（本物は Claude API・GAS が作る）。?ai=none でキー未設定、?ai=err で作れなかった表示
+    case 'ai': case 'aiplan': case 'aifix': {
+      var tk = db.sched.filter(function (r) { return r.sel === 'タスク' && !r.done; }), od2 = tk.filter(function (r) { return r.date.start < T; });
+      if (!db.ai) db.ai = { date: T, err: {},
+        plan: { at: now, note: '', summary: '（見本）午前に仕込み、午後は来客の前に資料をまとめる流れです。', warn: ['（見本）14時の来客と移動が近いので、10分の余白を取っています。'],
+          blocks: [{ start: '09:00', end: '09:30', kind: '予定', title: '朝礼', why: '', taskId: '' },
+            { start: '09:30', end: '11:00', kind: 'タスク', title: tk[0] ? tk[0].title : '（見本）資料づくり', why: '（見本）頭が冴えている午前に', taskId: tk[0] ? tk[0].id : '' },
+            { start: '12:00', end: '13:00', kind: '休憩', title: '昼休み', why: '', taskId: '' }],
+          defer: od2.slice(0, 1).map(function (r) { return { taskId: r.id, title: r.title, to: addDays(T, 1), why: '（見本）今日は詰まっているので' }; }) },
+        fixes: { at: now, items: [
+          { level: '急ぎ', what: '（見本）索引が3日届いていません', why: '（見本）毎晩の送信が止まっているかもしれません', steps: ['（見本）cellar-index.py --post を手で動かす'], action: { type: 'none', taskId: '', date: '', title: '', url: '' } },
+          { level: '今日', what: '（見本）持ち越しが長いタスク', why: '（見本）2週間動いていません', steps: [], action: od2[0] ? { type: 'task_move', taskId: od2[0].id, date: addDays(T, 1), title: '', url: '' } : { type: 'none', taskId: '', date: '', title: '', url: '' } },
+          { level: 'そのうち', what: '（見本）定例の見直し', why: '（見本）週の定例が遅れがち', steps: [], action: { type: 'task_create', taskId: '', date: addDays(T, 2), title: '（見本）定例の曜日を見直す', url: '' } }] } };
+      if (p.action === 'aiplan') { db.ai.plan.at = now; db.ai.plan.note = p.note || ''; }
+      if (p.action === 'aifix') db.ai.fixes.at = now;
+      var aiv = JSON.parse(JSON.stringify(db.ai)); aiv.ready = params.get('ai') !== 'none'; aiv.usage = { month: T.slice(0, 7), usd: 1.23, cap: 20, capped: false, calls: 12 };
+      if (!aiv.ready) { aiv.plan = null; aiv.fixes = null; }
+      if (params.get('ai') === 'err') aiv.err = { plan: 'Claude API 529：Overloaded', fixes: '' };
+      return ok(aiv);
+    }
     case 'move': { var m = db.sched.find(function (x) { return x.id === p.id; }); if (!m) return ng('そのタスクはありません'); m.date = { start: p.date, time: '', end: '', endTime: '' }; return ok({ id: p.id, date: p.date }); }
     case 'weather': return ok({ place: '増毛', desc: { sun: '晴れ', partly: '晴れ時々くもり', cloud: 'くもり', rain: '雨', snow: '雪' }[params.get('wx') || 'cloud'], icon: params.get('wx') || 'cloud', temp: 12, high: 14, low: 7, rain: params.get('wx') === 'rain' ? 80 : 30,
       day: Array.from({ length: 24 }, function (_, i) { return { h: i, t: Math.round(9 + 5 * Math.sin((i - 8) / 24 * 2 * Math.PI)), p: i >= 15 && i <= 19 ? 60 : 10 }; }) });
