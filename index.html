@@ -267,6 +267,36 @@ a.ev:hover .ttl { text-decoration: underline; }
 .ntasks .time { grid-template-columns: 52px minmax(0, 1fr) auto; }
 .ntasks .cnt { font-size: 12px; color: var(--muted); }
 
+/* 更新ノート（2026-10-26） */
+.rl-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.rl-bar select { border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); font-size: 14px; padding: 5px 8px; }
+.rl-bar .gap { flex: 1; }
+.rl-latest { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.rl-latest b { color: var(--ink); font-weight: 500; margin-right: 6px; }
+.rl-latest em { font-style: normal; color: var(--amber); margin-left: 6px; }
+.rl-ed { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 16px; padding: 16px; margin-bottom: 18px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.rl-ed h2 { grid-column: 1 / -1; font-size: 15px; margin: 0; }
+.rl-ed label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+.rl-ed label.wide, .rl-ed .big, .rl-ed .row { grid-column: 1 / -1; }
+.rl-ed input:not([type=checkbox]), .rl-ed select, .rl-ed textarea { border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); padding: 7px 10px; font-size: 16px; font-family: inherit; min-width: 0; }
+.rl-ed textarea { resize: vertical; }
+.rl-ed .who { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.rl-ed .who label, .rl-ed .big { flex-direction: row; align-items: center; gap: 6px; font-size: 14px; color: var(--ink); }
+.rl-ed .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.rl-bulk { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; margin-bottom: 8px; }
+.rl-list { list-style: none; margin: 0; padding: 0; }
+.rl-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 0 10px; padding: 12px 0; border-top: 1px solid var(--rule); align-items: start; }
+.rl-list li.empty { display: block; color: var(--muted); font-size: 14px; border: 0; }
+.rl-list input { margin-top: 4px; }
+.rl-list .meta { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: var(--muted); }
+.rl-list .meta b { color: var(--late); font-weight: 500; }
+.rl-list .st { color: var(--muted); }
+.rl-list li[data-st="公開"] .st { color: var(--bottle); font-weight: 500; }
+.rl-list li[data-st="取り下げ"] { opacity: .55; }
+.rl-list .tt { font-weight: 500; overflow-wrap: anywhere; }
+.rl-list .bd, .rl-list .mm { font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.rl-list .mm { color: var(--muted); }
+
 .pulse { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--muted); }
 .pulse span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--bottle); margin-right: 6px; vertical-align: 1px; }
 .pulse span.st-late::before { background: var(--amber); }
@@ -678,6 +708,7 @@ a.ev:hover .ttl { text-decoration: underline; }
       <button type="button" role="tab" data-tab="sched" aria-selected="true">スケジュール</button>
       <button type="button" role="tab" data-tab="ideas" aria-selected="false">アイデア</button>
       <button type="button" role="tab" data-tab="notes" aria-selected="false">案件ノート</button>
+      <button type="button" role="tab" data-tab="rel" aria-selected="false">更新ノート</button>
     </div>
 
     <div class="w-tab" id="tab-sched" role="tabpanel">
@@ -736,6 +767,25 @@ a.ev:hover .ttl { text-decoration: underline; }
           </aside>
         </div>
       </div>
+    </div>
+
+    <!-- 更新ノート（2026-10-26）：業務アプリの更新内容。選択肢と中身はサーバから -->
+    <div class="w-tab" id="tab-rel" role="tabpanel" hidden>
+      <div class="rl-bar">
+        <select id="rlApp" aria-label="アプリで絞る"></select>
+        <select id="rlState" aria-label="状態で絞る"></select>
+        <span class="gap"></span>
+        <button type="button" class="save" id="rlNew">新しく書く</button>
+      </div>
+      <div class="rl-latest" id="rlLatest" aria-label="アプリごとの最新の公開版"></div>
+      <form class="rl-ed" id="rlEd" autocomplete="off" hidden></form>
+      <div class="rl-bulk" id="rlBulk" hidden>
+        <span id="rlBulkN"></span>
+        <button type="button" class="act" data-st="公開">公開する</button>
+        <button type="button" class="act" data-st="取り下げ">取り下げる</button>
+        <button type="button" class="act" data-st="下書き">下書きに戻す</button>
+      </div>
+      <ol class="rl-list" id="rlList"></ol>
     </div>
 
     <footer class="pulse" id="pulse" aria-label="仕組みの調子"></footer>
@@ -848,7 +898,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-26 v3.10';
+var BUILD = '2026-10-26 v3.11';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1649,9 +1699,115 @@ function showTab(tab) {
   $('#tab-sched').hidden = tab !== 'sched';
   $('#tab-ideas').hidden = tab !== 'ideas';
   $('#tab-notes').hidden = tab !== 'notes';
+  $('#tab-rel').hidden = tab !== 'rel';
   if (tab === 'ideas' && !S.ideas) loadIdeas();
   if (tab === 'notes') showNotes();
+  if (tab === 'rel' && !RL.data) loadRel();
 }
+
+/* ───────── 更新ノート（2026-10-26）：業務アプリの更新内容を1か所で書く・直す・公開する ─────────
+   アプリ名などの選択肢はサーバが返す（公開ページに置かない）。ここで書いた・直したという記録は残さない：
+   端末にも置かない（書きかけ・絞り込みも覚えない）。公開した分は別のアプリがスタッフに見せる */
+var RL = { data: null, app: '', state: '', pick: {}, edit: null, rid: '', busy: false };
+function loadRel() {
+  fill($('#rlList'), [h('li', { class: 'empty' }, ['読み込み中…'])]);
+  return call('releases').then(function (d) { RL.data = d; renderRel(); },
+    function (e) { fill($('#rlList'), [h('li', { class: 'empty' }, ['更新ノートを読めませんでした：' + e.message])]); });
+}
+function relOpts(sel, list, first, cur) {
+  fill(sel, (first ? [h('option', { value: '' }, [first])] : []).concat(list.map(function (v) { return h('option', { value: v, selected: v === cur }, [v]); })));
+}
+function relPut(row) {
+  var rows = RL.data.rows;
+  for (var i = 0; i < rows.length; i++) if (rows[i].id === row.id) { rows[i] = row; return; }
+  rows.unshift(row);
+}
+function renderRel() {
+  if (!RL.data) return;
+  var o = RL.data.opts, rows = RL.data.rows;
+  relOpts($('#rlApp'), o.apps, 'すべてのアプリ', RL.app);
+  relOpts($('#rlState'), o.states, 'すべての状態', RL.state);
+  // アプリごとの最新の公開版（取り下げ・下書きは数えない）と、下書きの数
+  fill($('#rlLatest'), o.apps.filter(function (a) { return a !== '全アプリ'; }).map(function (a) {
+    var mine = rows.filter(function (r) { return r.app === a; });
+    var pub = mine.filter(function (r) { return r.state === '公開'; }).sort(function (x, y) { return x.date < y.date ? 1 : -1; })[0];
+    var drafts = mine.filter(function (r) { return r.state === '下書き'; }).length;
+    return h('span', null, [h('b', null, [a]), pub ? (pub.ver || '版なし') + '（' + fmtMD(pub.date) + '）' : '公開なし',
+      drafts ? h('em', null, ['下書き ' + drafts]) : null]);
+  }));
+  var list = rows.filter(function (r) { return (!RL.app || r.app === RL.app) && (!RL.state || r.state === RL.state); });
+  Object.keys(RL.pick).forEach(function (id) { if (!rows.some(function (r) { return r.id === id; })) delete RL.pick[id]; });
+  var n = Object.keys(RL.pick).length;
+  $('#rlBulk').hidden = !n; $('#rlBulkN').textContent = n + '件を選択中';
+  fill($('#rlList'), list.length ? list.map(function (r) {
+    var box = h('input', { type: 'checkbox', 'aria-label': '選ぶ：' + r.title, checked: !!RL.pick[r.id] });
+    box.addEventListener('change', function () { if (box.checked) RL.pick[r.id] = 1; else delete RL.pick[r.id]; renderRel(); });
+    return h('li', { 'data-st': r.state }, [box,
+      h('div', null, [
+        h('div', { class: 'meta' }, [h('span', { class: 'st' }, [r.state]), r.app, r.ver, r.kind, r.date ? fmtDay(r.date) : '公開日なし', r.big ? h('b', null, ['重要']) : null]),
+        h('div', { class: 'tt' }, [r.title || '（無題）']),
+        r.body ? h('div', { class: 'bd' }, [r.body]) : null,
+        r.memo ? h('div', { class: 'mm' }, ['開発メモ：' + r.memo]) : null
+      ]),
+      h('button', { type: 'button', class: 'link', onclick: function () { openRelEd(r); } }, ['直す'])]);
+  }) : [h('li', { class: 'empty' }, [rows.length ? '絞り込みに合うノートはありません' : 'まだノートはありません。「新しく書く」から'])]);
+}
+function openRelEd(row) {
+  var o = RL.data.opts, r = row || { title: '', app: RL.app || '', ver: '', date: '', kind: '', who: ['全員'], body: '', memo: '', big: false, link: '', state: '下書き' };
+  RL.edit = row ? row.id : 'new'; RL.rid = row ? '' : rid();
+  var f = $('#rlEd');
+  function field(label, el, wide) { return h('label', { class: wide ? 'wide' : null }, [h('span', null, [label]), el]); }
+  var app = h('select', { name: 'app', required: true }); relOpts(app, o.apps, 'アプリを選ぶ', r.app);
+  var kind = h('select', { name: 'kind' }); relOpts(kind, o.kinds, '区分なし', r.kind);
+  var who = h('div', { class: 'who' }, o.who.map(function (w) { return h('label', null, [h('input', { type: 'checkbox', name: 'who', value: w, checked: r.who.indexOf(w) >= 0 }), w]); }));
+  fill(f, [
+    h('h2', null, [row ? '直す（' + r.state + '）' : '新しく書く']),
+    field('件名（スタッフ向けの一言）', h('input', { name: 'title', maxlength: '200', value: r.title, required: true }), true),
+    field('アプリ', app), field('版', h('input', { name: 'ver', maxlength: '40', value: r.ver, placeholder: 'v127 など' })),
+    field('公開日', h('input', { name: 'date', type: 'date', value: r.date })), field('区分', kind),
+    field('対象', who, true),
+    field('本文（スタッフに見せる。使い方が変わる点を先に）', h('textarea', { name: 'body', rows: '4', maxlength: '4000' }, [r.body]), true),
+    field('開発メモ（自分だけ。各アプリには出ない）', h('textarea', { name: 'memo', rows: '3', maxlength: '4000' }, [r.memo]), true),
+    field('リンク（手順書・マニュアル）', h('input', { name: 'link', type: 'url', value: r.link, placeholder: 'https://' }), true),
+    h('label', { class: 'big' }, [h('input', { type: 'checkbox', name: 'big', checked: r.big }), '重要（各アプリで起動時に一度だけ全面に出す）']),
+    h('div', { class: 'row' }, [
+      h('button', { type: 'submit', class: 'save', value: 'save' }, [row ? '保存する' : '下書きで保存']),
+      row ? null : h('button', { type: 'submit', class: 'act', value: 'pub' }, ['保存して公開']),
+      h('button', { type: 'button', class: 'link', onclick: closeRelEd }, ['やめる']),
+      h('span', { class: 'state', id: 'rlEdMsg' }, [])])
+  ]);
+  f.hidden = false; f.elements.title.focus();
+  f.scrollIntoView({ block: 'nearest' });
+}
+function closeRelEd() { RL.edit = null; RL.rid = ''; $('#rlEd').hidden = true; fill($('#rlEd'), []); }
+$('#rlEd').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (RL.busy || !RL.edit) return;
+  var f = e.target, el = f.elements, pub = e.submitter && e.submitter.value === 'pub';
+  var who = Array.prototype.filter.call(f.querySelectorAll('input[name=who]'), function (x) { return x.checked; }).map(function (x) { return x.value; });
+  var args = { title: el.title.value.trim(), app: el.app.value, ver: el.ver.value.trim(), date: el.date.value, kind: el.kind.value,
+    who: JSON.stringify(who), body: el.body.value, memo: el.memo.value, link: el.link.value.trim(), big: el.big.checked };
+  if (!args.title || !args.app) { $('#rlEdMsg').textContent = '件名とアプリは要ります'; return; }
+  if (RL.edit === 'new') { args.rid = RL.rid; if (pub) args.state = '公開'; } else args.id = RL.edit;
+  RL.busy = true; $('#rlEdMsg').textContent = '保存しています…';
+  call('releaseSave', args, { long: true }).then(function (row) {
+    RL.busy = false; relPut(row); closeRelEd(); renderRel(); toast((row.state === '公開' ? '公開しました：' : '保存しました：') + row.title);
+  }, function (err) { RL.busy = false; $('#rlEdMsg').textContent = '保存できませんでした：' + err.message; });
+});
+$('#rlNew').addEventListener('click', function () { if (RL.data) openRelEd(null); });
+$('#rlApp').addEventListener('change', function () { RL.app = this.value; renderRel(); });
+$('#rlState').addEventListener('change', function () { RL.state = this.value; renderRel(); });
+Array.prototype.forEach.call(document.querySelectorAll('#rlBulk [data-st]'), function (b) {
+  b.addEventListener('click', function () {
+    var ids = Object.keys(RL.pick), st = b.getAttribute('data-st');
+    if (!ids.length || RL.busy) return;
+    RL.busy = true; b.classList.add('busy');
+    call('releaseState', { ids: JSON.stringify(ids), state: st }).then(function (d) {
+      RL.busy = false; b.classList.remove('busy'); d.rows.forEach(relPut); RL.pick = {}; renderRel(); toast(d.rows.length + '件を「' + st + '」にしました');
+    }, function (err) { RL.busy = false; b.classList.remove('busy'); toast('変えられませんでした：' + err.message, true); });
+  });
+});
+
 
 /* ───────── 案件ノート（2026-10-10）：大型案件ごとに1冊。開いてすぐ1行書ける。書き換えない・足していくだけ ─────────
    鍵（NOTE_KEY。無ければ部屋の合図と同じ）の内側。本文は個人ドライブの Cellar/notes.json。
@@ -3132,6 +3288,31 @@ function mockRoute(p) {
       return ok({ items: db.tastings });
     }
     case 'tastingdel': db.tastings = db.tastings.filter(function (x) { return x.id !== p.id; }); return ok({ items: db.tastings });
+    // 更新ノート（2026-10-26）。アプリ名は架空（本物はサーバの REL が返す）
+    case 'releases': case 'releaseSave': case 'releaseState': {
+      var RO = { apps: ['見本アプリA', '見本アプリB', '見本アプリC', '全アプリ'], kinds: ['新機能', '改善', '修正', 'お知らせ', '注意'],
+        who: ['全員', 'ホール', 'キッチン', '醸造', '管理者'], states: ['下書き', '公開', '取り下げ'] };
+      if (!db.rel) db.rel = [
+        { id: 'rel-1', url: '', at: now, title: '（見本）入力画面がひとつになりました', app: '見本アプリA', ver: 'v2', date: '', kind: '改善', who: ['全員'], body: '（見本）本文です。', memo: '（見本）開発メモ', state: '下書き', big: false, link: '' },
+        { id: 'rel-2', url: '', at: now, title: '（見本）一覧の並びを直しました', app: '見本アプリB', ver: 'v1.1', date: addDays(T, -2), kind: '修正', who: ['ホール', 'キッチン'], body: '（見本）本文です。', memo: '', state: '公開', big: true, link: '' }];
+      var relOf = function (id) { return db.rel.find(function (x) { return x.id === id; }); };
+      if (p.action === 'releases') return ok({ rows: db.rel.slice(), opts: RO });
+      if (p.action === 'releaseState') {
+        if (RO.states.indexOf(p.state) < 0) return ng('状態が選択肢にありません: ' + p.state);
+        var ids = JSON.parse(p.ids || '[]'); if (p.id) ids.push(p.id);
+        return ok({ rows: ids.filter(function (x, i, a) { return a.indexOf(x) === i; }).map(function (id) {
+          var r = relOf(id); if (!r) return null; r.state = p.state; if (p.state === '公開' && !r.date) r.date = T; return r; }).filter(Boolean) });
+      }
+      if (!String(p.title || '').trim()) return ng('件名が空です');
+      if (RO.apps.indexOf(p.app) < 0) return ng('アプリを選んでください');
+      var rv = { title: String(p.title).trim(), app: p.app, ver: p.ver || '', date: p.date || '', kind: p.kind || '', who: JSON.parse(p.who || '[]'),
+        body: p.body || '', memo: p.memo || '', link: p.link || '', big: p.big === true || p.big === 'true', at: now };
+      if (p.id) { var er = relOf(p.id); if (!er) return ng('更新ノートの行ではないので書き換えません'); Object.assign(er, rv); return ok(er); }
+      var dup = relOf(p.rid); if (dup) return ok(dup);
+      var nr = Object.assign({ id: p.rid || rid(), url: '', state: p.state === '公開' ? '公開' : '下書き' }, rv);
+      if (nr.state === '公開' && !nr.date) nr.date = T;
+      db.rel.unshift(nr); return ok(nr);
+    }
     case 'tasks': return ok({ date: T, rows: open() });
     // シーンのモックは部屋の写真で代用（カミーユの絵は公開ページのモックに置かない）。?scenes=1 で出す
     case 'scenes': return p.room !== 'mock' ? ng('room') : ok({ scenes: params.get('scenes') === '1' ? [{ name: 'scene-day-1', slot: 'day', up: 1 }, { name: 'scene-night-1', slot: 'night', up: 1 }] : [] });
