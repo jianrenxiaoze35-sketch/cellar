@@ -7,7 +7,7 @@
 <title>Cellar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Shippori+Mincho+B1:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Shippori+Mincho+B1:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Klee+One:wght@400;600&display=swap">
 <!--
   Cellar v3（2026-10-10）。設計図 §14。v2 の画面は _v2_index.html に残してある。
   3つの層：
@@ -20,9 +20,11 @@
 -->
 <style>
 :root {
-  /* 2026-10-26 本人の指示：テーマカラーは 仕事＝青／プライベート＝クリーム／秘密の部屋＝ピンク。--bottle は仕事の差し色（名前は昔のまま） */
-  --paper: #EEF2F8; --sheet: #F8FAFD; --ink: #1B2431; --muted: #5A6577; --rule: #CAD3E0;
-  --bottle: #2C5C9E; --amber: #A86A12; --late: #9A3B2E; --steel: #4A6FA5; --plum: #8A5A86;
+  /* 2026-10-29 本人の指示：仕事のテーマカラー（青）はやめる。昼は窓の光が差す机、夜は卓上灯の机。
+     差し色の --bottle は、カミーユの万年筆のブルーブラック（名前は昔のまま）。昼と夜は 自動（増毛の日の出・日の入）／昼／夜 で切り替える */
+  --paper: #E7E6E3; --sheet: #F6F6F4; --ink: #1F2328; --muted: #61666D; --rule: #D2D3D3;
+  --bottle: #2B3F5C; --amber: #A86A12; --late: #9A3B2E; --steel: #55667E; --plum: #7E5A7A;
+  --glow: radial-gradient(120% 70% at 12% -8%, rgba(255, 255, 255, .78), transparent 55%);
   --ivory: #EFE8DA; --ivory-dim: rgba(239, 232, 218, .72);
   --cream: #F3E2B9; --cream-ink: #2A2113; --pink: #F4B6C8; --pink-ink: #2B1219;
   --gothic: "Zen Kaku Gothic New", system-ui, sans-serif;
@@ -31,9 +33,16 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #131922; --sheet: #1A2230; --ink: #E2E8F1; --muted: #96A2B4; --rule: #2E3A4C;
-    --bottle: #8CB4EA; --amber: #D9A24A; --late: #E08B7D; --steel: #8DAAD6; --plum: #C49BC0;
+    --paper: #121315; --sheet: #1A1C1F; --ink: #E7E3DA; --muted: #9C9A94; --rule: #2B2D31;
+    --bottle: #A9BEDD; --amber: #D9A24A; --late: #E08B7D; --steel: #9AA9C0; --plum: #C49BC0;
+    --glow: radial-gradient(70% 45% at 50% 4%, rgba(255, 210, 140, .11), transparent 70%);
   }
+}
+/* 夜を手で選んだとき（端末が昼でも夜にする） */
+:root[data-theme="dark"] {
+    --paper: #121315; --sheet: #1A1C1F; --ink: #E7E3DA; --muted: #9C9A94; --rule: #2B2D31;
+    --bottle: #A9BEDD; --amber: #D9A24A; --late: #E08B7D; --steel: #9AA9C0; --plum: #C49BC0;
+    --glow: radial-gradient(70% 45% at 50% 4%, rgba(255, 210, 140, .11), transparent 70%);
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -67,8 +76,13 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .gate button { margin-top: 10px; width: 100%; }
 
 /* ───────── 仕事 ───────── */
-#work { padding: 36px 16px 60px; min-height: 100vh; background: var(--paper); }
-.w-head .w-go { margin-left: auto; }
+#work { padding: 36px 16px 60px; min-height: 100vh; background: var(--glow), var(--paper); background-attachment: fixed; }
+.w-head .w-go { margin-left: 8px; }
+/* 昼と夜（v4.4）：自動（増毛の日の出・日の入）／昼／夜。選んだものはこの端末に覚える */
+.mode-sw { display: inline-flex; margin-left: auto; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); padding: 2px; }
+.mode-sw button { border: 0; background: none; color: var(--muted); font: 12.5px/1 var(--gothic); padding: 6px 11px; border-radius: 999px; cursor: pointer; }
+.mode-sw button[aria-checked="true"] { background: var(--ink); color: var(--sheet); }
+.mode-sw button:focus-visible { outline: 2px solid var(--bottle); outline-offset: 1px; }
 
 /* ───────── タイムカード（2026-10-22） ───────── */
 /* ───────── 今日の設計と気になること（2026-10-26） ───────── */
@@ -98,14 +112,23 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .ai-re { display: flex; gap: 8px; margin-top: 10px; }
 .ai-re input { flex: 1; min-width: 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); padding: 6px 10px; font-size: 16px; color: var(--ink); }
 .ai-err { color: var(--late); font-size: 13px; margin: 4px 0; }
-.tc { margin: 0 0 22px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
-.tc-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
-.tc-now { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
-.tc-lab { font-size: 12px; color: var(--muted); letter-spacing: .12em; }
-.tc-now b { font-size: 18px; font-weight: 500; }
-.tc-now small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
-.tc-btns { display: flex; flex-wrap: wrap; gap: 8px; }
-.tc-btns button { min-height: 40px; min-width: 76px; }
+/* タイムカード（v4.3：小さなボタンに畳む）。状態のボタンを押すと、月の実働・一覧・直す が開く */
+.tc { margin: 0 0 18px; }
+.tc-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tc-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); color: var(--ink);
+  padding: 5px 12px 5px 10px; font: 14px/1.4 var(--gothic); cursor: pointer; }
+.tc-pill:focus-visible, .tc-btns button:focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
+.tc-pill .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+.tc[data-state="on"] .tc-pill .dot { background: var(--bottle); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bottle) 22%, transparent); }
+.tc[data-state="rest"] .tc-pill .dot { background: var(--amber); }
+.tc-pill b { font-weight: 500; }
+.tc-pill small { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tc-pill .chev { color: var(--muted); font-size: 11px; transition: transform .2s; }
+.tc-pill[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.tc-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.tc-btns button { min-height: 32px; padding: 3px 14px; border-radius: 999px; }
+.tc-panel { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
+@media (prefers-reduced-motion: no-preference) { .tc-panel:not([hidden]) { animation: ltFade .3s ease-out both; } }
 .tc-month { margin-top: 12px; font-size: 13px; color: var(--muted); }
 .tc-line { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 14px; }
 .tc-line b { color: var(--ink); font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; }
@@ -135,7 +158,7 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .tc-blab { font-size: 12px; color: var(--muted); }
 .tc-br { display: flex; align-items: center; gap: 6px; }
 .tc-br input { border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 6px 8px; font-size: 16px; color: var(--ink); }
-.tc-btns .link { align-self: center; }
+
 .w-wrap { max-width: 1080px; margin: 0 auto; }
 .w-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
 .w-date { font-size: 26px; font-weight: 500; letter-spacing: .02em; }
@@ -143,7 +166,9 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .w-wx { color: var(--muted); font-size: 14px; }
 .w-cam { margin: 14px 0 22px; color: var(--muted); font-size: 14px; }
 .w-cam b { color: var(--bottle); font-weight: 500; margin-right: 8px; }
-.w-nav { display: flex; gap: 20px; margin: 0 0 22px; border-bottom: 1px solid var(--rule); }
+.w-nav { display: flex; gap: 20px; margin: 0 0 22px; border-bottom: 1px solid var(--rule); overflow-x: auto; scrollbar-width: none; }
+.w-nav::-webkit-scrollbar { display: none; }
+@media (max-width: 480px) { .w-nav { gap: 14px; } .w-nav button { font-size: 14px; } }
 .w-nav button { border: 0; background: none; padding: 8px 0 10px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
 .w-nav button[aria-selected="true"] { color: var(--ink); border-color: var(--ink); font-weight: 500; }
 .w-sec h2 { font-size: 15px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: baseline; gap: 8px; }
@@ -228,6 +253,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .memo-act .hint { font-size: 12px; color: var(--muted); }
 .save { border: 0; background: var(--bottle); color: #fff; border-radius: 6px; padding: 7px 18px; cursor: pointer; font-weight: 500; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .save { color: #0E1A2C; } }
+:root[data-theme="dark"] .save { color: #0E1A2C; }
 .memos { list-style: none; margin: 22px 0 0; padding: 0; }
 .memos li { padding: 12px 0; border-top: 1px solid var(--rule); }
 .memos .meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
@@ -271,6 +297,148 @@ a.ev:hover .ttl { text-decoration: underline; }
 .rl-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
 .rl-bar select { border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); font-size: 14px; padding: 5px 8px; }
 .rl-bar .gap { flex: 1; }
+/* 見回り：カミーユからの便箋（v4.2・2026-10-29）。白い便箋に縹色の罫と枠。カミーユの文は罫の上に手書き（Klee One）、
+   チャートは罫の途切れたところに貼った図。1系列のグラフはインクの色、アプリの色は「どのアプリか」を示すときだけ
+   （分類色の1〜5番を固定の順で。ライト・ダーク とも validate_palette.js を通した） */
+:root { --letter: #FBFBFA; --lt-rule: #CFD6DD; --lt-frame: #9AA3AD; --pen: #1F3B63; --pen-red: #A5372A; --pen-font: "Klee One", var(--gothic);
+  --grid: #E4E5E6; --crit: #D03B3B; --lt-lh: 34px;
+  --a-hub: #2A78D6; --a-haccp: #EB6834; --a-brewery: #1BAF7A; --a-kanri: #EDA100; --a-shift: #E87BA4; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --letter: #1B1D21; --lt-rule: #2E3238; --lt-frame: #4A505A; --pen: #BFD0EA; --pen-red: #E8968A;
+  --grid: #26292E; --crit: #E06464; --a-hub: #3987E5; --a-haccp: #D95926; --a-brewery: #199E70; --a-kanri: #C98500; --a-shift: #D55181; } }
+:root[data-theme="dark"] { --letter: #1B1D21; --lt-rule: #2E3238; --lt-frame: #4A505A; --pen: #BFD0EA; --pen-red: #E8968A;
+  --grid: #26292E; --crit: #E06464; --a-hub: #3987E5; --a-haccp: #D95926; --a-brewery: #199E70; --a-kanri: #C98500; --a-shift: #D55181; }
+/* 上の並び：アプリで絞る。色の見本も兼ねる */
+.lt-filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 auto 10px; max-width: 820px; }
+.lt-chip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--rule); border-radius: 999px; background: var(--sheet); color: var(--ink);
+  padding: 4px 12px 4px 10px; font: 13px/1.4 var(--gothic); cursor: pointer; }
+.lt-chip i { width: 10px; height: 10px; border-radius: 3px; background: var(--sw, var(--pen)); flex: none; }
+.lt-chip b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.lt-chip.down b { color: var(--pen-red); }
+.lt-chip[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.lt-chip:focus-visible, .lt-hit:focus-visible, .lt-row:focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
+.lt-app { max-width: 820px; margin: -2px auto 12px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; font-size: 13px; color: var(--muted); }
+.lt-app .err { color: var(--pen-red); }
+/* 便箋 */
+.letter { position: relative; max-width: 820px; margin: 0 auto; background: var(--letter); border: 1px solid var(--rule);
+  padding: 46px clamp(20px, 6vw, 64px) 40px; box-shadow: 0 26px 40px -34px rgba(20, 34, 56, .55); }
+.letter::before { content: ""; position: absolute; inset: 14px; border: 3px double color-mix(in srgb, var(--lt-frame) 55%, transparent); pointer-events: none; }
+.lt-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 12px; }
+.lt-to { font: 600 22px/1.4 var(--pen-font); color: var(--pen); }
+.lt-date { margin-left: auto; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.lt-date b { font: 600 16px var(--pen-font); color: var(--pen); }
+.lt-date small { color: var(--muted); font-size: 12px; }
+/* 罫の上に書く文。行の高さと罫の間隔をそろえ、どこに置いても字が罫に乗る */
+.lt-say { margin: 0; font: 400 17.5px/var(--lt-lh) var(--pen-font); color: var(--pen);
+  background-image: linear-gradient(transparent calc(var(--lt-lh) - 1px), var(--lt-rule) calc(var(--lt-lh) - 1px));
+  background-size: 100% var(--lt-lh); }
+.lt-say + .lt-say { margin-top: 0; }
+.lt-say.dim { color: var(--muted); }
+.lt-say mark { background: linear-gradient(transparent 60%, color-mix(in srgb, var(--a-kanri) 35%, transparent) 60%); color: inherit; padding: 0 2px; }
+.lt-say .act { font-family: var(--gothic); font-size: 12px; line-height: 20px; padding: 0 9px; vertical-align: 2px; margin-left: 8px; }
+.lt-note { font-size: 12.5px; color: var(--muted); margin: 4px 0 0; }
+.lt-ft { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.lt-sec { margin-top: 34px; }
+.lt-sec > h3 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 4px; font: 600 19px/1.5 var(--pen-font); color: var(--pen); }
+.lt-sec > h3 small { font: 13px var(--gothic); color: var(--muted); }
+.lt-fig { margin: 14px 0 12px; }
+.lt-chart { width: 100%; }
+.lt-chart svg { display: block; overflow: visible; }
+.lt-chart text { font-family: var(--gothic); font-size: 12px; fill: var(--muted); }
+.lt-chart text.ink { fill: var(--ink); }
+.lt-chart text.hot { fill: var(--pen-red); font-weight: 700; }
+.lt-chart text.val { fill: var(--ink); font-variant-numeric: tabular-nums; }
+.lt-chart .gridl { stroke: var(--grid); stroke-width: 1; }
+.lt-row { cursor: pointer; }
+.lt-row:hover .rowbg, .lt-row.on .rowbg { fill: color-mix(in srgb, var(--pen) 6%, transparent); }
+.lt-hit { cursor: default; }
+.lt-hit:hover .mk, .lt-hit:focus .mk { filter: brightness(1.12); }
+.lt-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.lt-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lt-legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--sw); }
+.lt-legend i.line { height: 0; width: 16px; border-radius: 0; border-top: 2px solid var(--sw); background: none; }
+.lt-legend i.dash { border-top-style: dashed; }
+.lt-legend i.flag { width: 12px; height: 12px; border-radius: 50%; background: var(--crit); }
+/* 吹き出し：値を先に、名前はあと */
+.lt-tip { position: fixed; z-index: 50; pointer-events: none; max-width: 280px; background: var(--sheet); color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 7px 10px; font: 12.5px/1.55 var(--gothic); box-shadow: 0 10px 24px -14px rgba(10, 20, 40, .5); }
+.lt-tip .hd { color: var(--muted); margin-bottom: 2px; }
+.lt-tip .r { display: flex; align-items: baseline; gap: 8px; }
+.lt-tip .r i { width: 12px; border-top: 2px solid var(--sw, var(--ink)); flex: none; transform: translateY(-3px); }
+.lt-tip .r i.dash { border-top-style: dashed; }
+.lt-tip .r b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.lt-tip .r span { color: var(--muted); }
+/* 数字：小さな数字の札とメーター */
+.lt-stats { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 12px 0 4px; }
+.lt-stat { display: flex; flex-direction: column; }
+.lt-stat b { font: 600 26px/1.15 var(--gothic); color: var(--ink); }
+.lt-stat span { font-size: 12px; color: var(--muted); }
+.lt-stat .st { font-size: 12px; font-weight: 500; }
+.lt-stat .st.bad { color: var(--crit); }
+.lt-meter { margin: 14px 0 4px; }
+.lt-meter .lab { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+.lt-meter .lab b { color: var(--ink); font-weight: 500; }
+.lt-meter .trk { position: relative; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--pen) 14%, transparent); }
+.lt-meter .fil { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--pen); }
+.lt-meter .fil.warn { background: var(--amber); }
+.lt-meter .tgt { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+/* 一覧（チャートの下。押すと操作） */
+.lt-list h4 { margin: 14px 0 4px; font: 600 15px/1.5 var(--pen-font); color: var(--ink); }
+.lt-item { border-left: 3px solid var(--sw, var(--rule)); padding: 0 0 0 10px; margin: 7px 0; }
+.lt-item > summary { list-style: none; cursor: pointer; padding: 1px 0; }
+.lt-item > summary::-webkit-details-marker { display: none; }
+.lt-item > summary:focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
+.lt-item .tt { display: block; font-size: 14.5px; line-height: 1.55; }
+.lt-item .meta { display: block; font-size: 12px; color: var(--muted); }
+.lt-item[open] .tt { font-weight: 500; }
+.lt-do { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 7px 0 3px; }
+.lt-do input, .lt-do select { border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); padding: 3px 6px; font-size: 14px; color: var(--ink); font-family: inherit; }
+.lt-more { margin-top: 8px; font-size: 13px; }
+.lt-more > summary { cursor: pointer; color: var(--muted); }
+.lt-moves { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; }
+.lt-moves li { display: grid; grid-template-columns: 3.2em 5.5em minmax(0, 1fr); gap: 0 8px; padding: 3px 0 3px 8px; border-left: 3px solid var(--sw, var(--rule)); margin: 3px 0; }
+.lt-moves .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+.lt-moves .d { grid-column: 3; font-size: 12px; color: var(--muted); }
+.lt-close { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-top: 30px; }
+.lt-from { font: 600 21px/1.4 var(--pen-font); color: var(--pen); }
+.lt-close small { font-size: 12px; color: var(--muted); }
+/* v4.4 カミーユの痕跡。本文の青インクに、欄外の書き込みとチャートのしるしは朱で */
+.lt-sec { position: relative; }
+.lt-sec > h3 .ttl { text-decoration: underline wavy color-mix(in srgb, var(--pen) 42%, transparent); text-decoration-thickness: 1px; text-underline-offset: 7px; }
+.lt-margin { margin: 0 0 6px; font: 400 15px/1.6 var(--pen-font); color: var(--pen-red); transform: rotate(-1.5deg); transform-origin: left center; }
+.lt-margin:empty { display: none; }
+@media (min-width: 760px) {
+  .lt-margin { position: absolute; right: -4px; top: -2px; max-width: 48%; margin: 0; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    transform: rotate(-3deg); transform-origin: right center; }
+}
+.lt-chart text.val, .lt-chart text.hand { font-family: var(--pen-font); font-size: 13px; fill: var(--pen); }
+.lt-chart .redpen { fill: none; stroke: var(--pen-red); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .9; pointer-events: none; }
+.lt-chart text.redtxt { font-family: var(--pen-font); font-size: 13px; fill: var(--pen-red); }
+.lt-ps { align-self: stretch; margin: 0 0 18px; font: 400 16.5px/var(--lt-lh) var(--pen-font); color: var(--pen);
+  background-image: linear-gradient(transparent calc(var(--lt-lh) - 1px), var(--lt-rule) calc(var(--lt-lh) - 1px)); background-size: 100% var(--lt-lh); }
+.lt-ps:empty { display: none; }
+.lt-from { display: inline-flex; flex-direction: column; align-items: flex-end; }
+.lt-flourish { width: 150px; height: 20px; margin-top: -2px; overflow: visible; }
+.lt-flourish path { fill: none; stroke: var(--pen); stroke-width: 1.4; stroke-linecap: round; opacity: .8; }
+/* v4.3：押して絞った・区分を変えたときだけ、柔らかく出し直す */
+@keyframes ltFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.lt-fade { animation: ltFade .36s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .lt-fade { animation: none; } }
+.lt-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 0; }
+.lt-form textarea, .lt-form input:not([type=checkbox]), .lt-form select { flex: 1 1 14em; min-width: 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper);
+  padding: 5px 8px; font: 14px/1.5 var(--gothic); color: var(--ink); }
+.lt-form select { flex: 0 0 auto; }
+.lt-check { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--ink); }
+.lt-cols { list-style: none; margin: 4px 0; padding: 0; font-size: 13px; }
+.lt-cols li { padding: 2px 0; }
+.lt-sub { margin: 16px 0 2px; font: 600 15px/1.5 var(--pen-font); color: var(--ink); }
+.lt-sub small { font: 12px var(--gothic); color: var(--muted); }
+.lt-slot:empty { display: none; }
+@media (max-width: 520px) {
+  .letter { padding: 36px 18px 30px; }
+  .letter::before { inset: 8px; }
+  .lt-say { font-size: 16px; --lt-lh: 31px; }
+  .lt-stat b { font-size: 22px; }
+}
 .rl-latest { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 .rl-latest b { color: var(--ink); font-weight: 500; margin-right: 6px; }
 .rl-latest em { font-style: normal; color: var(--amber); margin-left: 6px; }
@@ -680,18 +848,25 @@ a.ev:hover .ttl { text-decoration: underline; }
     <header class="w-head">
       <div class="w-date" id="wDate"></div>
       <div class="w-wx" id="wWx"></div>
+      <div class="mode-sw" id="modeSw" role="radiogroup" aria-label="昼と夜">
+        <button type="button" role="radio" data-mode="auto" aria-checked="true">自動</button><button type="button" role="radio" data-mode="day" aria-checked="false">昼</button><button type="button" role="radio" data-mode="night" aria-checked="false">夜</button>
+      </div>
       <button type="button" class="act w-go" id="toCanvas">キャンバス</button>
     </header>
     <p class="w-cam"><b>カミーユ</b><span id="wCam"></span></p>
     <!-- タイムカード（2026-10-22）。記録は個人ドライブの Cellar/timecard.json -->
-    <section class="tc" id="tc" aria-label="タイムカード">
+    <section class="tc" id="tc" aria-label="タイムカード" data-state="off">
       <div class="tc-top">
-        <div class="tc-now"><span class="tc-lab">タイムカード</span><b id="tcState">読み込み中…</b><small id="tcSub"></small></div>
+        <button type="button" class="tc-pill" id="tcPill" aria-expanded="false" aria-controls="tcPanel" title="月の実働・一覧・時間を直す">
+          <span class="dot" aria-hidden="true"></span><b id="tcState">読み込み中…</b><small id="tcSub"></small><span class="chev" aria-hidden="true">▾</span>
+        </button>
         <div class="tc-btns" id="tcBtns"></div>
       </div>
-      <div id="tcFix" hidden></div>
-      <div class="tc-month" id="tcMonth"></div>
-      <div class="tc-list" id="tcList" hidden></div>
+      <div class="tc-panel" id="tcPanel" hidden>
+        <div id="tcFix" hidden></div>
+        <div class="tc-month" id="tcMonth"></div>
+        <div class="tc-list" id="tcList" hidden></div>
+      </div>
     </section>
     <!-- カミーユの設計と提案（2026-10-26・Claude API）。毎朝 6:30 と 12:30 に GAS が作った案を読むだけ。押したときだけ書き込む -->
     <section class="ai" id="ai" aria-label="今日の設計と気になること" hidden>
@@ -709,6 +884,7 @@ a.ev:hover .ttl { text-decoration: underline; }
       <button type="button" role="tab" data-tab="ideas" aria-selected="false">アイデア</button>
       <button type="button" role="tab" data-tab="notes" aria-selected="false">案件ノート</button>
       <button type="button" role="tab" data-tab="rel" aria-selected="false">更新ノート</button>
+      <button type="button" role="tab" data-tab="rounds" aria-selected="false">見回り</button>
     </div>
 
     <div class="w-tab" id="tab-sched" role="tabpanel">
@@ -786,6 +962,58 @@ a.ev:hover .ttl { text-decoration: underline; }
         <button type="button" class="act" data-st="下書き">下書きに戻す</button>
       </div>
       <ol class="rl-list" id="rlList"></ol>
+    </div>
+
+    <!-- 見回り（v4・2026-10-29）：4アプリとシフト・収支計画表を読むだけ。書けるのは迷子の行の日付と担当者だけ
+         v4.2（同日）：カミーユからの便箋。縹色の罫に手書きの文、数字はインクで描いたチャート。上の並びはアプリで絞る（色の凡例も兼ねる） -->
+    <div class="w-tab" id="tab-rounds" role="tabpanel" hidden>
+      <div class="lt-filter" id="rdIdx" role="group" aria-label="アプリで絞る"></div>
+      <div class="lt-app" id="rdApp" hidden></div>
+      <article class="letter" aria-label="Camille から Kent への見回りの便箋">
+        <header class="lt-head">
+          <span class="lt-to">Dear Kent,</span>
+          <span class="lt-date"><b id="rdDate"></b><small id="rdAt"></small><button type="button" class="link" id="rdRe">読み直す</button></span>
+        </header>
+        <div id="rdLead"></div>
+        <section class="lt-sec" aria-labelledby="rdH0">
+          <h3 id="rdH0"><span class="ttl">承認すること</span> <small id="rdApprN"></small></h3>
+          <p class="lt-margin" id="rdM0"></p>
+          <div id="rdAppr"></div>
+        </section>
+        <section class="lt-sec" aria-labelledby="rdH6">
+          <h3 id="rdH6"><span class="ttl">今日の段取り</span> <small id="rdPlanAt"></small></h3>
+          <p class="lt-margin" id="rdM6"></p>
+          <div id="rdPlan"></div>
+        </section>
+        <section class="lt-sec" aria-labelledby="rdH1">
+          <h3 id="rdH1"><span class="ttl">手を打つこと</span> <small id="rdLostN"></small></h3>
+          <p class="lt-margin" id="rdM1"></p>
+          <div id="rdLostSay"></div>
+          <figure class="lt-fig"><div class="lt-chart" id="rdLostChart"></div><figcaption class="lt-legend" id="rdLostLegend"></figcaption></figure>
+          <div id="rdLost"></div>
+        </section>
+        <section class="lt-sec" aria-labelledby="rdH2">
+          <h3 id="rdH2"><span class="ttl">人手</span> <small>向こう2週間</small></h3>
+          <p class="lt-margin" id="rdM2"></p>
+          <div id="rdShift"></div>
+        </section>
+        <section class="lt-sec" aria-labelledby="rdH3">
+          <h3 id="rdH3"><span class="ttl">数字</span> <small id="rdMonth"></small></h3>
+          <p class="lt-margin" id="rdM3"></p>
+          <div id="rdMoney"></div>
+        </section>
+        <section class="lt-sec" aria-labelledby="rdH4">
+          <h3 id="rdH4"><span class="ttl">今日の動き</span> <small id="rdMovesN"></small></h3>
+          <p class="lt-margin" id="rdM4"></p>
+          <div id="rdMoves"></div>
+        </section>
+        <section class="lt-sec" aria-labelledby="rdH5">
+          <h3 id="rdH5"><span class="ttl">今週のこと</span></h3>
+          <div id="rdWeek"></div>
+        </section>
+        <footer class="lt-close"><p class="lt-ps" id="rdPS"></p><span class="lt-from">Yours, Camille<svg class="lt-flourish" viewBox="0 0 150 20" aria-hidden="true"><path d="M6 13 C 26 4, 44 18, 66 11 S 104 3, 118 9 C 128 13, 136 15, 146 8"/></svg></span><small id="rdUse"></small></footer>
+      </article>
+      <div class="lt-tip" id="rdTip" role="status" hidden></div>
     </div>
 
     <footer class="pulse" id="pulse" aria-label="仕組みの調子"></footer>
@@ -898,7 +1126,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-26 v3.11';
+var BUILD = '2026-10-29 v4.4';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1249,22 +1477,24 @@ function tcTotal(d) {
 function renderTimecard() {
   var d = TC.d, st = $('#tcState'), sub = $('#tcSub'), bt = $('#tcBtns');
   if (!d) { st.textContent = TC.err ? '読めませんでした' : (token ? '読み込み中…' : '—'); sub.textContent = TC.err; fill(bt, []); fill($('#tcMonth'), []); return; }
+  if (TC.edit && TC.edit.where === 'top') TC.panel = true;
+  $('#tcPanel').hidden = !TC.panel; $('#tcPill').setAttribute('aria-expanded', String(!!TC.panel));
   var od = d.openDay, td = d.todayDay, now = nowHm(), btn = function (label, kind, main) {
     return h('button', { type: 'button', class: main ? 'save' : 'act', onclick: function () { punch(kind); } }, [label]);
   };
   if (od) {
     var last = od.br[od.br.length - 1], rest = last && !last[1];
-    st.textContent = rest ? '休憩中' : '勤務中';
+    st.textContent = rest ? '休憩中' : '勤務中'; $('#tc').setAttribute('data-state', rest ? 'rest' : 'on');
     sub.textContent = (od.date !== d.today ? fmtMD(od.date) + ' ' : '') + od.in + '〜　実働 ' + tcHm(tcWork(od, now)) + (rest ? '　休憩 ' + last[0] + '〜' : brMin(od) ? '　休憩 ' + tcHm(brMin(od)) : '');
     fill(bt, rest ? [btn('戻る', 'back', true), btn('退勤', 'out')] : [btn('休憩', 'break'), btn('退勤', 'out', true)]);
   } else if (td && td.out) {
-    st.textContent = '退勤済み';
+    st.textContent = '退勤済み'; $('#tc').setAttribute('data-state', 'done');
     sub.textContent = td.in + '〜' + td.out + '　実働 ' + tcHm(td.work) + (brMin(td) ? '　休憩 ' + tcHm(brMin(td)) : '');
     fill(bt, []);
-  } else { st.textContent = '未出勤'; sub.textContent = ''; fill(bt, [btn('出勤', 'in', true)]); }
+  } else { st.textContent = '未出勤'; sub.textContent = ''; fill(bt, [btn('出勤', 'in', true)]); $('#tc').setAttribute('data-state', 'off'); }
   // 打ち忘れ・押し遅れをその場で直す（2026-10-22）。開いている日→今日→今日をあとから付ける の順
   var fixDay = od || td, rec = fixDay && (d.days.filter(function (x) { return x.date === fixDay.date; })[0] || fixDay);
-  bt.appendChild(h('button', { type: 'button', class: 'link', 'aria-expanded': String(!!(TC.edit && TC.edit.where === 'top')), onclick: function () {
+  var fixBtn = (h('button', { type: 'button', class: 'link', 'aria-expanded': String(!!(TC.edit && TC.edit.where === 'top')), onclick: function () {
     if (TC.edit && TC.edit.where === 'top') { tcClose(); return; }
     tcEdit(rec || { date: d.today, in: '', out: '', br: [], memo: '' }, !rec, 'top');
   } }, [TC.edit && TC.edit.where === 'top' ? '閉じる' : rec ? '時間を直す' : 'あとから付ける']));
@@ -1273,7 +1503,7 @@ function renderTimecard() {
   var tot = tcTotal(d), r = d.range || {}, lo = (r.min || 0) * 60, hi = (r.max || 0) * 60, worked = d.days.filter(function (x) { return x.in; }).length;
   var kids = [h('div', { class: 'tc-line' }, [
     h('span', null, [(+d.month.slice(5)) + '月の実働 ', h('b', null, [tcHm(tot)]), worked ? '　' + worked + '日・1日平均 ' + tcHm(tot / worked) : '']),
-    h('button', { type: 'button', class: 'link', onclick: function () { TC.open = !TC.open; if (TC.edit && TC.edit.where === 'list') TC.edit = null; renderTcList(); renderTimecard(); } }, [TC.open ? '一覧を閉じる' : '一覧'])])];
+    h('span', { style: 'display:flex;gap:14px' }, [fixBtn, h('button', { type: 'button', class: 'link', onclick: function () { TC.open = !TC.open; if (TC.edit && TC.edit.where === 'list') TC.edit = null; renderTcList(); renderTimecard(); } }, [TC.open ? '一覧を閉じる' : '一覧'])])])];
   if (hi) {
     var scale = Math.max(hi, tot) * 1.04, bar = h('div', { class: 'tc-bar', role: 'img', 'aria-label': '目安 ' + r.min + '〜' + r.max + '時間のうち ' + tcHm(tot) });
     bar.appendChild(h('i', { class: tot > hi ? 'over' : '', style: 'width:' + (tot / scale * 100).toFixed(1) + '%' }));
@@ -1290,6 +1520,7 @@ function renderTimecard() {
   if (!TC.edit || TC.edit.where !== 'list') renderTcList();  // 直している途中は、15秒ごとの描き直しで入力を消さない
 }
 var PUNCH_SAID = { in: '出勤', break: '休憩に入りました', back: '休憩から戻りました', out: '退勤' };
+$('#tcPill').addEventListener('click', function () { TC.panel = !TC.panel; if (!TC.panel && TC.edit && TC.edit.where === 'top') TC.edit = null; renderTcFix(); renderTimecard(); });
 function punch(kind) {
   if (TC.busy) return;
   TC.busy = true; renderTimecard();
@@ -1399,59 +1630,9 @@ function loadAi() {
 }
 function aiStamp(at) { return at ? String(at).slice(11, 16) + ' 作成' : ''; }
 function renderAi() {
-  var d = AI.d, box = $('#ai');
-  box.hidden = !d && !AI.err;
-  if (box.hidden) return;
-  if (!d) { fill($('#aiPlan'), [h('p', { class: 'ai-err' }, ['読めませんでした：' + AI.err])]); fill($('#aiFix'), []); return; }
-  var u = d.usage || {};
-  $('#aiUse').textContent = d.ready ? '今月 $' + (u.usd || 0).toFixed(2) + '／上限 $' + u.cap + (u.capped ? '（自動は停止中）' : '') : '';
-  $('#aiPlanAt').textContent = d.plan ? aiStamp(d.plan.at) + (d.plan.note ? '・' + d.plan.note : '') : '';
-  $('#aiFixAt').textContent = d.fixes ? aiStamp(d.fixes.at) : '';
-  var err = d.err || {};
-  // 今日の設計
-  var pk = [];
-  if (!d.ready) pk.push(h('p', { class: 'ai-err' }, ['ANTHROPIC_API_KEY が未設定です（GAS のスクリプト プロパティ）']));
-  if (err.plan) pk.push(h('p', { class: 'ai-err' }, [err.plan]));
-  if (AI.busy === 'plan') pk.push(h('p', { class: 'state' }, ['組み直しています…（1〜2分）']));
-  var p = d.plan;
-  if (p) {
-    if (p.summary) pk.push(h('p', { class: 'ai-sum' }, [p.summary]));
-    pk.push(h('ol', { class: 'ai-blocks' }, (p.blocks || []).map(function (b) {
-      return h('li', null, [h('span', { class: 't' }, [b.start + '–' + b.end]), h('span', { class: 'k' + (b.kind === 'タスク' ? ' task' : '') }, [b.kind]),
-        h('span', null, [b.title]), b.why ? h('span', { class: 'w' }, [b.why]) : null]);
-    })));
-    if ((p.defer || []).length) {
-      pk.push(h('p', { class: 'ai-sub' }, ['回す案']));
-      pk.push(h('ul', { class: 'ai-defer' }, p.defer.map(function (x) {
-        var btn = h('button', { type: 'button', class: 'act', onclick: function () { aiMove(btn, x.taskId, x.to, x.title); } }, [fmtDay(x.to) + ' へ']);
-        return h('li', null, [h('span', null, [x.title, h('small', { class: 'why' }, ['　' + x.why])]), btn]);
-      })));
-    }
-    if ((p.warn || []).length) {
-      pk.push(h('p', { class: 'ai-sub' }, ['気をつけること']));
-      pk.push(h('ul', { class: 'ai-warn' }, p.warn.map(function (w) { return h('li', null, [w]); })));
-    }
-  } else if (d.ready && !err.plan && AI.busy !== 'plan') pk.push(h('p', { class: 'state' }, ['今日の案はまだありません。6:30 に作ります（いま作るなら「組み直す」）']));
-  fill($('#aiPlan'), pk);
-  $('#aiReBtn').disabled = !d.ready || !!AI.busy;
-  // 気になること
-  var fk = [];
-  if (err.fixes) fk.push(h('p', { class: 'ai-err' }, [err.fixes]));
-  if (AI.busy === 'fix') fk.push(h('p', { class: 'state' }, ['見直しています…（1〜2分）']));
-  var f = d.fixes;
-  if (f && (f.items || []).length) fk.push(h('ul', { class: 'ai-fix' }, f.items.map(function (it) {
-    var a = it.action || {}, btn = null;
-    if (a.type === 'task_move') btn = h('button', { type: 'button', class: 'act', onclick: function () { aiMove(btn, a.taskId, a.date, it.what); } }, [fmtDay(a.date) + ' へ移す']);
-    if (a.type === 'task_create') btn = h('button', { type: 'button', class: 'act', onclick: function () { aiCreate(btn, a.title, a.date); } }, ['タスクにする']);
-    if (a.type === 'open_url') btn = h('a', { class: 'act', href: a.url, target: '_blank', rel: 'noopener' }, ['開く']);
-    return h('li', null, [h('span', { class: 'lv' + (it.level === '急ぎ' ? ' urgent' : '') }, [it.level]),
-      h('span', { class: 'body' }, [h('b', null, [it.what]), h('span', { class: 'why' }, [it.why]),
-        (it.steps || []).length ? h('ol', null, it.steps.map(function (s) { return h('li', null, [s]); })) : null]), btn]);
-  })));
-  else if (f && d.ready) fk.push(h('p', { class: 'state' }, ['いま気になることはありません']));
-  else if (d.ready && !err.fixes && AI.busy !== 'fix') fk.push(h('p', { class: 'state' }, ['まだ見ていません。6:30 と 12:30 に見ます']));
-  fill($('#aiFix'), fk);
-  $('#aiFixRe').disabled = !d.ready || !!AI.busy;
+  // v4.3：今日の設計と気になることは、見回り（便箋）の「今日の段取り」に吸収した。仕事ページの上の欄は出さない
+  $('#ai').hidden = true;
+  renderRoundsPlan();
 }
 function aiMove(btn, id, date, title) {
   btn.classList.add('busy');
@@ -1700,9 +1881,809 @@ function showTab(tab) {
   $('#tab-ideas').hidden = tab !== 'ideas';
   $('#tab-notes').hidden = tab !== 'notes';
   $('#tab-rel').hidden = tab !== 'rel';
+  $('#tab-rounds').hidden = tab !== 'rounds';
+  // スマホ幅ではタブの帯が横に流れるので、選んだタブを見えるところへ送る
+  var nav = document.querySelector('.w-nav'), sb = nav.querySelector('[data-tab="' + tab + '"]');
+  if (sb) { var nr = nav.getBoundingClientRect(), br = sb.getBoundingClientRect(); if (br.right > nr.right || br.left < nr.left) nav.scrollLeft += br.left - nr.left - 8; }
   if (tab === 'ideas' && !S.ideas) loadIdeas();
   if (tab === 'notes') showNotes();
   if (tab === 'rel' && !RL.data) loadRel();
+  if (tab === 'rounds') openRounds(); else closeRounds();
+}
+
+/* ───────── 見回り（v4・2026-10-29）─────────
+   盤面はサーバ（Rounds.gs）が組む。開いたら置いてある盤面をすぐ出し、間隔が来たものだけ裏で読み直す（refresh=1）。
+   開いているあいだは5分ごと。「読み直す」は全部（refresh=2）。書けるのは迷子に出ている全体スケジュールの行の日付と担当者だけ */
+var RD = { v: null, ai: null, err: '', busy: false, timer: null, app: '', run: '' };
+function openRounds() {
+  // 置いてある盤面をすぐ出してから、間隔が来たものだけ読み直す
+  (RD.v ? Promise.resolve() : loadRounds(0)).then(function () { loadRounds(1); });
+  loadRoundsAi();
+  if (!RD.timer) RD.timer = setInterval(function () { if (!document.hidden) loadRounds(1); }, 5 * 60e3);
+}
+function closeRounds() { if (RD.timer) { clearInterval(RD.timer); RD.timer = null; } }
+function loadRounds(refresh) {
+  if (!token) return Promise.resolve();
+  if (refresh) { RD.busy = true; renderRoundsHead(); }
+  return call('rounds', refresh ? { refresh: refresh } : {}, { wait: refresh ? 300000 : 60000 })
+    .then(function (d) { RD.v = d; RD.err = ''; }, function (e) { RD.err = e.message; })
+    .then(function () { if (refresh) RD.busy = false; renderRounds(); });
+}
+function loadRoundsAi() {
+  return call('airounds').then(function (d) { RD.ai = d; renderRoundsAi(); }, function (e) { RD.ai = { loadErr: e.message }; renderRoundsAi(); });
+}
+function rdAge(at) {
+  if (!at) return '';
+  var m = Math.round((Date.now() - new Date(at).getTime()) / 60000);
+  return m < 1 ? 'いま' : m < 60 ? m + '分前' : m < 1440 ? Math.floor(m / 60) + '時間前' : Math.floor(m / 1440) + '日前';
+}
+// 迷子の11の規則を、意味で5つに分ける（上から急ぐ順）。short はチャートの行の名前
+var RD_CATS = [
+  { label: '人が決まっていない', short: '人が決まっていない', rules: ['owner', 'off'], hot: true },
+  { label: '衛生と記録', short: '衛生と記録', rules: ['incident', 'gap', 'confirm'], hot: true },
+  { label: '誰かを待っている', short: '誰かを待っている', rules: ['wait'] },
+  { label: '日付が決まらない・動いている', short: '日付が動いている', rules: ['nodue', 'moved', 'stale'] },
+  { label: '整理するもの', short: '整理するもの', rules: ['unlink', 'dup'] }
+];
+var RD_APP_KEYS = ['hub', 'haccp', 'brewery', 'kanri', 'shift'];
+var RD_APP_SHORT = { hub: 'ハブ', haccp: 'HACCP', brewery: '台帳', kanri: '会計', shift: 'シフト' };   // 狭い幅のチャートの行の名前   // 色の順（分類色の1〜5番）。絞っても色は変えない
+var RD_WHEN = { digest: '12:30 と 18:30 に書きます。', weekly: '日曜の 19:30 に書きます。', shift: '月曜の朝に書きます。', numbers: '月曜の朝と、月末の3日前に書きます。' };
+var RD_SVG = 'http://www.w3.org/2000/svg';
+RD.cat = -1;
+function sv(tag, attrs, kids) {
+  var e = document.createElementNS(RD_SVG, tag);
+  Object.keys(attrs || {}).forEach(function (k) { if (attrs[k] != null) e.setAttribute(k, attrs[k]); });
+  (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return e;
+}
+function rdAppLabel(app) { return RD.v && RD.v.apps[app] ? RD.v.apps[app].label : app === 'money' ? '数字' : app; }
+function rdColor(app) { return 'var(--a-' + app + ')'; }
+function rdMan(n) { return n == null ? '—' : (Math.round(n / 1e3) / 10) + '万'; }
+function rdYen(n) { return n == null ? '—' : '¥' + Math.round(n).toLocaleString('ja-JP'); }
+// 罫の上に書く1段
+function rdSay(text, cls) { return h('p', { class: 'lt-say' + (cls ? ' ' + cls : '') }, Array.isArray(text) ? text : [text]); }
+
+/* 吹き出し（値を先に、名前はあと。中身は textContent だけで組む） */
+function rdTip(target, rows, head) {
+  var show = function (x, y) {
+    var t = $('#rdTip');
+    fill(t, [head ? h('div', { class: 'hd' }, [head]) : null].concat(rows.map(function (r) {
+      return h('div', { class: 'r' }, [r.c ? h('i', { class: r.dash ? 'dash' : '', style: '--sw:' + r.c }) : null, h('b', null, [r.v]), r.k ? h('span', null, [r.k]) : null]);
+    })));
+    t.hidden = false;
+    var w = t.offsetWidth, hh = t.offsetHeight;
+    t.style.left = Math.max(8, Math.min(innerWidth - w - 8, x + 14)) + 'px';
+    t.style.top = Math.max(8, y - hh - 12 < 8 ? y + 18 : y - hh - 12) + 'px';
+  };
+  target.addEventListener('pointermove', function (e) { show(e.clientX, e.clientY); });
+  target.addEventListener('pointerleave', rdTipHide);
+  target.addEventListener('focus', function () { var b = target.getBoundingClientRect(); show(b.left + b.width / 2, b.top); });
+  target.addEventListener('blur', rdTipHide);
+}
+function rdTipHide() { var t = $('#rdTip'); if (t) t.hidden = true; }
+// 端だけ丸い横棒・縦棒（データの端 4px、根元は四角）
+function rdBarH(x, y, w, hgt, round) {
+  var r = round ? Math.min(4, w / 2, hgt / 2) : 0;
+  return 'M' + x + ',' + y + 'h' + (w - r) + (r ? 'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + r : '') + 'v' + (hgt - 2 * r) +
+    (r ? 'a' + r + ',' + r + ' 0 0 1 ' + (-r) + ',' + r : '') + 'h' + (-(w - r)) + 'z';
+}
+function rdBarV(x, y, w, hgt) {
+  var r = Math.min(4, w / 2, hgt);
+  return 'M' + x + ',' + (y + hgt) + 'v' + (-(hgt - r)) + 'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + (-r) + 'h' + (w - 2 * r) +
+    'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + r + 'v' + (hgt - r) + 'z';
+}
+function rdNice(max, n) {
+  var raw = max / (n || 4), p = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw / p;
+  var step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  return { step: step, top: Math.ceil(max / step) * step };
+}
+
+function renderRoundsHead() {
+  var v = RD.v, age = v && v.ready ? rdAge(v.at) : '';
+  var d = (v && v.today) || todayJst();
+  $('#rdDate').textContent = Number(d.slice(5, 7)) + '月' + Number(d.slice(8, 10)) + '日（' + wd(d) + '）';
+  $('#rdAt').textContent = RD.busy ? '読み直しています…' : RD.err ? '読めませんでした：' + RD.err : age ? (age === 'いま' ? 'いま読みました' : age + 'に読みました') : (v && v.note) || '';
+  $('#rdRe').disabled = RD.busy;
+}
+function renderRoundsAi() { renderRounds(); }
+function renderRounds() {
+  renderRoundsHead();
+  var v = RD.v, ai = RD.ai || {};
+  rdTipHide();
+  renderRoundsLead(ai);
+  renderRoundsPlan();
+  renderRoundsWeek();
+  var u = ai.usage || {};
+  $('#rdUse').textContent = ai.loadErr ? 'カミーユの見立てを読めませんでした：' + ai.loadErr
+    : ai.ready === false ? 'Claude API のキーが未設定です（GAS のスクリプト プロパティ ANTHROPIC_API_KEY）'
+    : ai.ready ? 'Claude API　今月 $' + (u.usd || 0).toFixed(2) + '／上限 $' + u.cap + (u.capped ? '（自動は止めています）' : '') : '';
+  if (!v || !v.ready) {
+    fill($('#rdIdx'), []); $('#rdApp').hidden = true;
+    fill($('#rdLostSay'), [rdSay(v ? v.note : '読み込み中…', 'dim')]);
+    ['#rdLostChart', '#rdLostLegend', '#rdLost', '#rdShift', '#rdMoney', '#rdMoves', '#rdAppr'].forEach(function (s) { fill($(s), []); });
+    rdMargins(v);
+    return;
+  }
+  // 上の並び：アプリで絞る（色の見本も兼ねる）
+  var chip = function (key, label, n, down) {
+    return h('button', { type: 'button', class: 'lt-chip' + (down ? ' down' : ''), style: key ? '--sw:' + rdColor(key) : null, 'aria-pressed': String(RD.app === key),
+      title: down ? '読めませんでした' : null, onclick: function () { RD.app = key; RD.cat = -1; renderRounds(); rdFade(document.querySelector('.letter')); } },
+      [key ? h('i', { 'aria-hidden': 'true' }) : null, label, h('b', null, [down ? '!' : String(n)])]);
+  };
+  fill($('#rdIdx'), [chip('', 'すべて', v.lost.length)].concat(v.tiles.map(function (t) { return chip(t.key, t.label, t.lost, !t.ok); })));
+  var cur = RD.app ? v.tiles.filter(function (t) { return t.key === RD.app; })[0] : null;
+  $('#rdApp').hidden = !cur;
+  if (cur) {
+    var dg = ((ai.digest && ai.digest.apps) || []).filter(function (a) { return a.app === cur.key; })[0];
+    fill($('#rdApp'), [
+      h('span', null, [cur.ok ? (cur.last ? '最後の動き ' + String(cur.last).slice(5, 16).replace('-', '/').replace('T', ' ') : '動きの記録はありません') : '']),
+      cur.ok ? null : h('span', { class: 'err' }, ['読めませんでした：' + cur.error]),
+      h('a', { class: 'link', href: cur.url, target: '_blank', rel: 'noopener' }, [cur.label + 'を開く']),
+      dg && (dg.stuck || []).length ? h('span', null, ['Camille：止まっているのは ' + dg.stuck.join('／')]) : null
+    ]);
+  }
+  var lost = v.lost.filter(function (x) { return !RD.app || x.app === RD.app; });
+  renderRoundsLost(lost, v);
+  renderRoundsAppr(v.appr);
+  renderRoundsShift(v.shift);
+  renderRoundsMoney(v.money);
+  renderRoundsMoves(v.moves.filter(function (m) { return !RD.app || m.app === RD.app; }), v);
+  rdMargins(v);
+}
+
+/* ── 手を打つこと：区分×アプリの積み上げ横棒。行を押すとその区分の一覧 ── */
+function renderRoundsLost(lost, v) {
+  $('#rdLostN').textContent = lost.length + '件';
+  var rows = RD_CATS.map(function (c) {
+    var items = lost.filter(function (x) { return c.rules.indexOf(x.rule) >= 0; })
+      .sort(function (a, b) { return String(a.due || '9').localeCompare(String(b.due || '9')); });
+    var by = {}; items.forEach(function (x) { by[x.app] = (by[x.app] || 0) + 1; });
+    return { c: c, items: items, by: by, n: items.length };
+  });
+  if (RD.cat < 0 || !rows[RD.cat] || !rows[RD.cat].n) { RD.cat = -1; for (var i = 0; i < rows.length; i++) if (rows[i].n) { RD.cat = i; break; } }
+  var top = rows.slice().sort(function (a, b) { return b.n - a.n; })[0];
+  fill($('#rdLostSay'), [rdSay(lost.length
+    ? (RD.app ? rdAppLabel(RD.app) + 'で' : '') + '手を打つことは ' + lost.length + '件です。いちばん多いのは「' + top.c.label + '」の ' + top.n + '件です。'
+    : (RD.app ? rdAppLabel(RD.app) + 'には、' : '') + 'いま手を打つことはありません。')]);
+  var box = $('#rdLostChart');
+  if (!lost.length) { fill(box, []); fill($('#rdLostLegend'), []); fill($('#rdLost'), []); return; }
+  var W = Math.max(280, box.clientWidth || 600), labelW = W < 440 ? 116 : 150, valW = 44, rowH = 36, barH = 18;
+  var x0 = labelW, max = Math.max.apply(null, rows.map(function (r) { return r.n; })), sc = (W - x0 - valW) / Math.max(1, max);
+  var H = rows.length * rowH;
+  var s = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '手を打つことを区分ごとに数えた横棒。色はアプリ' });
+  s.appendChild(sv('line', { class: 'gridl', x1: x0, x2: x0, y1: 0, y2: H }));
+  rows.forEach(function (r, i) {
+    var y = i * rowH + (rowH - barH) / 2;
+    var g = sv('g', { class: 'lt-row' + (i === RD.cat ? ' on' : ''), tabindex: r.n ? 0 : null, role: r.n ? 'button' : null, 'aria-label': r.c.label + ' ' + r.n + '件。押すと一覧' });
+    g.appendChild(sv('rect', { class: 'rowbg', x: 0, y: i * rowH, width: W, height: rowH, rx: 6, fill: 'transparent' }));
+    g.appendChild(sv('text', { x: 4, y: y + barH / 2, 'dominant-baseline': 'central', class: r.c.hot && r.n ? 'hot' : 'ink' }, [r.c.short]));
+    var keys = RD_APP_KEYS.filter(function (k) { return r.by[k]; }), x = x0;
+    keys.forEach(function (k, j) {
+      var w = r.by[k] * sc, last = j === keys.length - 1;
+      var seg = sv('path', { class: 'mk', d: rdBarH(x, y, Math.max(1, w - (last ? 0 : 2)), barH, last), style: 'fill:' + rdColor(k) });
+      g.appendChild(seg);
+      x += w;
+    });
+    g.appendChild(sv('text', { x: r.n ? x + 6 : x0 + 6, y: y + barH / 2, 'dominant-baseline': 'central', class: r.n ? 'val' : '' }, [r.n ? r.n + '件' : 'なし']));
+    if (r.n) {
+      rdTip(g, keys.map(function (k) { return { v: r.by[k] + '件', k: rdAppLabel(k), c: rdColor(k) }; }), r.c.label + '　' + r.n + '件');
+      var pick = function () { RD.cat = i; renderRoundsLost(lost, v); rdFade($('#rdLost')); };
+      g.addEventListener('click', pick);
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    }
+    s.appendChild(g);
+  });
+  var topI = -1; rows.forEach(function (r, i) { if (r.n && (topI < 0 || r.n > rows[topI].n)) topI = i; });
+  if (topI >= 0) {
+    var tw = (String(rows[topI].n) + '件').length * 13, tx = x0 + rows[topI].n * sc + 6, ty = topI * rowH + rowH / 2;
+    rdMark(s, rdHandCircle(tx + tw / 2, ty, tw / 2 + 9, 12, 'lost' + rows[topI].c.short));
+  }
+  fill(box, [s]);
+  var used = RD_APP_KEYS.filter(function (k) { return lost.some(function (x) { return x.app === k; }); });
+  fill($('#rdLostLegend'), used.map(function (k) { return h('span', null, [h('i', { style: '--sw:' + rdColor(k) }), rdAppLabel(k)]); })
+    .concat([h('span', null, ['行を押すと、その区分の一覧になります'])]));
+  // 選んだ区分の一覧（1行に畳み、押すと操作）
+  var r = rows[RD.cat];
+  fill($('#rdLost'), r ? [h('div', { class: 'lt-list' }, [h('h4', null, ['「' + r.c.label + '」の ' + r.n + '件'])].concat(r.items.map(function (x) { return rdItem(x, v); })))] : []);
+}
+function rdItem(x, v) {
+  var meta = [rdAppLabel(x.app), v.rules[x.rule].label, x.due ? '期日 ' + fmtDay(x.due) : '', x.who ? '担当 ' + x.who : '', x.note].filter(Boolean).join('、');
+  var d = h('details', { class: 'lt-item', style: '--sw:' + rdColor(x.app) }, [h('summary', null, [h('span', { class: 'tt' }, [x.title]), h('span', { class: 'meta' }, [meta])])]);
+  var box = h('div', { class: 'lt-do' });
+  if (x.url) box.appendChild(h('a', { class: 'act', href: x.url, target: x.url === '#' ? null : '_blank', rel: 'noopener' }, ['開く']));
+  if (x.app === 'hub' && v.rules[x.rule].write) {
+    // ハブの決まり：期限切れのタスクの期日を動かすときは理由が必須（ハブの口を通すので、ハブも同じことを確かめる）
+    var late = !!x.due && x.due < todayJst();
+    var date = h('input', { type: 'date', value: x.due && !late ? x.due : addDays(todayJst(), 1), 'aria-label': '新しい期日' });
+    var why = late ? h('input', { maxlength: 300, placeholder: '期日を動かす理由（期限切れなので必須）', 'aria-label': '期日を動かす理由' }) : null;
+    var go = h('button', { type: 'button', class: 'act' }, ['期日にする']);
+    go.addEventListener('click', function () {
+      if (why && !why.value.trim()) { why.focus(); toast('期限切れのタスクの期日を動かすときは、理由を書いてください', true); return; }
+      rdWrite(go, 'roundsdue', { id: x.id, date: date.value, reason: why ? why.value.trim() : '' }, '期日を ' + fmtDay(date.value) + ' にしました：' + x.title);
+    });
+    var f1 = h('div', { class: 'lt-form' }, [date, why, go]);
+    if (x.rule === 'moved') box.appendChild(h('p', { class: 'lt-note', style: 'flex-basis:100%;margin:0' }, ['期日の変更は ' + x.note + '。運営ルール K-2 の上限は2回です']));
+    box.appendChild(f1);
+    if ((x.rule === 'owner' || x.rule === 'off') && (v.staff || []).length) {
+      var sel = rdSel(v.staff, '', '担当に足す人');
+      var add = h('button', { type: 'button', class: 'act' }, ['担当に足す']);
+      add.addEventListener('click', function () { if (!sel.value) { toast('足す人を選んでください', true); return; } rdWrite(add, 'roundsassign', { id: x.id, name: sel.value }, '担当に ' + sel.value + ' を足しました：' + x.title); });
+      box.appendChild(h('div', { class: 'lt-form' }, [sel, add]));
+    }
+  }
+  if (box.firstChild) d.appendChild(box);
+  return d;
+}
+function rdWrite(btn, action, args, done) {
+  btn.classList.add('busy'); btn.disabled = true;
+  call(action, args).then(function () { toast(done); loadRounds(0); },
+    function (e) { toast('書けませんでした：' + e.message, true); btn.disabled = false; }).then(function () { btn.classList.remove('busy'); });
+}
+
+/* ── 人手：14日の縦棒（入っている時間）と、いつもの見込みの横線。気になる日に ! ── */
+function renderRoundsShift(s) {
+  var box = $('#rdShift');
+  if (!s) { fill(box, [rdSay('シフトをまだ読んでいません。', 'dim')]); return; }
+  var open = s.days.filter(function (d) { return !d.closed; }), flagged = open.filter(function (d) { return d.flags.length; });
+  var say = rdSay(flagged.length ? '向こう2週間で、気になる日は ' + flagged.length + '日です。' + (s.pending ? 'まだ承認していない希望が ' + s.pending + '件あります。' : '')
+    : '向こう2週間は、気になる日はありません。' + (s.pending ? 'まだ承認していない希望が ' + s.pending + '件あります。' : ''));
+  var chart = h('div', { class: 'lt-chart' });
+  var fig = h('figure', { class: 'lt-fig' }, [chart, h('figcaption', { class: 'lt-legend' }, [
+    h('span', null, [h('i', { style: '--sw:var(--pen)' }), '入っている時間']), h('span', null, [h('i', { class: 'line', style: '--sw:var(--muted)' }), 'いつもの売上から見た見込み']),
+    h('span', null, [h('i', { class: 'flag' }), '気になる日'])])]);
+  var cam = rdCam('shift', function (r) {
+    return (r.summary ? [rdSay(r.summary)] : []).concat(rdCamItems(r.items, function (it) { return { what: (it.date ? fmtDay(it.date) + '　' : '') + it.issue, sub: it.idea }; }));
+  });
+  var list = flagged.length ? h('div', { class: 'lt-list' }, flagged.map(function (d) {
+    return h('p', { class: 'lt-note', style: 'color:var(--ink);font-size:13px' }, [h('b', { style: 'color:var(--crit)' }, ['! ' + fmtDay(d.date) + '　']), d.flags.join('／') + (d.guests ? '（予約 ' + d.guests + '名）' : '')]);
+  })) : null;
+  fill(box, [say, fig, list, cam]);
+  // 描く（幅が決まってから）
+  var W = Math.max(300, chart.clientWidth || 600), padL = 34, padB = 36, padT = 22, H = 190, n = s.days.length;
+  var colW = (W - padL) / n, barW = Math.min(18, colW * 0.62);
+  var ymax = rdNice(Math.max(12, Math.max.apply(null, open.map(function (d) { return Math.max(d.hours || 0, d.need || 0); }))), 3);
+  var y = function (v) { return padT + (H - padT - padB) * (1 - v / ymax.top); };
+  var svg = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '向こう2週間の、日ごとの入っている時間と見込み' });
+  for (var t = 0; t <= ymax.top; t += ymax.step) {
+    svg.appendChild(sv('line', { class: 'gridl', x1: padL, x2: W, y1: y(t), y2: y(t) }));
+    svg.appendChild(sv('text', { x: padL - 6, y: y(t), 'text-anchor': 'end', 'dominant-baseline': 'central' }, [t + 'h']));
+  }
+  var today = (RD.v && RD.v.today) || todayJst();
+  s.days.forEach(function (d, i) {
+    var cx = padL + colW * i + colW / 2;
+    svg.appendChild(sv('text', { x: cx, y: H - padB + 14, 'text-anchor': 'middle', class: d.date === today ? 'ink' : '' }, [String(Number(d.date.slice(8)))]));
+    svg.appendChild(sv('text', { x: cx, y: H - padB + 29, 'text-anchor': 'middle', class: d.date === today ? 'ink' : '' }, [d.closed ? '休' : wd(d.date)]));
+    if (d.closed) return;
+    var g = sv('g', { class: 'lt-hit', tabindex: 0, 'aria-label': fmtDay(d.date) + ' ' + d.hours + '時間' + (d.need != null ? '、見込み ' + d.need + '時間' : '') + (d.flags.length ? '、' + d.flags.join('、') : '') });
+    g.appendChild(sv('rect', { x: padL + colW * i, y: padT - 18, width: colW, height: H - padT - padB + 18, fill: 'transparent' }));
+    if (d.hours > 0) g.appendChild(sv('path', { class: 'mk', d: rdBarV(cx - barW / 2, y(d.hours), barW, y(0) - y(d.hours)), style: 'fill:var(--pen)' }));
+    if (d.need != null) g.appendChild(sv('line', { x1: cx - barW / 2 - 4, x2: cx + barW / 2 + 4, y1: y(d.need), y2: y(d.need), style: 'stroke:var(--muted);stroke-width:2;stroke-linecap:round' }));
+    if (d.flags.length) {
+      var fy = Math.min(y(d.hours), d.need != null ? y(d.need) : y(d.hours)) - 11;
+      g.appendChild(sv('circle', { cx: cx, cy: fy, r: 7, style: 'fill:var(--crit);stroke:var(--letter);stroke-width:2' }));
+      g.appendChild(sv('text', { x: cx, y: fy, 'text-anchor': 'middle', 'dominant-baseline': 'central', style: 'fill:#fff;font-size:10px;font-weight:700' }, ['!']));
+    }
+    rdTip(g, [{ v: d.hours + '時間', k: '入っている時間（' + d.staff.length + '人）', c: 'var(--pen)' }, d.need != null ? { v: d.need + '時間', k: '見込み', c: 'var(--muted)' } : null]
+      .filter(Boolean).concat(d.staff.map(function (p) { return { v: p.start + '–' + p.end, k: p.name }; }))
+      .concat(d.flags.map(function (f) { return { v: '!', k: f, c: 'var(--crit)' }; })), fmtDay(d.date) + (d.guests ? '　予約 ' + d.guests + '名' : ''));
+    svg.appendChild(g);
+  });
+  svg.appendChild(sv('line', { class: 'gridl', x1: padL, x2: W, y1: y(0), y2: y(0), style: 'stroke:var(--muted)' }));
+  var fi = -1; s.days.forEach(function (d, i) { if (fi < 0 && !d.closed && d.flags.length) fi = i; });
+  if (fi >= 0) {
+    var fd = s.days[fi], top = Math.min(y(fd.hours || 0), fd.need != null ? y(fd.need) : y(fd.hours || 0)) - 22, bot = H - padB + 32;
+    rdMark(svg, rdHandCircle(padL + colW * fi + colW / 2, (top + bot) / 2, colW * 0.52 + 5, (bot - top) / 2 + 4, 'shift' + fd.date));
+  }
+  fill(chart, [svg]);
+}
+
+/* ── 数字：今月の売上の累計（実績・計画・見込み）の折れ線と、人件費率のメーター ── */
+function renderRoundsMoney(m) {
+  var box = $('#rdMoney');
+  $('#rdMonth').textContent = m && m.month ? Number(m.month.slice(5)) + '月' : '';
+  if (!m) { fill(box, [rdSay('収支計画表をまだ読んでいません。', 'dim')]); return; }
+  var cam = rdCam('numbers', function (r) {
+    return (r.summary ? [rdSay(r.summary)] : []).concat(rdCamItems(r.items, function (it) { return { what: it.what, sub: [it.why, it.check ? '確かめる先：' + it.check : ''].filter(Boolean).join('　') }; }));
+  });
+  if (!m.ready) { fill(box, [rdSay(m.note, 'dim'), cam]); return; }
+  var a = m.amounts, p = m.pct, mon = Number(m.month.slice(5));
+  var stat = function (label, val, warn) { return h('div', { class: 'lt-stat' }, [h('b', null, [val]), h('span', null, [label]), warn ? h('span', { class: 'st bad' }, ['▼ ' + warn]) : null]); };
+  var chart = h('div', { class: 'lt-chart' });
+  var meterMax = Math.max(50, Math.ceil(Math.max(p.laborRatio || 0, p.planLaborRatio || 0) / 10) * 10 + 10);
+  var meter = p.laborRatio == null ? h('p', { class: 'lt-note' }, ['人件費率は出せません（ハブの設定に「一律時給」が無い）']) : h('div', { class: 'lt-meter', role: 'img',
+    'aria-label': '人件費率 ' + p.laborRatio + '%、計画 ' + (p.planLaborRatio == null ? 'なし' : p.planLaborRatio + '%') }, [
+    h('div', { class: 'lab' }, [h('span', null, ['人件費率 ', h('b', null, [p.laborRatio + '%'])]), h('span', null, [p.planLaborRatio == null ? '' : '計画 ' + p.planLaborRatio + '%（縦の線）'])]),
+    h('div', { class: 'trk' }, [h('div', { class: 'fil' + (p.planLaborRatio != null && p.laborRatio > p.planLaborRatio ? ' warn' : ''), style: 'width:' + Math.min(100, p.laborRatio / meterMax * 100) + '%' }),
+      p.planLaborRatio == null ? null : h('div', { class: 'tgt', style: 'left:calc(' + Math.min(100, p.planLaborRatio / meterMax * 100) + '% - 1px)' })])]);
+  fill(box, [
+    rdSay(mon + '月は、今日までの計画に対して ' + (p.toDate == null ? '—' : p.toDate + '%') + '、このままだと月末は計画の ' + (p.forecast == null ? '—' : p.forecast + '%') + ' の見込みです。'),
+    h('div', { class: 'lt-stats' }, [stat('今日までの計画に対して', p.toDate == null ? '—' : p.toDate + '%', p.toDate != null && p.toDate < 100 ? '計画より ' + (100 - p.toDate) + 'ポイント下' : ''),
+      stat('月末の着地見込み', p.forecast == null ? '—' : p.forecast + '%', p.forecast != null && p.forecast < 100 ? '計画より ' + (100 - p.forecast) + 'ポイント下' : ''),
+      stat('今月の実績（税抜）', rdMan(a.actual))]),
+    h('figure', { class: 'lt-fig' }, [chart, h('figcaption', { class: 'lt-legend' }, [
+      h('span', null, [h('i', { class: 'line', style: '--sw:var(--pen)' }), '実績の累計']), h('span', null, [h('i', { class: 'line', style: '--sw:var(--muted)' }), '計画の累計']),
+      h('span', null, [h('i', { class: 'line dash', style: '--sw:var(--pen)' }), '見込み（曜日の平均）'])])]),
+    meter,
+    h('p', { class: 'lt-note' }, ['月の計画 ' + rdYen(a.planSales) + '　今日までの計画 ' + rdYen(a.planToDate) + '　実績 ' + rdYen(a.actual) + '（税抜）。' + m.note]),
+    cam
+  ]);
+  var days = m.days || [];
+  if (!days.length) return;
+  // 累計を組む
+  var openAll = days.filter(function (d) { return d.open; }).length, seenOpen = 0, cumA = 0, cumE = null, pts = [];
+  days.forEach(function (d) {
+    if (d.open) seenOpen++;
+    var plan = a.planSales * seenOpen / Math.max(1, openAll);
+    if (d.actual != null) cumA += d.actual;
+    if (d.actual == null) { if (cumE == null) cumE = cumA; cumE += d.est || 0; }
+    pts.push({ d: d.d, plan: plan, act: d.actual != null ? cumA : null, est: d.actual == null ? cumE : null });
+  });
+  var lastA = -1; pts.forEach(function (q, i) { if (q.act != null) lastA = i; });
+  if (lastA >= 0 && lastA + 1 < pts.length) pts[lastA].est = pts[lastA].act;   // 見込みの線を実績の端からつなぐ
+  var W = Math.max(300, chart.clientWidth || 600), padL = 44, padR = 70, padT = 12, padB = 26, H = 210;
+  var ymax = rdNice(Math.max(a.planSales, a.forecast || 0) * 1.04, 5);
+  var X = function (i) { return padL + (W - padL - padR) * (i / Math.max(1, pts.length - 1)); };
+  var Y = function (v) { return padT + (H - padT - padB) * (1 - v / ymax.top); };
+  var svg = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': mon + '月の売上の累計。実績・計画・見込み' });
+  for (var t = 0; t <= ymax.top + 1; t += ymax.step) {
+    svg.appendChild(sv('line', { class: 'gridl', x1: padL, x2: W - padR + 8, y1: Y(t), y2: Y(t) }));
+    svg.appendChild(sv('text', { x: padL - 6, y: Y(t), 'text-anchor': 'end', 'dominant-baseline': 'central' }, [t ? rdMan(t) : '0']));
+  }
+  [0, 9, 19, pts.length - 1].forEach(function (i) { if (pts[i]) svg.appendChild(sv('text', { x: X(i), y: H - 6, 'text-anchor': 'middle' }, [Number(pts[i].d.slice(8)) + '日'])); });
+  var line = function (key, style) {
+    var dd = ''; pts.forEach(function (q, i) { if (q[key] == null) return; dd += (dd ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(q[key]).toFixed(1); });
+    if (dd) svg.appendChild(sv('path', { d: dd, style: 'fill:none;stroke-linejoin:round;stroke-linecap:round;' + style }));
+  };
+  line('plan', 'stroke:var(--muted);stroke-width:1.5');
+  line('est', 'stroke:var(--pen);stroke-width:2;stroke-dasharray:5 4;opacity:.75');
+  line('act', 'stroke:var(--pen);stroke-width:2');
+  if (lastA >= 0) {
+    svg.appendChild(sv('circle', { cx: X(lastA), cy: Y(pts[lastA].act), r: 4.5, style: 'fill:var(--pen);stroke:var(--letter);stroke-width:2' }));
+    svg.appendChild(sv('text', { x: X(lastA), y: Y(pts[lastA].act) - 12, 'text-anchor': 'middle', class: 'val' }, ['実績 ' + rdMan(pts[lastA].act)]));
+    rdMark(svg, rdHandLine(X(lastA) - 36, Y(pts[lastA].act) - 4, X(lastA) + 36, Y(pts[lastA].act) - 5, 'money' + m.month));
+  }
+  svg.appendChild(sv('text', { x: X(pts.length - 1) + 8, y: Y(a.planSales), 'dominant-baseline': 'central', class: 'val' }, ['計画 ' + rdMan(a.planSales)]));
+  // 縦の目印線：近い日に吸いつき、その日の3つを一度に出す
+  var cross = sv('line', { x1: 0, x2: 0, y1: padT, y2: H - padB, style: 'stroke:var(--muted);stroke-width:1', visibility: 'hidden' });
+  svg.appendChild(cross);
+  var hit = sv('rect', { class: 'lt-hit', x: padL, y: padT, width: W - padL - padR, height: H - padT - padB, fill: 'transparent', tabindex: 0, 'aria-label': '日を選んで値を見る（左右の矢印）' });
+  var idx = lastA >= 0 ? lastA : 0;
+  var showAt = function (i, cx, cy) {
+    idx = Math.max(0, Math.min(pts.length - 1, i));
+    var q = pts[idx]; cross.setAttribute('x1', X(idx)); cross.setAttribute('x2', X(idx)); cross.setAttribute('visibility', 'visible');
+    var t = $('#rdTip');
+    fill(t, [h('div', { class: 'hd' }, [fmtDay(q.d) + 'までの累計'])].concat([
+      q.act != null ? { v: rdYen(q.act), k: '実績', c: 'var(--pen)' } : null, { v: rdYen(q.plan), k: '計画', c: 'var(--muted)' },
+      q.est != null && q.act == null ? { v: rdYen(q.est), k: '見込み', c: 'var(--pen)', dash: true } : null].filter(Boolean).map(function (r) {
+      return h('div', { class: 'r' }, [h('i', { class: r.dash ? 'dash' : '', style: '--sw:' + r.c }), h('b', null, [r.v]), h('span', null, [r.k])]);
+    })));
+    t.hidden = false;
+    var b = svg.getBoundingClientRect(), x = cx != null ? cx : b.left + X(idx), y = cy != null ? cy : b.top + padT;
+    t.style.left = Math.max(8, Math.min(innerWidth - t.offsetWidth - 8, x + 14)) + 'px';
+    t.style.top = Math.max(8, y - t.offsetHeight - 10) + 'px';
+  };
+  hit.addEventListener('pointermove', function (e) { var b = svg.getBoundingClientRect(); showAt(Math.round((e.clientX - b.left - padL) / (W - padL - padR) * (pts.length - 1)), e.clientX, e.clientY); });
+  hit.addEventListener('pointerleave', function () { cross.setAttribute('visibility', 'hidden'); rdTipHide(); });
+  hit.addEventListener('focus', function () { showAt(idx); });
+  hit.addEventListener('blur', function () { cross.setAttribute('visibility', 'hidden'); rdTipHide(); });
+  hit.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); showAt(idx + (e.key === 'ArrowLeft' ? -1 : 1)); } });
+  svg.appendChild(hit);
+  fill(chart, [svg]);
+}
+
+/* ── 今日の動き：6〜24時の線の上に、アプリごとの点 ── */
+function renderRoundsMoves(moves, v) {
+  var box = $('#rdMoves');
+  $('#rdMovesN').textContent = moves.length + '件';
+  if (!moves.length) { fill(box, [rdSay('今日の動きは、まだありません。', 'dim')]); return; }
+  var apps = RD_APP_KEYS.filter(function (k) { return moves.some(function (m) { return m.app === k; }); });
+  var who = {}; moves.forEach(function (m) { if (m.who) who[m.who] = 1; });
+  var chart = h('div', { class: 'lt-chart' });
+  var list = h('details', { class: 'lt-more' }, [h('summary', null, ['一覧で見る（' + moves.length + '件）']), h('ul', { class: 'lt-moves' }, moves.map(function (m) {
+    return h('li', { style: '--sw:' + rdColor(m.app) }, [h('span', { class: 't' }, [String(m.at).slice(11, 16)]), h('span', null, [m.who || '—']),
+      h('span', null, [h('b', null, [m.what]), m.title ? '　' + m.title : '']), h('span', { class: 'd' }, [rdAppLabel(m.app) + (m.detail ? '　' + m.detail : '') + (m.late ? '（期限切れ後）' : '')])]);
+  }))]);
+  fill(box, [rdSay('今日は ' + moves.length + '件の動きがありました（' + Object.keys(who).length + '人）。最後は ' + String(moves[0].at).slice(11, 16) + ' の「' + moves[0].what + '」です。'),
+    h('figure', { class: 'lt-fig' }, [chart]), list]);
+  var W = Math.max(300, chart.clientWidth || 600), narrow = W < 520, labelW = narrow ? 70 : 158, rowH = 30, padB = 24, H = apps.length * rowH + padB;
+  var X = function (hm) { var p = hm.split(':'); var v = Number(p[0]) + Number(p[1]) / 60; return labelW + (W - labelW - 10) * (Math.max(6, Math.min(24, v)) - 6) / 18; };
+  var svg = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '今日の動きを時刻とアプリで並べた点' });
+  [6, 9, 12, 15, 18, 21, 24].forEach(function (hh) {
+    var x = X(hh + ':00');
+    svg.appendChild(sv('line', { class: 'gridl', x1: x, x2: x, y1: 0, y2: H - padB }));
+    svg.appendChild(sv('text', { x: x, y: H - 6, 'text-anchor': 'middle' }, [hh + '時']));
+  });
+  apps.forEach(function (k, i) {
+    var cy = i * rowH + rowH / 2;
+    svg.appendChild(sv('rect', { x: 0, y: cy - 5, width: 10, height: 10, rx: 3, style: 'fill:' + rdColor(k) }));
+    svg.appendChild(sv('text', { x: 16, y: cy, 'dominant-baseline': 'central', class: 'ink' }, [narrow ? RD_APP_SHORT[k] : rdAppLabel(k)]));
+    moves.filter(function (m) { return m.app === k; }).forEach(function (m) {
+      var hm = String(m.at).slice(11, 16), cx = X(hm);
+      var g = sv('g', { class: 'lt-hit', tabindex: 0, 'aria-label': hm + ' ' + (m.who || '') + ' ' + m.what + ' ' + (m.title || '') });
+      g.appendChild(sv('circle', { cx: cx, cy: cy, r: 12, fill: 'transparent' }));
+      g.appendChild(sv('circle', { class: 'mk', cx: cx, cy: cy, r: 5, style: 'fill:' + rdColor(k) + ';stroke:var(--letter);stroke-width:2' }));
+      rdTip(g, [{ v: m.what, k: m.title || '' }, m.detail ? { v: '', k: m.detail } : null].filter(Boolean), hm + '　' + (m.who || '—') + '　' + rdAppLabel(k));
+      svg.appendChild(g);
+    });
+  });
+  fill(chart, [svg]);
+}
+
+/* ── カミーユの見立て（罫の上に手書き）。kind ごとにその話題の欄の中で出す ── */
+function rdCam(kind, body) {
+  var ai = RD.ai || {}, r = ai[kind], err = (ai.err || {})[kind];
+  var re = h('button', { type: 'button', class: 'link' }, [RD.run === kind ? '書いています…（1〜2分）' : r ? '書き直してもらう' : 'いま書いてもらう']);
+  re.disabled = !ai.ready || !!RD.run;
+  re.addEventListener('click', function () { rdRunAi(kind); });
+  var kids = [];
+  if (err) kids.push(h('p', { class: 'ai-err' }, ['書けませんでした：' + err]));
+  if (r) kids = kids.concat(body(r));
+  else if (!err) kids.push(rdSay(RD.run === kind ? '' : 'まだ書いていません。' + RD_WHEN[kind], 'dim'));
+  kids.push(h('div', { class: 'lt-ft' }, [r ? h('span', null, [String(r.at).slice(5, 16).replace('-', '/').replace('T', ' ') + ' に書きました']) : null, re]));
+  return h('div', { class: 'lt-cam', style: 'margin-top:14px' }, kids);
+}
+function rdCamItems(items, pick) {
+  return items && items.length ? items.map(function (it) {
+    var p = pick(it), act = rdAiAct(it.action, p.what);
+    return h('div', null, [rdSay(['・' + p.what].concat(act ? [act] : [])), p.sub ? h('p', { class: 'lt-note', style: 'margin:0 0 4px 1em' }, [p.sub]) : null]);
+  }) : [rdSay('いま挙げることはありません。', 'dim')];
+}
+function renderRoundsLead(ai) {
+  var r = ai.digest, err = (ai.err || {}).digest, out = [];
+  var re = h('button', { type: 'button', class: 'link' }, [RD.run === 'digest' ? '書いています…（1〜2分）' : r ? '書き直してもらう' : 'いま書いてもらう']);
+  re.disabled = !ai.ready || !!RD.run;
+  re.addEventListener('click', function () { rdRunAi('digest'); });
+  if (err) out.push(h('p', { class: 'ai-err' }, ['書けませんでした：' + err]));
+  if (r) {
+    if (r.summary) out.push(rdSay(r.summary));
+    if (r.next && r.next.what) {
+      var act = rdAiAct(r.next.action, r.next.what);
+      out.push(rdSay(['次は、', h('mark', null, [r.next.what]), '。'].concat(act ? [act] : [])));
+      if (r.next.why) out.push(h('p', { class: 'lt-note' }, [r.next.why]));
+    }
+  } else if (!err) out.push(rdSay(RD.run === 'digest' ? '' : '今日のまとめは、まだ書いていません。' + RD_WHEN.digest, 'dim'));
+  out.push(h('div', { class: 'lt-ft' }, [r ? h('span', null, [String(r.at).slice(11, 16) + ' に書きました']) : null, re]));
+  fill($('#rdLead'), out);
+}
+function renderRoundsWeek() {
+  fill($('#rdWeek'), [rdCam('weekly', function (r) {
+    return (r.summary ? [rdSay(r.summary)] : []).concat(rdCamItems(r.items, function (it) { return { what: it.what, sub: it.why }; }));
+  })]);
+}
+function rdAiAct(a, what) {
+  if (!a || a.type === 'none') return null;
+  if (a.type === 'open_app' || a.type === 'open_url') return h('a', { class: 'act', href: a.url, target: a.url === '#' ? null : '_blank', rel: 'noopener' }, ['開く']);
+  if (a.type === 'due') {
+    var item = RD.v && RD.v.lost.filter(function (x) { return x.id === a.taskId; })[0], late = !!(item && item.due && item.due < todayJst());
+    var b = h('button', { type: 'button', class: 'act' }, ['期日を ' + fmtDay(a.date) + ' にする' + (late ? '…' : '')]);
+    b.addEventListener('click', function () {
+      if (!late) { rdWrite(b, 'roundsdue', { id: a.taskId, date: a.date }, '期日を ' + fmtDay(a.date) + ' にしました：' + (what || '')); return; }
+      var f = rdReasonForm('期日を ' + fmtDay(a.date) + ' にする', true, function (bb, r) { rdWrite(bb, 'roundsdue', { id: a.taskId, date: a.date, reason: r }, '期日を ' + fmtDay(a.date) + ' にしました：' + (what || '')); });
+      b.replaceWith(f); rdFade(f);
+    });
+    return b;
+  }
+  return null;
+}
+function rdRunAi(kind) {
+  if (RD.run) return;
+  RD.run = kind; renderRounds();
+  call('airoundsrun', { kind: kind }, { wait: 200000, once: true })
+    .then(function (d) { RD.ai = d; if ((d.err || {})[kind]) toast('書けませんでした：' + d.err[kind], true); }, function (e) { toast('書けませんでした：' + e.message, true); })
+    .then(function () { RD.run = ''; renderRounds(); });
+}
+$('#rdRe').addEventListener('click', function () { loadRounds(2); });
+// 幅が変わったら描き直す（チャートは幅に合わせて描くため）
+var rdResizeT = null;
+window.addEventListener('resize', function () { if ($('#tab-rounds').hidden || !RD.v) return; clearTimeout(rdResizeT); rdResizeT = setTimeout(renderRounds, 200); });
+/* ───────── v4.3：承認すること・今日の段取り・フェードイン ───────── */
+// 押して絞ったり区分を変えたりしたときだけ、柔らかく出し直す（自動の読み直しでは動かさない）
+function rdFade(el) { if (!el) return; el.classList.remove('lt-fade'); void el.offsetWidth; el.classList.add('lt-fade'); }
+var RD_APPR_APPS = ['shift', 'hub', 'haccp'];
+var RD_APPR_LABEL = { shift: 'シフト', hub: 'ハブのタスク', haccp: 'HACCP の検査基準' };
+RD.apprApp = '';
+function rdTimes() { var out = []; for (var m = 6 * 60; m <= 24 * 60; m += 30) out.push(pad(Math.floor(m / 60)) + ':' + pad(m % 60)); return out; }
+function rdSel(list, cur, label) { return h('select', { 'aria-label': label }, [h('option', { value: '' }, [label])].concat(list.map(function (x) { return h('option', { value: x, selected: x === cur ? true : null }, [x]); }))); }
+// 承認の操作。返ってくるのは新しい盤面
+function rdApprove(btn, args, done) {
+  btn.classList.add('busy'); btn.disabled = true;
+  call('roundsapprove', args, { wait: 120000, once: true }).then(function (d) { RD.v = d; toast(done); renderRounds(); },
+    function (e) { toast('できませんでした：' + e.message, true); btn.disabled = false; }).then(function () { btn.classList.remove('busy'); });
+}
+// 理由を書いてから押す小さな欄（差し戻し・却下・期限切れの期日など）
+function rdReasonForm(label, need, go) {
+  var ta = h('textarea', { rows: 2, maxlength: 300, placeholder: need ? '理由（必須）' : '理由（任意）', 'aria-label': label + 'の理由' });
+  var b = h('button', { type: 'button', class: 'act' }, [label]);
+  b.addEventListener('click', function () { var r = ta.value.trim(); if (need && !r) { ta.focus(); toast('「' + label + '」には理由が必要です', true); return; } go(b, r); });
+  return h('div', { class: 'lt-form' }, [ta, b]);
+}
+function rdToggle(label, mk) {
+  var holder = h('div', { class: 'lt-slot' }), on = false;
+  var b = h('button', { type: 'button', class: 'act' }, [label]);
+  b.addEventListener('click', function () { on = !on; fill(holder, on ? [mk()] : []); b.setAttribute('aria-expanded', String(on)); if (on) rdFade(holder); });
+  return [b, holder];
+}
+function renderRoundsAppr(a) {
+  var box = $('#rdAppr');
+  if (!a) { $('#rdApprN').textContent = ''; fill(box, [rdSay('承認待ちをまだ読んでいません。', 'dim')]); return; }
+  var apps = RD_APPR_APPS.filter(function (k) { return !RD.app || RD.app === k; });
+  var n = {}; apps.forEach(function (k) { n[k] = a[k].items.length; });
+  var total = apps.reduce(function (s, k) { return s + n[k]; }, 0);
+  $('#rdApprN').textContent = total + '件';
+  if (!apps.length) { fill(box, [rdSay(rdAppLabel(RD.app) + 'には、承認することはありません。', 'dim')]); return; }
+  if (!RD.apprApp || apps.indexOf(RD.apprApp) < 0 || !n[RD.apprApp]) RD.apprApp = apps.filter(function (k) { return n[k]; })[0] || apps[0];
+  var parts = apps.filter(function (k) { return n[k]; }).map(function (k) { return RD_APPR_LABEL[k] + ' ' + n[k] + '件'; });
+  var kids = [rdSay(total ? '承認することは ' + total + '件です（' + parts.join('、') + '）。' : 'いま承認することはありません。')];
+  // 横棒：アプリごとの件数。行を押すとそのアプリの一覧
+  if (total) {
+    var chart = h('div', { class: 'lt-chart' });
+    kids.push(h('figure', { class: 'lt-fig' }, [chart]));
+    fill(box, kids.concat([h('div', { id: 'rdApprList' })]));
+    var W = Math.max(280, chart.clientWidth || 600), labelW = W < 440 ? 110 : 150, valW = 44, rowH = 32, barH = 16, max = Math.max.apply(null, apps.map(function (k) { return n[k]; }));
+    var sc = (W - labelW - valW) / Math.max(1, max), H = apps.length * rowH;
+    var s = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '承認することのアプリごとの件数' });
+    s.appendChild(sv('line', { class: 'gridl', x1: labelW, x2: labelW, y1: 0, y2: H }));
+    apps.forEach(function (k, i) {
+      var y = i * rowH + (rowH - barH) / 2, g = sv('g', { class: 'lt-row' + (k === RD.apprApp ? ' on' : ''), tabindex: n[k] ? 0 : null, role: n[k] ? 'button' : null, 'aria-label': RD_APPR_LABEL[k] + ' ' + n[k] + '件。押すと一覧' });
+      g.appendChild(sv('rect', { class: 'rowbg', x: 0, y: i * rowH, width: W, height: rowH, rx: 6, fill: 'transparent' }));
+      g.appendChild(sv('text', { x: 4, y: y + barH / 2, 'dominant-baseline': 'central', class: 'ink' }, [RD_APPR_LABEL[k]]));
+      if (n[k]) g.appendChild(sv('path', { class: 'mk', d: rdBarH(labelW, y, n[k] * sc, barH, true), style: 'fill:' + rdColor(k) }));
+      g.appendChild(sv('text', { x: labelW + n[k] * sc + 6, y: y + barH / 2, 'dominant-baseline': 'central', class: n[k] ? 'val' : '' }, [n[k] ? n[k] + '件' : 'なし']));
+      if (n[k]) {
+        var pick = function () { RD.apprApp = k; renderRoundsAppr(a); rdFade($('#rdApprList')); };
+        g.addEventListener('click', pick);
+        g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      }
+      s.appendChild(g);
+    });
+    var si = apps.indexOf('shift');
+    if (si >= 0 && a.shift.items.some(function (x) { return x.overdue; })) {
+      var w2 = (String(n.shift) + '件').length * 13, x2 = labelW + n.shift * sc + 6;
+      rdMark(s, rdHandCircle(x2 + w2 / 2, si * rowH + rowH / 2, w2 / 2 + 9, 11, 'appr' + n.shift));
+    }
+    fill(chart, [s]);
+  } else { fill(box, kids); return; }
+  var k = RD.apprApp, g = a[k], list = [];
+  if (!g.can && g.note) list.push(h('p', { class: 'lt-note' }, ['読むだけです（押す操作は出していません）：' + g.note]));
+  if (k === 'hub') list = list.concat(rdApprHub(g));
+  if (k === 'shift') list = list.concat(rdApprShift(g));
+  if (k === 'haccp') list = list.concat(rdApprHaccp(g));
+  fill($('#rdApprList'), [h('div', { class: 'lt-list' }, [h('h4', null, [RD_APPR_LABEL[k] + 'の ' + g.items.length + '件'])].concat(list))]);
+}
+// ハブのタスク：承認／選んでまとめて承認／差し戻し（理由が必須）
+function rdApprHub(g) {
+  var pick = {}, out = [];
+  if (g.can && g.items.length > 1) {
+    var bulk = h('button', { type: 'button', class: 'act' }, ['選んだものをまとめて承認']);
+    bulk.addEventListener('click', function () { var ids = Object.keys(pick).filter(function (x) { return pick[x]; }); if (!ids.length) { toast('行を選んでください', true); return; } rdApprove(bulk, { app: 'hub', ids: ids.join(','), decision: '承認' }, ids.length + '件を承認しました'); });
+    out.push(h('div', { class: 'lt-do' }, [bulk]));
+  }
+  return out.concat(g.items.map(function (x) {
+    var meta = [x.date ? '期日 ' + fmtDay(x.date) + (x.time ? ' ' + x.time : '') : '期日なし', x.who ? '担当 ' + x.who : '担当なし', x.cat, x.state === '差し戻し' ? '差し戻し中' + (x.back ? '：' + x.back : '') : ''].filter(Boolean).join('、');
+    var d = h('details', { class: 'lt-item', style: '--sw:' + rdColor('hub') }, [h('summary', null, [h('span', { class: 'tt' }, [x.title]), h('span', { class: 'meta' }, [meta])])]);
+    var body = [];
+    if (x.cond) body.push(h('p', { class: 'lt-note' }, ['完了条件：' + x.cond]));
+    var acts = h('div', { class: 'lt-do' });
+    if (g.can) {
+      var cb = h('input', { type: 'checkbox', 'aria-label': 'まとめて承認に入れる' }); cb.addEventListener('change', function () { pick[x.id] = cb.checked; });
+      if (g.items.length > 1) acts.appendChild(h('label', { class: 'lt-check' }, [cb, '選ぶ']));
+      var ok = h('button', { type: 'button', class: 'save' }, ['承認']);
+      ok.addEventListener('click', function () { rdApprove(ok, { app: 'hub', ids: x.id, decision: '承認' }, '承認しました：' + x.title); });
+      acts.appendChild(ok);
+      var t = rdToggle('差し戻す…', function () { return rdReasonForm('差し戻す', true, function (b, r) { rdApprove(b, { app: 'hub', ids: x.id, decision: '差し戻し', reason: r }, '差し戻しました：' + x.title); }); });
+      acts.appendChild(t[0]); body.push(acts, t[1]);
+    }
+    acts.appendChild(h('a', { class: 'link', href: x.url || RD_APPS_URL('hub'), target: '_blank', rel: 'noopener' }, ['ハブで開く']));
+    if (!g.can) body.push(acts);
+    body.forEach(function (b) { d.appendChild(b); });
+    return d;
+  }));
+}
+function RD_APPS_URL(k) { return RD.v && RD.v.apps[k] ? RD.v.apps[k].url : '#'; }
+/* ───────── v4.4 カミーユの痕跡：手で描いたしるし（朱）と、欄外の書き込み ─────────
+   しるしの揺れは文字列から決まる（描き直しても同じ形。読み直すたびに揺れが変わらない） */
+function rdRand(seed) {
+  var h = 2166136261;
+  for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return function () { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 1000) / 1000; };
+}
+function rdSmooth(pts) {
+  var d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
+  for (var i = 1; i < pts.length - 1; i++) {
+    var mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2;
+    d += 'Q' + pts[i][0].toFixed(1) + ',' + pts[i][1].toFixed(1) + ' ' + mx.toFixed(1) + ',' + my.toFixed(1);
+  }
+  var l = pts[pts.length - 1];
+  return d + 'L' + l[0].toFixed(1) + ',' + l[1].toFixed(1);
+}
+// 手で描いた丸：一周より少し多く回して、描き始めと終わりが重なる
+function rdHandCircle(cx, cy, rx, ry, seed) {
+  var r = rdRand(seed), a0 = -2.2 + r() * 0.5, turn = Math.PI * 2 * (1.07 + r() * 0.06), n = 22, pts = [];
+  for (var i = 0; i <= n; i++) {
+    var t = a0 + turn * i / n, k = 1 + (r() - 0.5) * 0.07 + (i / n) * 0.06;
+    pts.push([cx + Math.cos(t) * rx * k, cy + Math.sin(t) * ry * k]);
+  }
+  return rdSmooth(pts);
+}
+function rdHandLine(x1, y1, x2, y2, seed) {
+  var r = rdRand(seed), n = 7, pts = [];
+  for (var i = 0; i <= n; i++) pts.push([x1 + (x2 - x1) * i / n, y1 + (y2 - y1) * i / n + (r() - 0.5) * 2.4]);
+  return rdSmooth(pts);
+}
+function rdMark(svg, d) { svg.appendChild(sv('path', { class: 'redpen', d: d })); }
+// 欄外の書き込み（朱）。盤面の数字から決まった言い方で書くだけ（解釈は足さない）
+function rdMargins(v) {
+  var set = function (id, t) { var el = $('#' + id); if (el) el.textContent = t || ''; };
+  var cam = $('#wCam') ? $('#wCam').textContent.trim() : '';
+  $('#rdPS').textContent = cam ? 'P.S. ' + cam : '';
+  if (!v || !v.ready) { ['rdM0', 'rdM1', 'rdM2', 'rdM3', 'rdM4'].forEach(function (id) { set(id, ''); }); return; }
+  var a = v.appr, total = 0, late = 0;
+  if (a) RD_APPR_APPS.forEach(function (k) { if (!RD.app || RD.app === k) total += a[k].items.length; });
+  if (a && (!RD.app || RD.app === 'shift')) late = a.shift.items.filter(function (x) { return x.overdue; }).length;
+  set('rdM0', late ? '締切を過ぎた希望が ' + late + '件。ここから。' : total ? 'ぜんぶで ' + total + '件。ひとつずつで大丈夫。' : '今日は承認なし。');
+  var lost = v.lost.filter(function (x) { return !RD.app || x.app === RD.app; }), top = null;
+  RD_CATS.forEach(function (c) { var n = lost.filter(function (x) { return c.rules.indexOf(x.rule) >= 0; }).length; if (n && (!top || n > top.n)) top = { c: c, n: n }; });
+  set('rdM1', top ? 'まずは「' + top.c.short + '」から。' : '');
+  var f = v.shift && v.shift.days.filter(function (d) { return !d.closed && d.flags.length; })[0];
+  set('rdM2', v.shift ? (f ? fmtDay(f.date) + '、気にしておいて。' : '2週間、穴はなし。') : '');
+  var m = v.money;
+  set('rdM3', m && m.ready && m.pct.toDate != null ? (m.pct.toDate < 100 ? '計画まで あと ' + (100 - m.pct.toDate) + 'ポイント。' : '計画どおり。いい調子。') : '');
+  var mv = v.moves.filter(function (x) { return !RD.app || x.app === RD.app; })[0];
+  set('rdM4', mv ? '最後は ' + String(mv.at).slice(11, 16) + (mv.who ? '、' + mv.who + 'さん。' : '。') : '');
+}
+// 今日の段取りの書き込み：いまの時間・つぎの時間
+function rdPlanMargin(d) {
+  var el = $('#rdM6'); if (!el) return;
+  var bl = (d && d.plan && d.plan.blocks) || [], n = jstNow(), now = pad(n.getUTCHours()) + ':' + pad(n.getUTCMinutes());
+  var cur = bl.filter(function (b) { return b.start <= now && now < b.end && b.kind !== '余白'; })[0], next = bl.filter(function (b) { return b.start > now && b.kind !== '余白'; })[0];
+  el.textContent = cur ? 'いまは「' + cur.title + '」の時間。' : next ? 'つぎは ' + next.start + ' の「' + next.title + '」。' : '';
+}
+
+// シフト：承認／選んでまとめて承認（新規だけ）／時間を直して承認（開始・終了・本人了承が必須）／却下（理由が必須）
+function rdApprShift(g) {
+  var pick = {}, out = [], KIND = { new: '新規の希望', change: '変更の申請', off: '休みの申請' };
+  var news = g.items.filter(function (x) { return x.kind === 'new'; });
+  if (g.can && news.length > 1) {
+    var bulk = h('button', { type: 'button', class: 'act' }, ['選んだ新規の希望をまとめて承認']);
+    bulk.addEventListener('click', function () { var ids = Object.keys(pick).filter(function (x) { return pick[x]; }); if (!ids.length) { toast('行を選んでください', true); return; } rdApprove(bulk, { app: 'shift', bulk: '1', ids: ids.join(',') }, ids.length + '件を承認しました'); });
+    out.push(h('div', { class: 'lt-do' }, [bulk]));
+  }
+  return out.concat(g.items.map(function (x) {
+    var time = x.kind === 'change' ? (x.before || '') + ' → ' + (x.wishStart || '?') + '–' + (x.wishEnd || '?') : x.kind === 'off' ? '休み' : (x.start || '?') + '–' + (x.end || '?');
+    var meta = [KIND[x.kind] || '', x.overdue ? '締切を過ぎています' : x.deadline ? '締切 ' + fmtDay(x.deadline) : '', x.requester ? '申請 ' + x.requester : '', x.reason ? '理由：' + x.reason : ''].filter(Boolean).join('、');
+    var d = h('details', { class: 'lt-item', style: '--sw:' + rdColor('shift') }, [h('summary', null, [h('span', { class: 'tt' }, [(x.date ? fmtDay(x.date) + '　' : '') + x.name + '　' + time]), h('span', { class: 'meta' }, [meta])])]);
+    var same = (g.sameDay || {})[x.date] || [];
+    if (x.date) d.appendChild(h('p', { class: 'lt-note' }, ['この日の承認済み ' + same.length + '人' + (same.length ? '：' + same.join('／') : '')]));
+    if (!g.can) { d.appendChild(h('div', { class: 'lt-do' }, [h('a', { class: 'link', href: RD_APPS_URL('shift'), target: '_blank', rel: 'noopener' }, ['シフト自動編成で開く'])])); return d; }
+    var acts = h('div', { class: 'lt-do' });
+    if (x.kind === 'new' && news.length > 1) { var cb = h('input', { type: 'checkbox', 'aria-label': 'まとめて承認に入れる' }); cb.addEventListener('change', function () { pick[x.id] = cb.checked; }); acts.appendChild(h('label', { class: 'lt-check' }, [cb, '選ぶ'])); }
+    var ok = h('button', { type: 'button', class: 'save' }, [x.kind === 'off' ? '休みを承認' : '承認']);
+    ok.addEventListener('click', function () { rdApprove(ok, { app: 'shift', id: x.id, decide: 'approve' }, '承認しました：' + x.name + ' ' + fmtDay(x.date)); });
+    acts.appendChild(ok);
+    var slots = [];
+    if (x.kind !== 'off') {
+      var tm = rdToggle('時間を直して承認…', function () {
+        var s = rdSel(rdTimes(), x.wishStart || x.start, '開始'), e = rdSel(rdTimes(), x.wishEnd || x.end, '終了');
+        var cs = h('input', { type: 'checkbox' }), why = h('input', { maxlength: 300, placeholder: '理由（任意）', 'aria-label': '時間を直した理由' });
+        var go = h('button', { type: 'button', class: 'act' }, ['この時間で承認']);
+        go.addEventListener('click', function () {
+          if (!s.value || !e.value) { toast('開始と終了を選んでください', true); return; }
+          if (!cs.checked) { toast('本人の了承を取ってから「本人了承済み」にチェックしてください', true); return; }
+          rdApprove(go, { app: 'shift', id: x.id, decide: 'modify', start: s.value, end: e.value, consent: '1', reason: why.value.trim() }, '時間を直して承認しました：' + x.name);
+        });
+        return h('div', { class: 'lt-form' }, [s, e, h('label', { class: 'lt-check' }, [cs, '本人了承済み']), why, go]);
+      });
+      acts.appendChild(tm[0]); slots.push(tm[1]);
+    }
+    var rj = rdToggle('却下…', function () { return rdReasonForm('却下する', true, function (b, r) { rdApprove(b, { app: 'shift', id: x.id, decide: 'reject', reason: r }, '却下しました：' + x.name); }); });
+    acts.appendChild(rj[0]); slots.push(rj[1]);
+    d.appendChild(acts); slots.forEach(function (sl) { d.appendChild(sl); });
+    return d;
+  }));
+}
+// HACCP の検査基準：承認／差し戻す（コメントが必須）。変更した本人は押せない
+function rdApprHaccp(g) {
+  return g.items.map(function (x) {
+    var meta = ['変更 ' + (x.by || '—'), x.at ? x.at.replace('T', ' ') : '', x.why ? '理由：' + x.why : '', x.state === '要確認' ? '差し戻し中' : ''].filter(Boolean).join('、');
+    var d = h('details', { class: 'lt-item', style: '--sw:' + rdColor('haccp') }, [h('summary', null, [h('span', { class: 'tt' }, [x.name + (x.step ? '（' + x.step + '）' : '') + (x.ver ? '　' + x.ver : '')]), h('span', { class: 'meta' }, [meta])])]);
+    if ((x.cols || []).length) d.appendChild(h('ul', { class: 'lt-cols' }, x.cols.map(function (c) { return h('li', null, [h('b', null, [c.f]), '　' + (c.a || '（空）') + ' → ' + (c.b || '（空）')]); })));
+    var acts = h('div', { class: 'lt-do' });
+    if (x.self) d.appendChild(h('p', { class: 'lt-note' }, ['Kent が変えた項目です。変更した本人は承認できないので、ほかの人に頼んでください。']));
+    else {
+      var ok = h('button', { type: 'button', class: 'save' }, ['承認']);
+      ok.addEventListener('click', function () { rdApprove(ok, { app: 'haccp', key: x.key }, '承認しました：' + x.name); });
+      acts.appendChild(ok);
+      var t = rdToggle('差し戻す…', function () { return rdReasonForm('差し戻す', true, function (b, r) { rdApprove(b, { app: 'haccp', key: x.key, judge: '要確認', reason: r }, '差し戻しました：' + x.name); }); });
+      acts.appendChild(t[0]); d.appendChild(acts); d.appendChild(t[1]);
+    }
+    if (x.self) d.appendChild(acts);
+    acts.appendChild(h('a', { class: 'link', href: RD_APPS_URL('haccp'), target: '_blank', rel: 'noopener' }, ['HACCP BASE で開く']));
+    return d;
+  });
+}
+
+/* 今日の段取り（もとの「今日の設計」と「気になること」を便箋に入れた）。中身は AI.d（6:30 と 12:30 に GAS が作る） */
+var RD_PLAN_KIND = { '予定': 'var(--muted)', 'タスク': 'var(--pen)', '休憩': 'var(--lt-rule)', '移動': 'var(--amber)', '余白': 'transparent' };
+function renderRoundsPlan() {
+  var box = $('#rdPlan'); if (!box) return;
+  var d = AI.d, out = [];
+  if (!d) { $('#rdPlanAt').textContent = ''; fill(box, [rdSay(AI.err ? '今日の段取りを読めませんでした：' + AI.err : '読み込み中…', 'dim')]); return; }
+  var err = d.err || {}, p = d.plan;
+  $('#rdPlanAt').textContent = p ? aiStamp(p.at) + (p.note ? '・' + p.note : '') : '';
+  if (!d.ready) out.push(h('p', { class: 'ai-err' }, ['ANTHROPIC_API_KEY が未設定です（GAS のスクリプト プロパティ）']));
+  if (err.plan) out.push(h('p', { class: 'ai-err' }, ['作れませんでした：' + err.plan]));
+  if (AI.busy === 'plan') out.push(rdSay('組み直しています…（1〜2分）', 'dim'));
+  if (p) {
+    if (p.summary) out.push(rdSay(p.summary));
+    var blocks = (p.blocks || []).filter(function (b) { return /^\d{1,2}:\d{2}$/.test(b.start) && /^\d{1,2}:\d{2}$/.test(b.end); });
+    if (blocks.length) {
+      var chart = h('div', { class: 'lt-chart' });
+      out.push(h('figure', { class: 'lt-fig' }, [chart, h('figcaption', { class: 'lt-legend' }, ['予定', 'タスク', '休憩', '移動'].map(function (k) { return h('span', null, [h('i', { style: '--sw:' + RD_PLAN_KIND[k] + (k === '休憩' ? ';outline:1px solid var(--muted)' : '') }), k]); }))]));
+      out.push(h('details', { class: 'lt-more' }, [h('summary', null, ['時間割を一覧で見る（' + blocks.length + '）']), h('ul', { class: 'lt-moves' }, blocks.map(function (b) {
+        return h('li', null, [h('span', { class: 't' }, [b.start]), h('span', null, [b.kind]), h('span', null, [h('b', null, [b.title]), b.why ? h('span', { class: 'd' }, [b.why]) : null])]);
+      }))]));
+      setTimeout(function () { rdPlanChart(chart, blocks); }, 0);
+    }
+    if ((p.defer || []).length) {
+      out.push(h('h4', { class: 'lt-sub' }, ['回す案']));
+      p.defer.forEach(function (x) {
+        var b = h('button', { type: 'button', class: 'act' }, [fmtDay(x.to) + ' へ']);
+        b.addEventListener('click', function () { aiMove(b, x.taskId, x.to, x.title); });
+        out.push(rdSay(['・' + x.title, b])); if (x.why) out.push(h('p', { class: 'lt-note', style: 'margin:0 0 4px 1em' }, [x.why]));
+      });
+    }
+    if ((p.warn || []).length) { out.push(h('h4', { class: 'lt-sub' }, ['気をつけること'])); p.warn.forEach(function (w) { out.push(rdSay('・' + w)); }); }
+  } else if (d.ready && !err.plan && AI.busy !== 'plan') out.push(rdSay('今日の段取りはまだ作っていません。6:30 に作ります（いま作るなら下の「組み直す」）。', 'dim'));
+  // 組み直す
+  var note = h('input', { maxlength: 300, placeholder: '組み直す理由（例：会議が30分延びた）', 'aria-label': '組み直す理由' });
+  var re = h('button', { type: 'button', class: 'act' }, ['組み直す']);
+  re.disabled = !d.ready || !!AI.busy;
+  re.addEventListener('click', function () { aiRun('plan', { note: note.value.trim() }); });
+  out.push(h('div', { class: 'lt-form', style: 'margin-top:10px' }, [note, re]));
+  // 気になること
+  var f = d.fixes, fx = h('button', { type: 'button', class: 'link' }, [AI.busy === 'fix' ? '見直しています…' : '見直す']);
+  fx.disabled = !d.ready || !!AI.busy;
+  fx.addEventListener('click', function () { aiRun('fix'); });
+  out.push(h('h4', { class: 'lt-sub' }, ['気になること　', h('small', null, [f ? aiStamp(f.at) : '']), ' ', fx]));
+  if (err.fixes) out.push(h('p', { class: 'ai-err' }, ['作れませんでした：' + err.fixes]));
+  if (f && (f.items || []).length) f.items.forEach(function (it) {
+    var a = it.action || {}, btn = null;
+    if (a.type === 'task_move') { btn = h('button', { type: 'button', class: 'act' }, [fmtDay(a.date) + ' へ移す']); btn.addEventListener('click', function () { aiMove(btn, a.taskId, a.date, it.what); }); }
+    if (a.type === 'task_create') { btn = h('button', { type: 'button', class: 'act' }, ['タスクにする']); btn.addEventListener('click', function () { aiCreate(btn, a.title, a.date); }); }
+    if (a.type === 'open_url') btn = h('a', { class: 'act', href: a.url, target: '_blank', rel: 'noopener' }, ['開く']);
+    out.push(rdSay([(it.level === '急ぎ' ? '◆ ' : '・') + it.what].concat(btn ? [btn] : [])));
+    if (it.why || (it.steps || []).length) out.push(h('p', { class: 'lt-note', style: 'margin:0 0 4px 1em' }, [[it.why].concat(it.steps || []).filter(Boolean).join('　')]));
+  });
+  else if (f && d.ready) out.push(rdSay('いま気になることはありません。', 'dim'));
+  fill(box, out);
+  rdPlanMargin(d);
+}
+// 時間割の帯：6〜24時の1本の線の上に、予定・タスク・休憩・移動を並べる（色は種類。アプリの色は使わない）
+function rdPlanChart(chart, blocks) {
+  var W = Math.max(300, chart.clientWidth || 600), padB = 22, barY = 8, barH = 26, H = barY + barH + padB;
+  var mins = function (hm) { var q = hm.split(':'); return Number(q[0]) * 60 + Number(q[1]); };
+  var from = Math.min(9 * 60, Math.min.apply(null, blocks.map(function (b) { return mins(b.start); })));
+  var to = Math.max(18 * 60, Math.max.apply(null, blocks.map(function (b) { return mins(b.end); })));
+  from = Math.floor(from / 60) * 60; to = Math.ceil(to / 60) * 60;
+  var X = function (m) { return (W - 2) * (m - from) / Math.max(60, to - from) + 1; };
+  var svg = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '今日の時間割' });
+  for (var t = from; t <= to; t += 60) {
+    svg.appendChild(sv('line', { class: 'gridl', x1: X(t), x2: X(t), y1: barY - 4, y2: barY + barH + 4 }));
+    if ((t - from) % (W < 520 ? 180 : 120) === 0) svg.appendChild(sv('text', { x: X(t), y: H - 6, 'text-anchor': 'middle' }, [(t / 60) + '時']));
+  }
+  var now = jstNow(), nm = now.getUTCHours() * 60 + now.getUTCMinutes();
+  blocks.forEach(function (b) {
+    var x1 = X(mins(b.start)), x2 = X(mins(b.end)), w = Math.max(2, x2 - x1 - 2), c = RD_PLAN_KIND[b.kind] || 'var(--muted)';
+    var g = sv('g', { class: 'lt-hit', tabindex: 0, 'aria-label': b.start + '〜' + b.end + ' ' + b.kind + ' ' + b.title });
+    g.appendChild(sv('rect', { class: 'mk', x: x1, y: barY, width: w, height: barH, rx: 4,
+      style: 'fill:' + c + (b.kind === '余白' || b.kind === '休憩' ? ';stroke:var(--muted);stroke-width:1' : '') }));
+    if (w > 46) g.appendChild(sv('text', { x: x1 + 6, y: barY + barH / 2, 'dominant-baseline': 'central', style: 'fill:' + (b.kind === 'タスク' ? 'var(--letter)' : 'var(--ink)') + ';font-size:11px' },
+      [b.title.length * 11 > w - 10 ? b.title.slice(0, Math.max(1, Math.floor((w - 16) / 11))) + '…' : b.title]));
+    rdTip(g, [{ v: b.start + '–' + b.end, k: b.kind }, { v: b.title, k: '' }, b.why ? { v: '', k: b.why } : null].filter(Boolean));
+    svg.appendChild(g);
+  });
+  if (nm >= from && nm <= to) svg.appendChild(sv('line', { x1: X(nm), x2: X(nm), y1: 2, y2: barY + barH + 6, style: 'stroke:var(--crit);stroke-width:2;stroke-linecap:round' }));
+  fill(chart, [svg]);
 }
 
 /* ───────── 更新ノート（2026-10-26）：業務アプリの更新内容を1か所で書く・直す・公開する ─────────
@@ -3198,6 +4179,122 @@ function mockRoute(p) {
       if (params.get('ai') === 'err') aiv.err = { plan: 'Claude API 529：Overloaded', fixes: '' };
       return ok(aiv);
     }
+    // 見回り（v4・2026-10-29）。見本の盤面（本物は Rounds.gs）。人名は架空。?rounds=none で読み直す前、?rounds=down で1枚読めない
+    case 'rounds': case 'roundsdue': case 'roundsassign': case 'roundsapprove': {
+      if (!db.rounds) {
+        var A2 = { hub: { label: 'デイリーハブ', url: '#' }, haccp: { label: 'HACCP BASE', url: '#' }, brewery: { label: '国稀ブルワリーアプリ', url: '#' }, kanri: { label: '会計管理', url: '#' }, shift: { label: 'シフト自動編成', url: '#' } };
+        var RR = { owner: { n: 1, label: '担当が空', write: true }, nodue: { n: 2, label: '期日が空', write: true }, moved: { n: 3, label: '期日を2回以上動かした', write: true }, stale: { n: 4, label: '14日だれも触っていない' },
+          off: { n: 5, label: '担当者がその日シフトにいない', write: true }, wait: { n: 6, label: '承認待ちが3日を超えた' }, unlink: { n: 7, label: 'プロジェクト・マイルストーンに結びついていない' },
+          dup: { n: 8, label: '個人と全体に同じ題名' }, confirm: { n: 9, label: '要確認が残っている' }, incident: { n: 10, label: '事象の是正が期限切れ' }, gap: { n: 11, label: '記録の抜け' } };
+        var L2 = function (rule, app, title, o) { return Object.assign({ rule: rule, label: RR[rule].label, app: app, id: 'r' + title.length + rule, title: title, url: '#', due: '', who: '', note: '' }, o || {}); };
+        var days = [];
+        for (var i = 0; i < 14; i++) {
+          var dd = addDays(T, i);
+          if (isClosedDay(dd)) { days.push({ date: dd, closed: true }); continue; }
+          var thin = i === 1, st2 = thin ? [{ name: '見本A', start: '10:00', end: '15:00' }, { name: '見本B', start: '17:00', end: '22:00' }] : [{ name: '見本A', start: '10:00', end: '18:00' }, { name: '見本C', start: '16:00', end: '22:00' }];
+          var bands = []; for (var mm = 600; mm < 1320; mm += 30) bands.push({ t: pad(Math.floor(mm / 60)) + ':' + pad(mm % 60), n: st2.filter(function (s) { var a = +s.start.slice(0, 2) * 60 + +s.start.slice(3), b = +s.end.slice(0, 2) * 60 + +s.end.slice(3); return a <= mm && mm < b; }).length });
+          days.push({ date: dd, staff: st2, hours: thin ? 10 : 14, need: 12, guests: i === 2 ? 30 : 0, bands: bands,
+            flags: thin ? ['15:00〜17:00 に誰もいません', 'いつもより手薄（10時間／見込み 12時間）'] : i === 2 ? ['いつもより厚い（14時間／見込み 12時間）'] : [] });
+        }
+        db.rounds = { ready: true, at: now, today: T, closed: isClosedDay(T), apps: A2, rules: RR,
+          users: [{ id: 'u1', name: '見本A' }, { id: 'u2', name: '見本B' }], staff: ['見本A', '見本B', '見本C'],
+          appr: {
+            hub: { can: true, items: [
+              { id: 'ah1', title: '（見本）購入申請：計量カップ', date: addDays(T, 7), time: '', cat: '購入', who: '見本A', cond: '（見本）計量カップが届いている', state: '承認待ち', url: '#' },
+              { id: 'ah2', title: '（見本）冷蔵庫の温度記録の見直し', date: addDays(T, 3), time: '', cat: '作業', who: '見本B', cond: '（見本）記録表が新しくなっている', state: '承認待ち', url: '#' },
+              { id: 'ah3', title: '（見本）グラスの発注', date: addDays(T, 1), time: '', cat: '発注', who: '見本C', cond: '', state: '差し戻し', back: '（見本）数を確かめてから', url: '#' }] },
+            shift: { can: true, sameDay: {}, items: [
+              { id: 'as1', kind: 'new', name: '見本B', date: addDays(T, 2), start: '17:00', end: '22:00', deadline: addDays(T, -1), overdue: true },
+              { id: 'as2', kind: 'new', name: '見本C', date: addDays(T, 3), start: '10:00', end: '15:00', deadline: addDays(T, 1), overdue: false },
+              { id: 'as3', kind: 'change', name: '見本A', date: addDays(T, 4), before: '10:00-15:00', wishStart: '12:00', wishEnd: '17:00', reason: '（見本）通院', requester: '見本A' },
+              { id: 'as4', kind: 'off', name: '見本D', date: addDays(T, 6), reason: '（見本）家の用事', requester: '見本D' }] },
+            haccp: { can: true, me: '小沢健人', items: [
+              { key: 'k1', name: '井水の濁度', step: '受水', ver: 'v2', by: '小沢健人', why: '（見本）基準の見直し', at: addDays(T, -5) + 'T10:00', state: '未承認', self: true, ids: ['h1'], cols: [{ f: '上限', a: '2', b: '1' }] },
+              { key: 'k2', name: '残留塩素', step: '受水', ver: 'v3', by: '見本E', why: '（見本）機器の更新', at: addDays(T, -4) + 'T09:00', state: '未承認', self: false, ids: ['h3'], cols: [{ f: '下限', a: '0.1', b: '0.2' }] }] } },
+          lost: [L2('owner', 'hub', '（見本）仕込み表の更新', { due: addDays(T, 1) }), L2('owner', 'hub', '（見本）グラスの発注', { due: addDays(T, 3) }),
+            L2('nodue', 'hub', '（見本）衛生マニュアルの承認', { who: '見本B' }),
+            L2('unlink', 'hub', '（見本）冬季限定のラベル案', { due: addDays(T, 6), who: '見本A' }), L2('dup', 'hub', '（見本）見積書を送る', { due: addDays(T, 1), who: '' }),
+            L2('wait', 'brewery', '（見本）官能検査の承認待ち L-1020', { due: addDays(T, -9), who: '見本E', note: '9日' }),
+            L2('moved', 'hub', '（見本）作業の表まとめ', { due: addDays(T, 2), who: '見本A', note: '3回' }), L2('stale', 'hub', '（見本）古いタスク', { due: addDays(T, -28), note: '28日' }),
+            L2('off', 'hub', '（見本）冷蔵庫の点検', { due: addDays(T, 1), who: '見本C', note: '見本C は ' + fmtMD(addDays(T, 1)) + ' のシフトにいません' }),
+            L2('confirm', 'brewery', '（見本）T3 °P 2.5→3.1', { note: '逆戻り・確認者が測り直す', who: '見本D' }),
+            L2('incident', 'haccp', '（見本）雨漏り', { due: addDays(T, -9), note: '是正の確認' }), L2('gap', 'haccp', '開店前チェック 60%', { note: '抜け 10日・16日' })],
+          moves: [{ app: 'brewery', at: T + 'T10:30', who: '見本D', what: '°P 3.1→2.6', title: '（見本）L-1024 発酵測定', detail: '打ち間違い' },
+            { app: 'kanri', at: T + 'T10:00', who: '見本E', what: '更新', title: 'materials', detail: '（見本）麦芽の単価 120→130' },
+            { app: 'hub', at: T + 'T09:15', who: '見本A', what: '完了', title: '（見本）開店前点検', detail: '' }],
+          shift: { days: days, pending: 1, pendList: [], perHour: 10000 },
+          money: (function () {   // 見本の今月：営業日の売上は平日6.2万・金土9.8万（計画より少し下）、今日から先は同じ曜日の見込み
+            var ym = T.slice(0, 7), dd = ym + '-01', days = [], act = 0, est = 0, open = 0, done = 0;
+            while (dd.slice(0, 7) === ym) {
+              var o = !isClosedDay(dd), dw = new Date(dd + 'T00:00:00Z').getUTCDay(), v = o ? (dw === 5 || dw === 6 ? 98000 : 62000) : 0;
+              if (o) { open++; if (dd < T) done++; }
+              days.push({ d: dd, open: o, actual: dd < T ? v : null, est: dd >= T && o ? v : null });
+              if (dd < T) act += v; else est += v;
+              dd = addDays(dd, 1);
+            }
+            var plan = 2000000, toDate = Math.round(plan * done / open), labor = Math.round(act * 0.337);
+            return { month: ym, ready: true, days: days,
+              amounts: { planSales: plan, planToDate: toDate, actual: act, forecast: act + est, planLabor: 600000, labor: labor, laborHours: Math.round(labor / 1100 * 10) / 10 },
+              pct: { toDate: Math.round(act / toDate * 100), forecast: Math.round((act + est) / plan * 100), laborRatio: 33.7, planLaborRatio: 30 },
+              openDays: { all: open, done: done, salesDays: done }, note: '（見本）計画は税込を 1.1 で割って税抜に寄せた近似。' };
+          })() };
+      }
+      if (p.action === 'roundsapprove') {
+        var ap = db.rounds.appr, drop = function (list, ids) { ids.forEach(function (i) { var n = list.findIndex(function (x) { return x.id === i || x.key === i; }); if (n >= 0) list.splice(n, 1); }); };
+        if (p.app === 'hub') { if (p.decision === '差し戻し' && !p.reason) return ng('差し戻しの理由を書いてください'); drop(ap.hub.items, String(p.ids).split(',')); }
+        else if (p.app === 'shift') {
+          if (p.decide === 'reject' && !p.reason) return ng('却下の理由を書いてください（スタッフに届きます）');
+          if (p.decide === 'modify' && p.consent !== '1') return ng('時間を直すときは、本人の了承を取ってから「本人了承済み」にチェックしてください');
+          drop(ap.shift.items, String(p.bulk ? p.ids : p.id).split(','));
+        } else if (p.app === 'haccp') {
+          var hg = ap.haccp.items.filter(function (x) { return x.key === p.key; })[0];
+          if (hg && hg.self) return ng('変更した本人（' + hg.by + '）は承認できません。別の人が見てください');
+          if (p.judge === '要確認' && !p.reason) return ng('差し戻すときはコメントを書いてください');
+          drop(ap.haccp.items, [p.key]);
+        }
+      }
+      var rv = JSON.parse(JSON.stringify(db.rounds));
+      rv.lost.sort(function (a, b) { return rv.rules[a.rule].n - rv.rules[b.rule].n; });   // サーバと同じく規則の順
+      if (p.action === 'roundsdue' || p.action === 'roundsassign') {
+        var hit = db.rounds.lost.findIndex(function (x) { return x.id === p.id && x.app === 'hub' && ['owner', 'nodue', 'moved', 'off'].indexOf(x.rule) >= 0; });
+        if (hit < 0) return ng('その行はいま直せる迷子に出ていません');
+        db.rounds.lost.splice(hit, 1); return ok({ id: p.id });
+      }
+      if (params.get('rounds') === 'none' && !p.refresh) return ok({ ready: false, note: 'まだ見回っていません（↻ で読みます）' });
+      if (params.get('rounds') === 'down') { rv.tiles = null; }
+      rv.tiles = Object.keys(rv.apps).map(function (k) {
+        var down = params.get('rounds') === 'down' && k === 'brewery';
+        return { key: k, label: rv.apps[k].label, url: '#', ok: !down, error: down ? 'アクセス権がありません' : '', at: now,
+          lost: rv.lost.filter(function (x) { return x.app === k; }).length, moves: rv.moves.filter(function (x) { return x.app === k; }).length,
+          last: (rv.moves.filter(function (x) { return x.app === k; })[0] || {}).at || '' };
+      });
+      rv.at = now;
+      return ok(rv);
+    }
+    case 'airounds': case 'airoundsrun': {
+      if (!db.airounds) db.airounds = { err: {},
+        digest: { at: now, summary: '（見本）製造は動いていて、HACCP の記録の抜けと承認待ちが溜まっています。明日の夕方に人手の穴があります。',
+          apps: [{ app: 'hub', moved: ['（見本）開店前点検が完了'], stuck: ['（見本）期日を3回動かした作業の表まとめ'] }, { app: 'haccp', moved: [], stuck: ['（見本）検査基準の承認待ち13件'] }],
+          next: { what: '（見本）検査基準の承認を誰かに頼む', why: '（見本）変更した本人は承認できないため', action: { type: 'open_app', app: 'haccp', url: '#', taskId: '', date: '' } } },
+        weekly: { at: now, summary: '（見本）今週は期日の付け替えが多く、記録系のタスクが後ろに回った週でした。製造の記録は毎日入っています。',
+          items: [{ what: '（見本）作業の表まとめの期日が3回動いています', why: '（見本）元になる洗い出しが未提出のまま、期日だけが動いています', action: { type: 'none', app: '', url: '', taskId: '', date: '' } },
+            { what: '（見本）開店前チェックの抜けが週末に集中しています', why: '（見本）土日の朝に新しい人が入っている日と重なっています', action: { type: 'open_app', app: 'haccp', url: '#', taskId: '', date: '' } },
+            { what: '（見本）定休日の夜に会計管理の単価がまとめて直されています', why: '（見本）月末の締めの前の作業と思われます。続くなら定例にできます', action: { type: 'open_app', app: 'kanri', url: '#', taskId: '', date: '' } }] },
+        shift: { at: now, summary: '（見本）明日の15〜17時が空いていて、土曜は予約30名に対して人手が厚めです。',
+          items: [{ date: addDays(T, 1), issue: '（見本）15:00〜17:00 に誰もいません', idea: '（見本）見本C を 15時からに前倒し' },
+            { date: addDays(T, 2), issue: '（見本）予約30名で、いつもより厚い（14時間／見込み 12時間）', idea: '（見本）予約の時間帯に寄せて、見本A の終わりを 16時に' }] },
+        numbers: { at: now, summary: '（見本）今日までは計画の87%、着地は93%の見込みです。人件費率が計画より高めです。',
+          items: [{ what: '（見本）人件費率が計画より3.7ポイント高い', why: '（見本）平日の夜の人手が売上に対して厚い日が続いています', check: '（見本）シフト自動編成の平日の夜の帯' },
+            { what: '（見本）平日の売上が計画を下回っている', why: '（見本）団体の予約が週末に寄っています', check: '（見本）全体スケジュールの予約・団体の入り方' }] } };
+      if (p.action === 'airoundsrun') {
+        if (p.kind === 'shift') db.airounds.shift = { at: now, summary: '（見本）明日の15〜17時が空いています。', items: [{ date: addDays(T, 1), issue: '（見本）15:00〜17:00 に誰もいません', idea: '（見本）見本C を 15時からに' }] };
+        else if (p.kind === 'numbers') db.airounds.numbers = { at: now, summary: '（見本）着地は計画の93%の見込みです。', items: [{ what: '（見本）人件費率が計画より3.7ポイント高い', why: '（見本）平日の夜の人手が厚い', check: '（見本）シフト自動編成の平日の夜' }] };
+        else if (p.kind === 'weekly') db.airounds.weekly = { at: now, summary: '（見本）今週は期日の付け替えが多い週でした。', items: [{ what: '（見本）作業の表まとめの期日が3回動いています', why: '（見本）元の洗い出しが未提出', action: { type: 'none', app: '', url: '', taskId: '', date: '' } }] };
+        else db.airounds.digest.at = now;
+      }
+      var av = JSON.parse(JSON.stringify(db.airounds)); av.ready = params.get('ai') !== 'none'; av.usage = { month: T.slice(0, 7), usd: 1.23, cap: 20, capped: false, calls: 12 };
+      return ok(av);
+    }
     case 'move': { var m = db.sched.find(function (x) { return x.id === p.id; }); if (!m) return ng('そのタスクはありません'); m.date = { start: p.date, time: '', end: '', endTime: '' }; return ok({ id: p.id, date: p.date }); }
     case 'weather': return ok({ place: '増毛', desc: { sun: '晴れ', partly: '晴れ時々くもり', cloud: 'くもり', rain: '雨', snow: '雪' }[params.get('wx') || 'cloud'], icon: params.get('wx') || 'cloud', temp: 12, high: 14, low: 7, rain: params.get('wx') === 'rain' ? 80 : 30,
       day: Array.from({ length: 24 }, function (_, i) { return { h: i, t: Math.round(9 + 5 * Math.sin((i - 8) / 24 * 2 * Math.PI)), p: i >= 15 && i <= 19 ? 60 : 10 }; }) });
@@ -3368,9 +4465,33 @@ function tick() { renderHead(); renderTimeline(); renderTimecard(); if (house ==
 renderTrivia(); renderTopics(); renderWork();
 var first = params.get('house');
 // ?view=canvas はタブレットのホーム画面用（最初からキャンバスで開く）
+/* 昼と夜（v4.4）：自動は増毛の日の出〜日の入を昼にする。手で選んだものはこの端末に覚える（無くても動く） */
+var MODE_KEY = 'cellar.mode';
+function modeGet() { try { return localStorage.getItem(MODE_KEY) || 'auto'; } catch (e) { return 'auto'; } }
+function modeSet(m) { try { localStorage.setItem(MODE_KEY, m); } catch (e) {} applyMode(); }
+function applyMode() {
+  var m = modeGet(), d = jstNow(), sun = sunOf(d), hh = hourOf(d);
+  var t = m === 'day' ? 'light' : m === 'night' ? 'dark' : (hh >= sun.rise && hh < sun.set ? 'light' : 'dark');
+  if (document.documentElement.getAttribute('data-theme') !== t) document.documentElement.setAttribute('data-theme', t);
+  var hm = function (x) { return Math.floor(x) + ':' + pad(Math.round((x % 1) * 60)); };
+  document.querySelectorAll('#modeSw [data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-mode') === m)); });
+  var a = document.querySelector('#modeSw [data-mode="auto"]');
+  if (a) a.title = '増毛の日の出 ' + hm(sun.rise) + '・日の入 ' + hm(sun.set) + ' で切り替える';
+}
+document.querySelectorAll('#modeSw [data-mode]').forEach(function (b) { b.addEventListener('click', function () { modeSet(b.getAttribute('data-mode')); }); });
+applyMode();
+setInterval(applyMode, 60e3);
 setHouse(params.get('view') === 'canvas' ? 'canvas' : 'private', true);
 if (first === 'work' || params.get('view') === 'work') setTimeout(function () { toWork(false); }, 0);
-if (MOCK && params.get('tab') === 'ideas') showTab('ideas');
+// モックだけ：?mock=1&tab=rounds などで仕事ページのそのタブを開く
+if (MOCK && ['ideas', 'notes', 'rel', 'rounds'].indexOf(params.get('tab')) >= 0) {
+  showTab(params.get('tab'));
+  if (params.get('tab') !== 'ideas') setTimeout(function () {
+    var nv = document.querySelector('.w-nav'), sb = nv.querySelector('[aria-selected="true"]');
+    $('#home').scrollTo({ top: $('#home').scrollTop + nv.getBoundingClientRect().top - 8 });
+    if (sb) nv.scrollLeft += sb.getBoundingClientRect().right - nv.getBoundingClientRect().right + 8;   // 開いた直後は帯の幅が決まっていないので、着いてから送る
+  }, 600);
+}
 renderClock();
 if (MOCK) mockPanel();
 if (!token) showGate(); else { loadWork(); loadPrivate(); }
