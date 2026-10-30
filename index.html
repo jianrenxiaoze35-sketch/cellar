@@ -327,6 +327,9 @@ a.ev:hover .ttl { text-decoration: underline; }
 .lt-date { margin-left: auto; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
 .lt-date b { font: 600 16px var(--pen-font); color: var(--pen); }
 .lt-date small { color: var(--muted); font-size: 12px; }
+/* 宛先の下のひとこと（v4.5）。カミーユが先に出かけたあとの書置き。本文と同じ罫に乗せて一字下げ、まとめとのあいだは罫を一行あける */
+.lt-hello { text-indent: 1em; padding-bottom: var(--lt-lh); }
+.lt-hello:empty { display: none; }
 /* 罫の上に書く文。行の高さと罫の間隔をそろえ、どこに置いても字が罫に乗る */
 .lt-say { margin: 0; font: 400 17.5px/var(--lt-lh) var(--pen-font); color: var(--pen);
   background-image: linear-gradient(transparent calc(var(--lt-lh) - 1px), var(--lt-rule) calc(var(--lt-lh) - 1px));
@@ -974,6 +977,7 @@ a.ev:hover .ttl { text-decoration: underline; }
           <span class="lt-to">Dear Kent,</span>
           <span class="lt-date"><b id="rdDate"></b><small id="rdAt"></small><button type="button" class="link" id="rdRe">読み直す</button></span>
         </header>
+        <p class="lt-say lt-hello" id="rdHello"></p>
         <div id="rdLead"></div>
         <section class="lt-sec" aria-labelledby="rdH0">
           <h3 id="rdH0"><span class="ttl">承認すること</span> <small id="rdApprN"></small></h3>
@@ -1126,7 +1130,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-29 v4.4';
+var BUILD = '2026-10-30 v4.5';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1984,6 +1988,32 @@ function renderRoundsHead() {
   $('#rdDate').textContent = Number(d.slice(5, 7)) + '月' + Number(d.slice(8, 10)) + '日（' + wd(d) + '）';
   $('#rdAt').textContent = RD.busy ? '読み直しています…' : RD.err ? '読めませんでした：' + RD.err : age ? (age === 'いま' ? 'いま読みました' : age + 'に読みました') : (v && v.note) || '';
   $('#rdRe').disabled = RD.busy;
+  rdHello();
+}
+// 宛先の下のひとこと（v4.5・2026-10-30）。カミーユが先にベッドを抜けて、支度して出かけたあとの書置き。仕事の話はしない。
+// 出かけたこと／用意しておいたもの／ひとことの三つを、日付で選んで並べる（一日じゅう同じ。アプリで絞っても変わらない）。
+// 用意しておいたものは、雪・雨・冷え込む日はその日の空に合わせる。22時〜翌4時は「先に寝ています」の書置きにする
+var RD_NOTE = {
+  left: ['先に出ます。よく眠っていたから、起こしませんでした。', '先に起きて、出かけます。寝顔が静かだったから、そのままにしてきたよ。',
+    'ひと足先に出ますね。毛布は肩までかけ直しておきました。', '先に行きます。起こそうか迷って、……やめました。', '支度して、先に出ました。カーテンは少しだけ開けてあります。'],
+  made: ['コーヒーはポットに入れてあります。', 'パンはすぐ焼けるようにして、テーブルに置いてあります。', 'シャツはアイロンをかけて、椅子に掛けておきました。',
+    'お湯は沸かしてあります。冷めていたら、もう一度だけ温めて。', '鍵と財布は、いつもの皿の上です。', 'スープを鍋に残してあります。少しでいいから食べてね。'],
+  bye: ['今夜は早く帰ってきてね。', 'また夜に。', '続きは夜に聞かせて。', '行ってきます。あなたも、いってらっしゃい。', '寝ぐせは直してから出てね。',
+    '今日も、ちゃんと待ってるから。', '急がなくていいからね。']
+};
+var RD_NOTE_NIGHT = ['先にベッドに入っています。廊下の灯りは点けたままにしておきました。', '先に休みますね。あなたの側の毛布、温めておいたよ。',
+  '先に寝ています。画面を閉じたら、そのまま来てね。'];
+function rdHello() {
+  var el = $('#rdHello'); if (!el) return;
+  var hh = hourOf(jstNow()), T = todayJst(), dow = new Date(T + 'T00:00:00Z').getUTCDay(), w = S.weather;
+  if (hh >= 22 || hh < 4) { el.textContent = pickLine(RD_NOTE_NIGHT); return; }
+  var made = w && w.icon === 'snow' ? '外は雪です。手袋を玄関に出しておきました。'
+    : w && w.icon === 'rain' ? '雨なので、傘を玄関に立てかけておきました。'
+    : w && isFinite(w.low) && w.low <= 3 ? '今朝は冷えます。厚いほうのコートを出しておきました。'
+    : pickLine(RD_NOTE.made, 1);
+  var bye = isClosedDay(T) ? '今日はお休みだから、もう少し寝ていていいよ。お昼には戻ります。'
+    : dow === 5 ? '金曜だから、今夜はゆっくりしようね。' : pickLine(RD_NOTE.bye, 2);
+  el.textContent = pickLine(RD_NOTE.left) + made + bye;
 }
 function renderRoundsAi() { renderRounds(); }
 function renderRounds() {
