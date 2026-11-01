@@ -171,6 +171,36 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 @media (max-width: 480px) { .w-nav { gap: 14px; } .w-nav button { font-size: 14px; } }
 .w-nav button { border: 0; background: none; padding: 8px 0 10px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
 .w-nav button[aria-selected="true"] { color: var(--ink); border-color: var(--ink); font-weight: 500; }
+/* マップ（2026-11-01）：前に開いたあとに更新されたところが光る */
+.am-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.am-box { border: 1px solid var(--rule); background: var(--sheet); overflow: auto; }
+.am-box svg { display: block; width: 100%; min-width: 700px; height: auto; user-select: none; }
+.am-e { fill: none; stroke: var(--muted); stroke-width: 1; opacity: .45; }
+.am-e.rel { stroke: var(--bottle); stroke-width: 4; opacity: .8; }
+.am-e.off { opacity: .06; }
+.am-rl { font-size: 16px; font-weight: 700; fill: var(--bottle); paint-order: stroke; stroke: var(--sheet); stroke-width: 5px; text-anchor: middle; }
+.am-rl.off { opacity: .08; }
+.am-n { cursor: pointer; outline: none; }
+.am-n text { fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-width: 4px; stroke-linejoin: round; font-size: 17px; }
+.am-n.app text { font-size: 25px; font-weight: 700; }
+.am-n.off { opacity: .12; }
+.am-n.sel circle, .am-n.sel rect, .am-n:focus-visible circle, .am-n:focus-visible rect { stroke: var(--ink); stroke-width: 3; }
+.am-n a:hover { text-decoration: underline; }
+@keyframes amGlow { 0%, 100% { filter: drop-shadow(0 0 2px var(--amber)); } 50% { filter: drop-shadow(0 0 12px var(--amber)) drop-shadow(0 0 4px var(--amber)); } }
+@keyframes amGlowRow { 0%, 100% { background-color: transparent; } 50% { background-color: color-mix(in srgb, var(--amber) 28%, transparent); } }
+.am-n.new circle, .am-n.new rect { stroke: var(--amber); stroke-width: 4; animation: amGlow 1.8s ease-in-out infinite; }
+.am-n.new text { fill: var(--amber); font-weight: 700; }
+.am-list { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.am-list li { padding: 6px 4px; border-bottom: 1px solid var(--rule); overflow-wrap: anywhere; }
+.am-list li.new { animation: amGlowRow 1.8s ease-in-out infinite; }
+.am-list small { color: var(--muted); }
+.am-h { font-size: 13px; color: var(--muted); margin: 16px 0 4px; font-weight: 500; }
+.am-det { margin-top: 12px; font-size: 14px; }
+.am-det h3 { margin: 0 0 4px; font-size: 17px; }
+@media (prefers-reduced-motion: reduce) {
+  .am-n.new circle, .am-n.new rect { animation: none; filter: drop-shadow(0 0 6px var(--amber)); }
+  .am-list li.new { animation: none; background-color: color-mix(in srgb, var(--amber) 22%, transparent); }
+}
 .w-sec h2 { font-size: 15px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: baseline; gap: 8px; }
 .w-sec h2 .n { font-weight: 400; color: var(--muted); font-size: 13px; }
 .w-sec + .w-sec { margin-top: 26px; }
@@ -890,6 +920,7 @@ a.ev:hover .ttl { text-decoration: underline; }
       <button type="button" role="tab" data-tab="notes" aria-selected="false">案件ノート</button>
       <button type="button" role="tab" data-tab="rel" aria-selected="false">更新ノート</button>
       <button type="button" role="tab" data-tab="rounds" aria-selected="false">見回り</button>
+      <button type="button" role="tab" data-tab="map" aria-selected="false">マップ</button>
     </div>
 
     <div class="w-tab" id="tab-sched" role="tabpanel">
@@ -971,6 +1002,12 @@ a.ev:hover .ttl { text-decoration: underline; }
 
     <!-- 見回り（v4・2026-10-29）：4アプリとシフト・収支計画表を読むだけ。書けるのは迷子の行の日付と担当者だけ
          v4.2（同日）：カミーユからの便箋。縹色の罫に手書きの文、数字はインクで描いたチャート。上の並びはアプリで絞る（色の凡例も兼ねる） -->
+    <div class="w-tab" id="tab-map" role="tabpanel" hidden>
+      <div class="am-bar"><span id="amNote"></span><button type="button" class="link" id="amRe">読み直す</button><button type="button" class="link" id="amSeen" hidden>更新を見た</button><a id="amOpen" class="link" target="_blank" rel="noopener" hidden>元の画面を開く ↗</a></div>
+      <div class="am-box"><svg id="amSvg" viewBox="-800 -770 1600 1400" role="img" aria-label="アプリとマスターの関係図"></svg></div>
+      <div class="am-det" id="amDet"></div>
+    </div>
+
     <div class="w-tab" id="tab-rounds" role="tabpanel" hidden>
       <div class="lt-filter" id="rdIdx" role="group" aria-label="アプリで絞る"></div>
       <div class="lt-app" id="rdApp" hidden></div>
@@ -1133,7 +1170,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-01 v4.7';
+var BUILD = '2026-11-01 v4.8';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1889,6 +1926,8 @@ function showTab(tab) {
   $('#tab-notes').hidden = tab !== 'notes';
   $('#tab-rel').hidden = tab !== 'rel';
   $('#tab-rounds').hidden = tab !== 'rounds';
+  $('#tab-map').hidden = tab !== 'map';
+  if (tab === 'map' && !AM.d) amLoad();
   // スマホ幅ではタブの帯が横に流れるので、選んだタブを見えるところへ送る
   var nav = document.querySelector('.w-nav'), sb = nav.querySelector('[data-tab="' + tab + '"]');
   if (sb) { var nr = nav.getBoundingClientRect(), br = sb.getBoundingClientRect(); if (br.right > nr.right || br.left < nr.left) nav.scrollLeft += br.left - nr.left - 8; }
@@ -1897,6 +1936,160 @@ function showTab(tab) {
   if (tab === 'rel' && !RL.data) loadRel();
   if (tab === 'rounds') openRounds(); else closeRounds();
 }
+
+/* ───────── マップ（2026-11-01）─────────
+   別アプリのアクセスマップのシートをサーバ経由で読んで描く。ここからは書かない。
+   更新の控えは端末に置く（前に開いたときとの比べ）。最初の1回は控えを作るだけで光らない */
+var AM = { d: null, sel: '', seen: {}, busy: false };
+var AM_SEEN_KEY = 'cellar.amSeen', AM_COLORS = ['--a-hub', '--a-haccp', '--a-brewery', '--a-kanri', '--a-shift'];
+function amEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function amHref(u) { return /^https:\/\//.test(String(u)) ? amEsc(u) : '#'; }
+function amLink(u, t) { return '<a href="' + amHref(u) + '" target="_blank" rel="noopener">' + amEsc(t) + ' ↗</a>'; }
+function amUpdKey(r) { return 'u:' + r.slice(0, 4).join('|'); }
+function amSigs(d) {
+  var o = {};
+  d.apps.forEach(function (a) { o['a:' + a.k] = a.ver + '|' + a.stamp; });
+  d.masters.forEach(function (m) { o['m:' + m.n] = m.stamp; });
+  d.updates.forEach(function (r) { o[amUpdKey(r)] = '1'; });
+  return o;
+}
+function amSave() { try { localStorage.setItem(AM_SEEN_KEY, JSON.stringify(AM.seen)); } catch (e) {} }
+function amSync(d) {
+  var prev = null, sigs = amSigs(d), next = {};
+  try { prev = JSON.parse(localStorage.getItem(AM_SEEN_KEY) || 'null'); } catch (e) {}
+  Object.keys(sigs).forEach(function (k) {
+    var p = prev && prev[k];
+    next[k] = { s: sigs[k], n: !prev ? false : !p ? true : (p.n || p.s !== sigs[k]) };
+  });
+  AM.seen = next; amSave();
+}
+function amIsNew(k) { return !!(AM.seen[k] && AM.seen[k].n); }
+function amAppName(k) { var a = AM.d.apps.filter(function (x) { return x.k === k; })[0]; return a ? a.n : k; }
+// アプリは、自分の版・更新日か、そのアプリの更新履歴の新しい行で光る
+function amNodeNew(k) {
+  if (amIsNew(k)) return true;
+  if (k.indexOf('a:') !== 0) return false;
+  var name = amAppName(k.slice(2));
+  return AM.d.updates.some(function (r) { return r[1] === name && amIsNew(amUpdKey(r)); });
+}
+function amNewCount() { return Object.keys(AM.seen).filter(function (k) { return AM.seen[k].n; }).length; }
+function amClear(k) {
+  var hit = function (x) { if (AM.seen[x]) AM.seen[x].n = false; };
+  hit(k);
+  if (k.indexOf('a:') === 0) { var name = amAppName(k.slice(2)); AM.d.updates.forEach(function (r) { if (r[1] === name) hit(amUpdKey(r)); }); }
+  amSave();
+}
+function amLoad() {
+  if (AM.busy) return Promise.resolve();
+  AM.busy = true; $('#amRe').disabled = true; $('#amNote').textContent = '読み込み中…';
+  return call('accessmap').then(function (d) {
+    AM.d = d; amSync(d); amRender();
+  }, function (e) { $('#amNote').textContent = 'マップを読めませんでした：' + e.message; }).then(function () { AM.busy = false; $('#amRe').disabled = false; });
+}
+function amPos(d) {
+  var P = function (deg, r) { var a = deg * Math.PI / 180; return [r * Math.cos(a), r * Math.sin(a)]; };
+  var pos = {}, deg = {}, solo = {}, app = {};
+  d.apps.forEach(function (a) { app[a.k] = a; pos['a:' + a.k] = P(a.deg, 330); });
+  d.masters.forEach(function (m) {
+    var u = m.use.filter(function (k) { return app[k]; });
+    m.u = u;
+    if (u.length === 1) { (solo[u[0]] = solo[u[0]] || []).push(m); return; }
+    if (!u.length) return;
+    if (m.x !== null && m.y !== null) { pos['m:' + m.n] = [m.x, m.y]; return; }
+    var x = 0, y = 0; u.forEach(function (k) { x += pos['a:' + k][0]; y += pos['a:' + k][1]; });
+    pos['m:' + m.n] = [x / u.length, y / u.length];
+  });
+  // 1アプリだけのマスターは、そのアプリの外側に扇状に置く
+  Object.keys(solo).forEach(function (k) {
+    var L = solo[k], c = app[k].deg, st = L.length > 10 ? 4.8 : 13;
+    L.forEach(function (m, i) { var a = c + (i - (L.length - 1) / 2) * st; deg[m.n] = a; pos['m:' + m.n] = P(a, 530); });
+  });
+  return { pos: pos, deg: deg, P: P };
+}
+function amNeighbors(k) {
+  var d = AM.d, s = {}; s[k] = 1;
+  if (k.indexOf('a:') === 0) {
+    var a = k.slice(2);
+    d.masters.forEach(function (m) { if (m.u.indexOf(a) >= 0) s['m:' + m.n] = 1; });
+    d.rels.forEach(function (r) { if (r[0] === a) s['a:' + r[1]] = 1; if (r[1] === a) s['a:' + r[0]] = 1; });
+  } else d.masters.forEach(function (m) { if ('m:' + m.n === k) m.u.forEach(function (x) { s['a:' + x] = 1; }); });
+  return s;
+}
+function amRender() {
+  var d = AM.d, G = amPos(d), pos = G.pos, f = function (n) { return n.toFixed(1); }, svg = '';
+  var nb = AM.sel ? amNeighbors(AM.sel) : null;
+  var cls = function (k) { return (nb && !nb[k] ? ' off' : '') + (AM.sel === k ? ' sel' : '') + (amNodeNew(k) ? ' new' : ''); };
+  d.masters.forEach(function (m) {
+    if (!pos['m:' + m.n]) return;
+    var p = pos['m:' + m.n];
+    m.u.forEach(function (k) {
+      var a = pos['a:' + k], on = !nb || AM.sel === 'a:' + k || AM.sel === 'm:' + m.n;
+      svg += '<path class="am-e' + (on ? '' : ' off') + '" d="M' + f(a[0]) + ' ' + f(a[1]) + 'L' + f(p[0]) + ' ' + f(p[1]) + '"/>';
+    });
+  });
+  var rels = d.rels.filter(function (r) { return pos['a:' + r[0]] && pos['a:' + r[1]]; });
+  rels.forEach(function (r) {
+    var a = pos['a:' + r[0]], b = pos['a:' + r[1]], on = !nb || AM.sel === 'a:' + r[0] || AM.sel === 'a:' + r[1];
+    svg += '<path class="am-e rel' + (on ? '' : ' off') + '" d="M' + f(a[0]) + ' ' + f(a[1]) + 'L' + f(b[0]) + ' ' + f(b[1]) + '"/>';
+  });
+  d.masters.forEach(function (m) {
+    var p = pos['m:' + m.n], k = 'm:' + m.n;
+    if (!p) return;
+    var shared = m.u.length > 1, s = shared ? 8 : 5, label;
+    if (shared) label = '<text x="' + f(p[0]) + '" y="' + f(p[1] - 13) + '" text-anchor="middle">' + amEsc(m.n) + '</text>';
+    else {
+      var a = G.deg[m.n], left = Math.cos(a * Math.PI / 180) < 0, q = G.P(a, 14), tx = f(p[0] + q[0]), ty = f(p[1] + q[1]);
+      label = '<text x="' + tx + '" y="' + ty + '" dy=".35em" text-anchor="' + (left ? 'end' : 'start') + '" transform="rotate(' + f(left ? a + 180 : a) + ' ' + tx + ' ' + ty + ')">' + amEsc(m.n) + '</text>';
+    }
+    svg += '<g class="am-n mas' + cls(k) + '" data-k="' + amEsc(k) + '" tabindex="0" role="button" aria-label="マスター ' + amEsc(m.n) + (amNodeNew(k) ? '（更新あり）' : '') + '"><rect x="' + f(p[0] - s) + '" y="' + f(p[1] - s) + '" width="' + 2 * s + '" height="' + 2 * s + '" rx="' + (m.kind === 'スプレッドシート' ? 0 : 3) + '" fill="' + (shared ? 'var(--ink)' : 'var(--muted)') + '"/>' + label + '</g>';
+  });
+  rels.forEach(function (r) {
+    var a = pos['a:' + r[0]], b = pos['a:' + r[1]], on = !nb || AM.sel === 'a:' + r[0] || AM.sel === 'a:' + r[1];
+    svg += '<text class="am-rl' + (on ? '' : ' off') + '" x="' + f(a[0] + (b[0] - a[0]) * .4) + '" y="' + f(a[1] + (b[1] - a[1]) * .4 + 5) + '">' + amEsc(r[2]) + '</text>';
+  });
+  d.apps.forEach(function (a) {
+    var k = 'a:' + a.k, p = pos[k];
+    svg += '<g class="am-n app' + cls(k) + '" data-k="' + amEsc(k) + '" tabindex="0" role="button" aria-label="アプリ ' + amEsc(a.n) + (amNodeNew(k) ? '（更新あり）' : '') + '"><circle cx="' + f(p[0]) + '" cy="' + f(p[1]) + '" r="20" fill="var(' + AM_COLORS[a.c % AM_COLORS.length] + ')"/><text x="' + f(p[0]) + '" y="' + f(p[1] + (p[1] > 0 ? 46 : -30)) + '" text-anchor="middle">' + amEsc(a.n) + '</text></g>';
+  });
+  $('#amSvg').innerHTML = svg;
+  var n = amNewCount();
+  $('#amNote').textContent = n ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + n + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。';
+  $('#amSeen').hidden = !n;
+  if (d.url) { $('#amOpen').href = d.url; $('#amOpen').hidden = false; }
+  amDetail();
+}
+function amDetail() {
+  var d = AM.d, k = AM.sel, html = '';
+  var upRow = function (r) { return '<li' + (amIsNew(amUpdKey(r)) ? ' class="new"' : '') + '><small>' + amEsc(r[0]) + '</small> <b>' + amEsc(r[1]) + '</b> <small>' + amEsc(r[2]) + '</small><br>' + amEsc(r[3]) + '</li>'; };
+  if (k.indexOf('a:') === 0) {
+    var a = d.apps.filter(function (x) { return 'a:' + x.k === k; })[0];
+    if (a) {
+      html += '<h3>' + amEsc(a.n) + '</h3><small>' + amEsc(a.st) + '・' + amEsc(a.ver) + '・コード更新 ' + amEsc(a.stamp || '未取得') + '</small><p>' + amEsc(a.d) + '</p><p>' + amLink(a.url, 'アプリを開く') + (a.gas ? '　' + amLink(a.gas, 'GASエディタ') : '') + '</p>';
+      var us = d.updates.filter(function (r) { return r[1] === a.n; }), rs = d.rels.filter(function (r) { return r[0] === a.k || r[1] === a.k; });
+      if (rs.length) html += '<div class="am-h">直接の接続</div><ul class="am-list">' + rs.map(function (r) { return '<li><b>' + amEsc(amAppName(r[0])) + '</b> ↔ <b>' + amEsc(amAppName(r[1])) + '</b><br>' + amEsc(r[3]) + '</li>'; }).join('') + '</ul>';
+      if (us.length) html += '<div class="am-h">更新</div><ul class="am-list">' + us.map(upRow).join('') + '</ul>';
+      html += '<div class="am-h">マスター</div><ul class="am-list">' + d.masters.filter(function (m) { return m.u.indexOf(a.k) >= 0; }).map(function (m) { return '<li>' + amLink(m.url, m.n) + ' <small>' + amEsc((m.stamp || '').slice(0, 10)) + '</small></li>'; }).join('') + '</ul>';
+    }
+  } else if (k) {
+    var m = d.masters.filter(function (x) { return 'm:' + x.n === k; })[0];
+    if (m) html += '<h3>' + amEsc(m.n) + '</h3><small>' + amEsc(m.kind) + '・最終更新 ' + amEsc(m.stamp || '未取得') + '</small><p>' + amLink(m.url, 'マスターを開く') + '</p><div class="am-h">使っているアプリ</div><ul class="am-list">' + m.u.map(function (x) { return '<li>' + amEsc(amAppName(x)) + '</li>'; }).join('') + '</ul>';
+  } else {
+    html += '<div class="am-h">直近の更新</div><ul class="am-list">' + (d.updates.slice(0, 10).map(upRow).join('') || '<li>まだありません。</li>') + '</ul>';
+    if (d.alerts.length) html += '<div class="am-h">確かめること</div><ul class="am-list">' + d.alerts.map(function (r) { return '<li><b>' + amEsc(r[1]) + '</b>：' + amEsc(r[2]) + '</li>'; }).join('') + '</ul>';
+  }
+  $('#amDet').innerHTML = html;
+}
+function amPick(g) {
+  var k = g ? g.getAttribute('data-k') : '';
+  var wasNew = k && amNodeNew(k);
+  AM.sel = AM.sel === k ? '' : k;
+  amRender();              // 光っていた行を詳しい欄で見せてから、控えを消す
+  if (wasNew) { amClear(k); var keep = AM.sel; [].forEach.call($('#amSvg').querySelectorAll('.am-n'), function (x) { if (x.getAttribute('data-k') === k) x.classList.remove('new'); }); var c = amNewCount(); $('#amNote').textContent = c ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + c + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。'; $('#amSeen').hidden = !c; AM.sel = keep; }
+}
+$('#amSvg').addEventListener('click', function (e) { amPick(e.target.closest('.am-n')); });
+$('#amSvg').addEventListener('keydown', function (e) { var g = e.target.closest('.am-n'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); amPick(g); } });
+$('#amRe').addEventListener('click', amLoad);
+$('#amSeen').addEventListener('click', function () { Object.keys(AM.seen).forEach(function (k) { AM.seen[k].n = false; }); amSave(); amRender(); });
 
 /* ───────── 見回り（v4・2026-10-29）─────────
    盤面はサーバ（Rounds.gs）が組む。開いたら置いてある盤面をすぐ出し、間隔が来たものだけ裏で読み直す（refresh=1）。
@@ -4489,6 +4682,18 @@ function mockRoute(p) {
     }
     case 'tastingdel': db.tastings = db.tastings.filter(function (x) { return x.id !== p.id; }); return ok({ items: db.tastings });
     // 更新ノート（2026-10-26）。アプリ名は架空（本物はサーバの REL が返す）
+    // マップ（2026-11-01）。名前はすべて架空（本物はサーバが返す）
+    case 'accessmap':
+      return ok({ url: 'https://example.com/map',
+        apps: [{ k: 'a', n: '見本アプリA', c: 0, deg: -90, st: '稼働', ver: 'v3', url: 'https://example.com/a', gas: '', d: '（見本）入口のアプリ', stamp: '2026-10-30 10:00' },
+          { k: 'b', n: '見本アプリB', c: 1, deg: 30, st: '稼働', ver: 'v2', url: 'https://example.com/b', gas: '', d: '（見本）記録のアプリ', stamp: '2026-10-29 10:00' },
+          { k: 'c', n: '見本アプリC', c: 2, deg: 150, st: '稼働', ver: 'v5', url: 'https://example.com/c', gas: '', d: '（見本）在庫のアプリ', stamp: '' }],
+        masters: [{ n: '見本の共有マスター', kind: 'Notion', url: 'https://example.com/m1', use: ['a', 'b'], x: null, y: null, stamp: '2026-10-31 09:00' },
+          { n: '見本の表', kind: 'スプレッドシート', url: 'https://example.com/m2', use: ['b', 'c'], x: 120, y: 60, stamp: '2026-10-28 09:00' },
+          { n: '見本の専用マスター', kind: 'Notion', url: 'https://example.com/m3', use: ['c'], x: null, y: null, stamp: '' }],
+        rels: [['a', 'b', '読む', '（見本）AがBを読む', '（見本）']],
+        updates: [['2026-10-31', '見本アプリA', 'v3', '（見本）一覧を直しました', '見本'], ['2026-10-20', '見本アプリB', 'v2', '（見本）項目を足しました', '見本']],
+        alerts: [['x1', '見本アプリC', '（見本）更新日が取れません', '', '']] });
     case 'releases': case 'releaseSave': case 'releaseState': {
       var RO = { apps: ['見本アプリA', '見本アプリB', '見本アプリC', '全アプリ'], kinds: ['新機能', '改善', '修正', 'お知らせ', '注意'],
         who: ['全員', 'ホール', 'キッチン', '醸造', '管理者'], states: ['下書き', '公開', '取り下げ'] };
