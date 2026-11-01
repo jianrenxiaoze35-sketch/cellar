@@ -329,6 +329,8 @@ a.ev:hover .ttl { text-decoration: underline; }
 .lt-date small { color: var(--muted); font-size: 12px; }
 /* 宛先の下のひとこと（v4.5）。カミーユが先に出かけたあとの書置き。本文と同じ罫に乗せて一字下げ、まとめとのあいだは罫を一行あける */
 .lt-hello { text-indent: 1em; padding-bottom: var(--lt-lh); }
+#rdHello { padding-bottom: 0; }
+#rdBack { padding-bottom: var(--lt-lh); }
 .lt-hello:empty { display: none; }
 /* 罫の上に書く文。行の高さと罫の間隔をそろえ、どこに置いても字が罫に乗る */
 .lt-say { margin: 0; font: 400 17.5px/var(--lt-lh) var(--pen-font); color: var(--pen);
@@ -975,9 +977,10 @@ a.ev:hover .ttl { text-decoration: underline; }
       <article class="letter" aria-label="Camille から Kent への見回りの便箋">
         <header class="lt-head">
           <span class="lt-to">Dear Kent,</span>
-          <span class="lt-date"><b id="rdDate"></b><small id="rdAt"></small><button type="button" class="link" id="rdRe">読み直す</button></span>
+          <span class="lt-date"><b id="rdDate"></b><small id="rdAt"></small><button type="button" class="link" id="rdRe">読み直す</button><button type="button" class="act" id="rdRewrite">便箋を書き直す</button></span>
         </header>
         <p class="lt-say lt-hello" id="rdHello"></p>
+        <p class="lt-say" id="rdBack"></p>
         <div id="rdLead"></div>
         <section class="lt-sec" aria-labelledby="rdH0">
           <h3 id="rdH0"><span class="ttl">承認すること</span> <small id="rdApprN"></small></h3>
@@ -1015,7 +1018,7 @@ a.ev:hover .ttl { text-decoration: underline; }
           <h3 id="rdH5"><span class="ttl">今週のこと</span></h3>
           <div id="rdWeek"></div>
         </section>
-        <footer class="lt-close"><p class="lt-ps" id="rdPS"></p><span class="lt-from">Yours, Camille<svg class="lt-flourish" viewBox="0 0 150 20" aria-hidden="true"><path d="M6 13 C 26 4, 44 18, 66 11 S 104 3, 118 9 C 128 13, 136 15, 146 8"/></svg></span><small id="rdUse"></small></footer>
+        <footer class="lt-close"><p class="lt-ps" id="rdPS"></p><p class="lt-ps" id="rdRest"></p><span class="lt-from">Yours, Camille<svg class="lt-flourish" viewBox="0 0 150 20" aria-hidden="true"><path d="M6 13 C 26 4, 44 18, 66 11 S 104 3, 118 9 C 128 13, 136 15, 146 8"/></svg></span><small id="rdUse"></small></footer>
       </article>
       <div class="lt-tip" id="rdTip" role="status" hidden></div>
     </div>
@@ -1130,7 +1133,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-10-30 v4.5';
+var BUILD = '2026-11-01 v4.6';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1649,9 +1652,9 @@ function aiCreate(btn, title, date) {
     function (e) { toast('作れませんでした：' + e.message, true); }).then(function () { btn.classList.remove('busy'); });
 }
 function aiRun(kind, args) {
-  if (AI.busy) return;
+  if (AI.busy) return Promise.resolve();
   AI.busy = kind; renderAi();
-  call(kind === 'plan' ? 'aiplan' : 'aifix', args || {}, { wait: 200000, once: true })
+  return call(kind === 'plan' ? 'aiplan' : 'aifix', args || {}, { wait: 200000, once: true })
     .then(function (d) { AI.d = d; var e = (d.err || {})[kind === 'plan' ? 'plan' : 'fixes']; if (e) toast('作れませんでした：' + e, true); },
       function (e) { toast('作れませんでした：' + e.message, true); })
     .then(function () { AI.busy = ''; renderAi(); });
@@ -1988,6 +1991,7 @@ function renderRoundsHead() {
   $('#rdDate').textContent = Number(d.slice(5, 7)) + '月' + Number(d.slice(8, 10)) + '日（' + wd(d) + '）';
   $('#rdAt').textContent = RD.busy ? '読み直しています…' : RD.err ? '読めませんでした：' + RD.err : age ? (age === 'いま' ? 'いま読みました' : age + 'に読みました') : (v && v.note) || '';
   $('#rdRe').disabled = RD.busy;
+  rdRewriteBtn();
   rdHello();
 }
 // 宛先の下のひとこと（v4.5・2026-10-30）。カミーユが先にベッドを抜けて、支度して出かけたあとの書置き。仕事の話はしない。
@@ -2003,15 +2007,32 @@ var RD_NOTE = {
 };
 var RD_NOTE_NIGHT = ['先にベッドに入っています。廊下の灯りは点けたままにしておきました。', '先に休みますね。あなたの側の毛布、温めておいたよ。',
   '先に寝ています。画面を閉じたら、そのまま来てね。'];
+// カミーユの休憩（2026-11-01）：自動で更新する時刻を、カミーユが休憩に様子を見に戻る時刻として書く。
+// 時刻は GAS の時間トリガーの写し（aiMorning 6:30／aiNoon 12:30／aiEvening 18:30／aiWeeklyRun 日曜 19:30／roundsNight 23:30／roundsPulse 30分ごと 7〜23時）。
+// トリガーは前後15分ほどずれるので「ごろ」と書く。トリガーを変えたらここも直す
+var RD_REST = 'わたしの休憩は、朝の6時半、お昼の12時半、夕方の6時半。そのたびに、あなたの様子を見に戻ってきます。' +
+  '朝は今日の段取りを、お昼は気になることとまとめを、夕方はまとめを、この便箋に書き足しておくね。' +
+  '月曜の朝はシフトと数字も見ておきます。日曜は夜の7時半にも、一週間の話をしに戻ります。' +
+  '合間も30分おきに（朝7時から夜11時台まで）、帳面だけそっと覗いています。夜11時半に今日の控えを取ったら、わたしもおしまい。';
+function rdBackLine(hh, dow) {
+  if (hh < 6.5) return '朝の6時半ごろ、起きたらいちばんに様子を見に来ます。';
+  if (hh < 12.5) return '次はお昼の休憩、12時半ごろに様子を見に戻ります。';
+  if (hh < 18.5) return '次は夕方の休憩、6時半ごろに様子を見に戻ります。';
+  if (dow === 0 && hh < 19.5) return '次は夜の7時半ごろ、一週間の話をしに戻ります。';
+  if (hh < 23.5) return '次は夜の11時半ごろ、今日の控えを取りながら、もう一度だけ顔を見に来ます。';
+  return '今日はここまで。朝の6時半ごろ、また様子を見に来ます。';
+}
 function rdHello() {
   var el = $('#rdHello'); if (!el) return;
   var hh = hourOf(jstNow()), T = todayJst(), dow = new Date(T + 'T00:00:00Z').getUTCDay(), w = S.weather;
+  $('#rdBack').textContent = rdBackLine(hh, dow);
+  $('#rdRest').textContent = RD_REST;
   if (hh >= 22 || hh < 4) { el.textContent = pickLine(RD_NOTE_NIGHT); return; }
   var made = w && w.icon === 'snow' ? '外は雪です。手袋を玄関に出しておきました。'
     : w && w.icon === 'rain' ? '雨なので、傘を玄関に立てかけておきました。'
     : w && isFinite(w.low) && w.low <= 3 ? '今朝は冷えます。厚いほうのコートを出しておきました。'
     : pickLine(RD_NOTE.made, 1);
-  var bye = isClosedDay(T) ? '今日はお休みだから、もう少し寝ていていいよ。お昼には戻ります。'
+  var bye = isClosedDay(T) ? (hh < 12.5 ? '今日はお休みだから、もう少し寝ていていいよ。お昼には戻ります。' : '今日はお休みだから、ゆっくりしていてね。')
     : dow === 5 ? '金曜だから、今夜はゆっくりしようね。' : pickLine(RD_NOTE.bye, 2);
   el.textContent = pickLine(RD_NOTE.left) + made + bye;
 }
@@ -2396,13 +2417,43 @@ function rdAiAct(a, what) {
   return null;
 }
 function rdRunAi(kind) {
-  if (RD.run) return;
+  if (RD.run) return Promise.resolve();
   RD.run = kind; renderRounds();
-  call('airoundsrun', { kind: kind }, { wait: 200000, once: true })
+  return call('airoundsrun', { kind: kind }, { wait: 200000, once: true })
     .then(function (d) { RD.ai = d; if ((d.err || {})[kind]) toast('書けませんでした：' + d.err[kind], true); }, function (e) { toast('書けませんでした：' + e.message, true); })
     .then(function () { RD.run = ''; renderRounds(); });
 }
 $('#rdRe').addEventListener('click', function () { loadRounds(2); });
+/* 便箋を書き直す（2026-11-01）：盤面を全部読み直してから、カミーユの書くところを順に書き直す。
+   段取り・気になること・まとめは毎回。週のこと・シフト・数字は、すでに便箋に載っているものだけ（無いものは定時に任せる）。
+   書けなかった欄は前の文を残す（サーバがそうする）。送り直さないので、押した回数だけ料金がかかる */
+var RD_REWRITE_NAME = { read: '読み直し', plan: '段取り', fix: '気になること', digest: 'まとめ', weekly: '週のこと', shift: '人手', numbers: '数字' };
+function rdRewriteBtn() {
+  var b = $('#rdRewrite'), ai = RD.ai || {}; if (!b) return;
+  b.textContent = RD.rewrite ? '書き直しています…（' + RD_REWRITE_NAME[RD.rewrite] + '）' : '便箋を書き直す';
+  b.disabled = !ai.ready || !!RD.rewrite || !!RD.run || !!AI.busy || RD.busy;
+}
+function rdRewrite() {
+  if (RD.rewrite || RD.run || AI.busy || RD.busy || !(RD.ai || {}).ready) return;
+  var ai = RD.ai, kinds = ['digest'].concat(['weekly', 'shift', 'numbers'].filter(function (k) { return ai[k]; }));
+  var steps = [
+    { key: 'read', run: function () { return loadRounds(2); } },
+    { key: 'plan', run: function () { return aiRun('plan'); } },
+    { key: 'fix', run: function () { return aiRun('fix'); } }
+  ].concat(kinds.map(function (k) { return { key: k, run: function () { return rdRunAi(k); } }; }));
+  RD.rewrite = 'read'; rdRewriteBtn();
+  var chain = Promise.resolve();
+  steps.forEach(function (st) {
+    chain = chain.then(function () { RD.rewrite = st.key; rdRewriteBtn(); return st.run(); });
+  });
+  chain.then(function () {
+    RD.rewrite = ''; rdRewriteBtn();
+    var e1 = (AI.d && AI.d.err) || {}, e2 = (RD.ai && RD.ai.err) || {};
+    var bad = (e1.plan ? 1 : 0) + (e1.fixes ? 1 : 0) + kinds.filter(function (k) { return e2[k]; }).length;
+    toast(bad ? '書けなかった欄が ' + bad + ' つあります（前の文を残しました）' : '便箋を書き直しました', !!bad);
+  });
+}
+$('#rdRewrite').addEventListener('click', rdRewrite);
 // 幅が変わったら描き直す（チャートは幅に合わせて描くため）
 var rdResizeT = null;
 window.addEventListener('resize', function () { if ($('#tab-rounds').hidden || !RD.v) return; clearTimeout(rdResizeT); rdResizeT = setTimeout(renderRounds, 200); });
