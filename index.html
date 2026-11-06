@@ -196,10 +196,20 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .am-list small { color: var(--muted); }
 .am-h { font-size: 13px; color: var(--muted); margin: 16px 0 4px; font-weight: 500; }
 .am-det { margin-top: 12px; font-size: 14px; }
+/* 各アプリの入口（v4.9）：地図の上にいつも出す。光り方は地図の点と同じ */
+.am-go { list-style: none; margin: 0 0 10px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; }
+.am-go li { display: flex; align-items: center; gap: 8px; border: 1px solid var(--rule); background: var(--sheet); padding: 0 10px; min-height: 44px; font-size: 14px; }
+.am-go li.new { border-color: var(--amber); animation: amGlowRow 1.8s ease-in-out infinite; }
+.am-go i { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.am-go a.go { flex: 1; min-width: 0; color: var(--ink); text-decoration: none; font-weight: 700; overflow-wrap: anywhere; padding: 10px 0; }
+.am-go a.go:hover { text-decoration: underline; }
+.am-go span.go { flex: 1; color: var(--muted); }
+.am-go small { flex: none; color: var(--muted); }
+.am-go small a { color: var(--muted); }
 .am-det h3 { margin: 0 0 4px; font-size: 17px; }
 @media (prefers-reduced-motion: reduce) {
   .am-n.new circle, .am-n.new rect { animation: none; filter: drop-shadow(0 0 6px var(--amber)); }
-  .am-list li.new { animation: none; background-color: color-mix(in srgb, var(--amber) 22%, transparent); }
+  .am-list li.new, .am-go li.new { animation: none; background-color: color-mix(in srgb, var(--amber) 22%, transparent); }
 }
 .w-sec h2 { font-size: 15px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: baseline; gap: 8px; }
 .w-sec h2 .n { font-weight: 400; color: var(--muted); font-size: 13px; }
@@ -1004,6 +1014,7 @@ a.ev:hover .ttl { text-decoration: underline; }
          v4.2（同日）：カミーユからの便箋。縹色の罫に手書きの文、数字はインクで描いたチャート。上の並びはアプリで絞る（色の凡例も兼ねる） -->
     <div class="w-tab" id="tab-map" role="tabpanel" hidden>
       <div class="am-bar"><span id="amNote"></span><button type="button" class="link" id="amRe">読み直す</button><button type="button" class="link" id="amSeen" hidden>更新を見た</button><a id="amOpen" class="link" target="_blank" rel="noopener" hidden>元の画面を開く ↗</a></div>
+      <ul class="am-go" id="amGo" aria-label="アプリを開く"></ul>
       <div class="am-box"><svg id="amSvg" viewBox="-800 -770 1600 1400" role="img" aria-label="アプリとマスターの関係図"></svg></div>
       <div class="am-det" id="amDet"></div>
     </div>
@@ -1170,7 +1181,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-01 v4.8';
+var BUILD = '2026-11-06 v4.9';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -2052,11 +2063,21 @@ function amRender() {
     svg += '<g class="am-n app' + cls(k) + '" data-k="' + amEsc(k) + '" tabindex="0" role="button" aria-label="アプリ ' + amEsc(a.n) + (amNodeNew(k) ? '（更新あり）' : '') + '"><circle cx="' + f(p[0]) + '" cy="' + f(p[1]) + '" r="20" fill="var(' + AM_COLORS[a.c % AM_COLORS.length] + ')"/><text x="' + f(p[0]) + '" y="' + f(p[1] + (p[1] > 0 ? 46 : -30)) + '" text-anchor="middle">' + amEsc(a.n) + '</text></g>';
   });
   $('#amSvg').innerHTML = svg;
+  amGo();
   var n = amNewCount();
   $('#amNote').textContent = n ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + n + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。';
   $('#amSeen').hidden = !n;
   if (d.url) { $('#amOpen').href = d.url; $('#amOpen').hidden = false; }
   amDetail();
+}
+// 各アプリの入口。名前を押すとそのアプリが開く（GASエディタは小さく横に）
+function amGo() {
+  $('#amGo').innerHTML = AM.d.apps.map(function (a) {
+    var ok = amHref(a.url) !== '#', isNew = amNodeNew('a:' + a.k);
+    return '<li' + (isNew ? ' class="new"' : '') + '><i style="background:var(' + AM_COLORS[a.c % AM_COLORS.length] + ')"></i>' +
+      (ok ? '<a class="go" href="' + amHref(a.url) + '" target="_blank" rel="noopener">' + amEsc(a.n) + ' ↗</a>' : '<span class="go">' + amEsc(a.n) + '（入口なし）</span>') +
+      '<small>' + amEsc(a.ver) + (amHref(a.gas) !== '#' ? '・' + amLink(a.gas, 'GAS') : '') + '</small></li>';
+  }).join('');
 }
 function amDetail() {
   var d = AM.d, k = AM.sel, html = '';
@@ -2084,7 +2105,7 @@ function amPick(g) {
   var wasNew = k && amNodeNew(k);
   AM.sel = AM.sel === k ? '' : k;
   amRender();              // 光っていた行を詳しい欄で見せてから、控えを消す
-  if (wasNew) { amClear(k); var keep = AM.sel; [].forEach.call($('#amSvg').querySelectorAll('.am-n'), function (x) { if (x.getAttribute('data-k') === k) x.classList.remove('new'); }); var c = amNewCount(); $('#amNote').textContent = c ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + c + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。'; $('#amSeen').hidden = !c; AM.sel = keep; }
+  if (wasNew) { amClear(k); var keep = AM.sel; [].forEach.call($('#amSvg').querySelectorAll('.am-n'), function (x) { if (x.getAttribute('data-k') === k) x.classList.remove('new'); }); amGo(); var c = amNewCount(); $('#amNote').textContent = c ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + c + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。'; $('#amSeen').hidden = !c; AM.sel = keep; }
 }
 $('#amSvg').addEventListener('click', function (e) { amPick(e.target.closest('.am-n')); });
 $('#amSvg').addEventListener('keydown', function (e) { var g = e.target.closest('.am-n'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); amPick(g); } });
@@ -4685,9 +4706,9 @@ function mockRoute(p) {
     // マップ（2026-11-01）。名前はすべて架空（本物はサーバが返す）
     case 'accessmap':
       return ok({ url: 'https://example.com/map',
-        apps: [{ k: 'a', n: '見本アプリA', c: 0, deg: -90, st: '稼働', ver: 'v3', url: 'https://example.com/a', gas: '', d: '（見本）入口のアプリ', stamp: '2026-10-30 10:00' },
+        apps: [{ k: 'a', n: '見本アプリA', c: 0, deg: -90, st: '稼働', ver: 'v3', url: 'https://example.com/a', gas: 'https://example.com/a-edit', d: '（見本）入口のアプリ', stamp: '2026-10-30 10:00' },
           { k: 'b', n: '見本アプリB', c: 1, deg: 30, st: '稼働', ver: 'v2', url: 'https://example.com/b', gas: '', d: '（見本）記録のアプリ', stamp: '2026-10-29 10:00' },
-          { k: 'c', n: '見本アプリC', c: 2, deg: 150, st: '稼働', ver: 'v5', url: 'https://example.com/c', gas: '', d: '（見本）在庫のアプリ', stamp: '' }],
+          { k: 'c', n: '見本アプリC', c: 2, deg: 150, st: '稼働', ver: 'v5', url: '', gas: '', d: '（見本）在庫のアプリ', stamp: '' }],
         masters: [{ n: '見本の共有マスター', kind: 'Notion', url: 'https://example.com/m1', use: ['a', 'b'], x: null, y: null, stamp: '2026-10-31 09:00' },
           { n: '見本の表', kind: 'スプレッドシート', url: 'https://example.com/m2', use: ['b', 'c'], x: 120, y: 60, stamp: '2026-10-28 09:00' },
           { n: '見本の専用マスター', kind: 'Notion', url: 'https://example.com/m3', use: ['c'], x: null, y: null, stamp: '' }],
