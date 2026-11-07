@@ -52,7 +52,7 @@ button, input, textarea { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
 .house { position: fixed; inset: 0; overflow: auto; transition: opacity 1.2s ease, visibility 0s linear 1.2s; opacity: 0; visibility: hidden; }
-body[data-house="private"] #home, body[data-house="room"] #room, body[data-house="canvas"] #canvas { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
+body[data-house="private"] #home, body[data-house="room"] #room { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
 body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 
 /* ───────── ひとつのページ（2026-10-22）：上がプライベート、下へスクロールすると仕事 ───────── */
@@ -301,42 +301,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 .memos .of { font-size: 12px; color: var(--bottle); }
 .memos .empty { color: var(--muted); font-size: 14px; border: 0; }
 /* 案件ノート（2026-10-10）：冊を選び、1行ずつ積む。古い行はぼかし、触ると見える */
-.nlock { max-width: 420px; }
-.nlock p { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
-.nlock input { width: 100%; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 9px 12px; font-size: 16px; }
-.nlock .row3 { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
-.nbooks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
-.nbooks button { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 4px 14px; cursor: pointer; font-size: 14px; }
-.nbooks button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.nbooks .c { font-size: 12px; opacity: .7; margin-left: 6px; }
-.nwrap { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 28px 44px; }
-@media (max-width: 860px) { .nwrap { grid-template-columns: 1fr; } }
-.nhead { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-.nhead label { display: flex; align-items: center; gap: 6px; }
-.nhead input { border: 0; border-bottom: 1px solid var(--rule); background: transparent; padding: 2px 4px; font-size: 13px; color: var(--ink); min-width: 0; }
-.nhead input[type=text] { width: 9em; }
-.nhead input.wide { width: 16em; }
-.nhead .due input { color: var(--late); font-weight: 700; }
-.nadd { display: flex; gap: 8px; }
-.nadd input { flex: 1; min-width: 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); padding: 9px 12px; font-size: 16px; }
-.nadd select { max-width: 11em; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); font-size: 13px; padding: 0 6px; }
-.ncam { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
-.ncam b { color: var(--bottle); font-weight: 500; margin-right: 6px; }
-.nlines { list-style: none; margin: 14px 0 0; padding: 0; }
-.nlines li { padding: 9px 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 0 12px; }
-.nlines .at { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
-.nlines .tx { white-space: pre-wrap; overflow-wrap: anywhere; }
-.nlines .tk { display: block; font-size: 12px; color: var(--bottle); }
-.nlines li.old .tx { filter: blur(5px); cursor: pointer; transition: filter .25s ease; user-select: none; }
-.nlines li.old.shown .tx { filter: none; user-select: auto; }
-.nlines .more { border: 0; }
-.ntasks .time { grid-template-columns: 52px minmax(0, 1fr) auto; }
-.ntasks .cnt { font-size: 12px; color: var(--muted); }
 
-/* 更新ノート（2026-10-26） */
-.rl-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
-.rl-bar select { border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); font-size: 14px; padding: 5px 8px; }
-.rl-bar .gap { flex: 1; }
 /* 見回り：カミーユからの便箋（v4.2・2026-10-29）。白い便箋に縹色の罫と枠。カミーユの文は罫の上に手書き（Klee One）、
    チャートは罫の途切れたところに貼った図。1系列のグラフはインクの色、アプリの色は「どのアプリか」を示すときだけ
    （分類色の1〜5番を固定の順で。ライト・ダーク とも validate_palette.js を通した） */
@@ -484,31 +449,6 @@ a.ev:hover .ttl { text-decoration: underline; }
   .lt-say { font-size: 16px; --lt-lh: 31px; }
   .lt-stat b { font-size: 22px; }
 }
-.rl-latest { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
-.rl-latest b { color: var(--ink); font-weight: 500; margin-right: 6px; }
-.rl-latest em { font-style: normal; color: var(--amber); margin-left: 6px; }
-.rl-ed { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 16px; padding: 16px; margin-bottom: 18px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
-.rl-ed h2 { grid-column: 1 / -1; font-size: 15px; margin: 0; }
-.rl-ed label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
-.rl-ed label.wide, .rl-ed .big, .rl-ed .row { grid-column: 1 / -1; }
-.rl-ed input:not([type=checkbox]), .rl-ed select, .rl-ed textarea { border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); padding: 7px 10px; font-size: 16px; font-family: inherit; min-width: 0; }
-.rl-ed textarea { resize: vertical; }
-.rl-ed .who { display: flex; flex-wrap: wrap; gap: 4px 14px; }
-.rl-ed .who label, .rl-ed .big { flex-direction: row; align-items: center; gap: 6px; font-size: 14px; color: var(--ink); }
-.rl-ed .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.rl-bulk { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; margin-bottom: 8px; }
-.rl-list { list-style: none; margin: 0; padding: 0; }
-.rl-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 0 10px; padding: 12px 0; border-top: 1px solid var(--rule); align-items: start; }
-.rl-list li.empty { display: block; color: var(--muted); font-size: 14px; border: 0; }
-.rl-list input { margin-top: 4px; }
-.rl-list .meta { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: var(--muted); }
-.rl-list .meta b { color: var(--late); font-weight: 500; }
-.rl-list .st { color: var(--muted); }
-.rl-list li[data-st="公開"] .st { color: var(--bottle); font-weight: 500; }
-.rl-list li[data-st="取り下げ"] { opacity: .55; }
-.rl-list .tt { font-weight: 500; overflow-wrap: anywhere; }
-.rl-list .bd, .rl-list .mm { font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.rl-list .mm { color: var(--muted); }
 
 .pulse { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--muted); }
 .pulse span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--bottle); margin-right: 6px; vertical-align: 1px; }
@@ -735,6 +675,19 @@ a.ev:hover .ttl { text-decoration: underline; }
 
 /* ───────── スマートキャンバス（常駐ボードの機能。2026-10-13）：天気と時間帯から描く色の場の上に、遠くから読める字だけ ───────── */
 #canvas { overflow: hidden; overflow: clip; background: #0B1220; color: #F5F7F8; }
+/* v5：仕事ページの中の1枚。全画面（.full）は前のキャンバスと同じ大きさ */
+#canvas.board { position: relative; height: clamp(320px, 46vw, 520px); margin: 4px 0 26px; border-radius: 14px; isolation: isolate; box-shadow: 0 1px 0 var(--rule); }
+#canvas.board:not(.full) .cv { padding: 22px clamp(18px, 3vw, 40px) 16px; gap: 10px 32px; }
+#canvas.board:not(.full) .cv-hm { font-size: clamp(54px, 8.4vw, 116px); }
+#canvas.board:not(.full) .cv-date { font-size: 14px; margin-top: 8px; }
+#canvas.board:not(.full) .cv-wx .t { font-size: clamp(32px, 3.8vw, 52px); }
+#canvas.board:not(.full) .cv-next .tt { font-size: clamp(18px, 2vw, 26px); }
+#canvas.board:not(.full) .cv-side li { font-size: 14px; padding: 3px 0; }
+#canvas.board:not(.full) .cv-side h3 b { font-size: 21px; }
+#canvas.board:not(.full) .cv-sos { padding: 10px 18px; font-size: 17px; }
+#canvas.board:not(.full).sos .cv { padding-top: 58px; }
+#canvas.board:not(.full) .cv-ctl { bottom: 62px; right: 14px; }
+#canvas.full { position: fixed; inset: 0; z-index: 60; height: auto; margin: 0; border-radius: 0; }
 #cvScene { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cv { position: absolute; inset: 0; padding: max(30px, env(safe-area-inset-top)) clamp(20px, 4.5vw, 72px) max(26px, env(safe-area-inset-bottom));
   display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 14px 56px;
@@ -776,7 +729,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 @keyframes cvbeat { 50% { filter: brightness(.72); } }
 .cv-ctl { position: absolute; z-index: 6; right: clamp(16px, 3vw, 40px); bottom: max(80px, env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;
   opacity: 0; pointer-events: none; transition: opacity .6s ease; }
-#canvas.ui .cv-ctl { opacity: 1; pointer-events: auto; }
+#canvas.ui .cv-ctl, #canvas .cv-ctl:focus-within { opacity: 1; pointer-events: auto; }
 .cv-ctl button { border: 1px solid rgba(255, 255, 255, .4); background: rgba(10, 16, 28, .45); color: #fff; border-radius: 999px; padding: 7px 16px; font-size: 13px; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .cv-ctl button[aria-pressed="true"] { background: rgba(255, 255, 255, .9); color: #10161F; }
 @media (max-width: 760px) {
@@ -788,6 +741,45 @@ a.ev:hover .ttl { text-decoration: underline; }
   .cv-rail { grid-row: 5; }
 }
 @media (prefers-reduced-motion: reduce) { .cv-sos { animation: none; } .cv { transition: none; } }
+@media (max-width: 760px) { #canvas.board:not(.full) { height: 600px; } }
+
+/* 見回りの中の「今日の予定」（v5）：前のスケジュールを便箋の一節に */
+.lt-today .sched { margin-top: 10px; gap: 24px 32px; }
+.lt-today .w-sec h2 { font: 600 15px/1.5 var(--pen-font); color: var(--pen); }
+
+/* アイデアの引き出し（v5） */
+.idrawer { position: fixed; z-index: 45; top: 0; right: 0; bottom: 0; width: min(480px, 100%); overflow: auto; overscroll-behavior: contain;
+  background: var(--paper); color: var(--ink); border-left: 1px solid var(--rule); box-shadow: -18px 0 40px rgba(0, 0, 0, .18);
+  padding: max(18px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+  transform: translateX(104%); visibility: hidden; transition: transform .5s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .5s; }
+.idrawer.open { transform: none; visibility: visible; transition: transform .5s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+.idrawer .ideas { grid-template-columns: 1fr; gap: 22px; }
+.idrawer #topics { columns: auto; }
+.id-head { display: flex; align-items: baseline; gap: 10px; position: sticky; top: calc(-1 * max(18px, env(safe-area-inset-top))); z-index: 1; background: var(--paper);
+  padding: 6px 0 10px; margin-bottom: 6px; border-bottom: 1px solid var(--rule); }
+.id-head h2 { margin: 0; font-size: 17px; }
+.id-head small { color: var(--muted); font-size: 12px; }
+.id-head .gap { flex: 1; }
+.topics-head .link + .link { margin-left: 12px; }
+#ideaAuto[aria-pressed="false"] { opacity: .6; }
+.id-scrim { position: fixed; inset: 0; z-index: 44; background: rgba(8, 10, 14, .28); opacity: 0; transition: opacity .4s ease; }
+.id-scrim.on { opacity: 1; }
+.id-tab { position: fixed; z-index: 43; right: 0; top: 50%; transform: translate(100%, -50%); writing-mode: vertical-rl; letter-spacing: .3em;
+  border: 1px solid var(--rule); border-right: 0; border-radius: 10px 0 0 10px; background: var(--sheet); color: var(--ink); padding: 16px 9px; cursor: pointer;
+  font-size: 13px; box-shadow: -4px 0 14px rgba(0, 0, 0, .08); transition: transform .45s cubic-bezier(.2, .8, .2, 1); }
+body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
+.id-tab .n { display: block; margin-top: 8px; font-size: 11px; color: var(--amber); letter-spacing: 0; }
+@keyframes idIn { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes idSwap { 0% { opacity: 0; transform: translateY(10px); filter: blur(3px); } 100% { opacity: 1; transform: none; filter: none; } }
+@keyframes idNew { 0% { background: color-mix(in srgb, var(--amber) 30%, transparent); } 100% { background: transparent; } }
+.idrawer.open .ideas > section { animation: idIn .55s cubic-bezier(.2, .8, .2, 1) both; }
+.idrawer.open .ideas > section + section { animation-delay: .08s; }
+#topics.swap li { animation: idSwap .7s ease both; animation-delay: calc(var(--i, 0) * 70ms); }
+.memos li.new { animation: idIn .5s ease both, idNew 2.4s ease .3s both; }
+@media (prefers-reduced-motion: reduce) {
+  .idrawer, .idrawer.open, .id-tab, .id-scrim { transition: none; }
+  .idrawer.open .ideas > section, #topics.swap li, .memos li.new { animation: none; }
+}
 
 /* ───────── しらせ ───────── */
 #toast { position: fixed; z-index: 60; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--paper);
@@ -896,7 +888,7 @@ a.ev:hover .ttl { text-decoration: underline; }
       <div class="mode-sw" id="modeSw" role="radiogroup" aria-label="昼と夜">
         <button type="button" role="radio" data-mode="auto" aria-checked="true">自動</button><button type="button" role="radio" data-mode="day" aria-checked="false">昼</button><button type="button" role="radio" data-mode="night" aria-checked="false">夜</button>
       </div>
-      <button type="button" class="act w-go" id="toCanvas">キャンバス</button>
+      <button type="button" class="act w-go" id="ideaOpen" aria-expanded="false" aria-controls="idrawer">アイデア</button>
     </header>
     <p class="w-cam"><b>カミーユ</b><span id="wCam"></span></p>
     <!-- タイムカード（2026-10-22）。記録は個人ドライブの Cellar/timecard.json -->
@@ -913,6 +905,24 @@ a.ev:hover .ttl { text-decoration: underline; }
         <div class="tc-list" id="tcList" hidden></div>
       </div>
     </section>
+    <!-- スマートキャンバス（国稀 常駐ボードの機能）。v5（2026-11-07）：仕事ページの中に置いて、いつも動かす。全画面にもできる（タブレット・2枚目の画面用） -->
+    <section id="canvas" class="board" aria-label="キャンバス">
+      <canvas id="cvScene" aria-hidden="true"></canvas>
+      <div class="cv-sos" id="cvSos" role="status" aria-live="assertive" hidden><span id="cvSosWho"></span><span class="el" id="cvSosEl"></span></div>
+      <div class="cv" id="cv">
+        <div class="cv-time"><div class="cv-hm" id="cvHm"></div><div class="cv-date" id="cvDate"></div></div>
+        <div class="cv-wx" id="cvWx"></div>
+        <div class="cv-side" id="cvSide"></div>
+        <div class="cv-next" id="cvNext"></div>
+        <div class="cv-rail" id="cvRail" aria-hidden="true"></div>
+      </div>
+      <div class="cv-ctl" id="cvCtl">
+        <button type="button" id="cvChime" aria-pressed="false">SOS の音</button>
+        <button type="button" id="cvWake" aria-pressed="false">画面を点けたまま</button>
+        <button type="button" id="cvMail" aria-pressed="false">メールの件名</button>
+        <button type="button" id="cvFull" aria-pressed="false">全画面</button>
+      </div>
+    </section>
     <!-- カミーユの設計と提案（2026-10-26・Claude API）。毎朝 6:30 と 12:30 に GAS が作った案を読むだけ。押したときだけ書き込む -->
     <section class="ai" id="ai" aria-label="今日の設計と気になること" hidden>
       <div class="ai-head"><b>今日の設計</b><small id="aiPlanAt"></small><span class="gap"></span><small id="aiUse"></small></div>
@@ -925,89 +935,8 @@ a.ev:hover .ttl { text-decoration: underline; }
       <div id="aiFix"></div>
     </section>
     <div class="w-nav" role="tablist" aria-label="仕事のページ">
-      <button type="button" role="tab" data-tab="sched" aria-selected="true">スケジュール</button>
-      <button type="button" role="tab" data-tab="ideas" aria-selected="false">アイデア</button>
-      <button type="button" role="tab" data-tab="notes" aria-selected="false">案件ノート</button>
-      <button type="button" role="tab" data-tab="rel" aria-selected="false">更新ノート</button>
-      <button type="button" role="tab" data-tab="rounds" aria-selected="false">見回り</button>
+      <button type="button" role="tab" data-tab="rounds" aria-selected="true">見回り</button>
       <button type="button" role="tab" data-tab="map" aria-selected="false">マップ</button>
-    </div>
-
-    <div class="w-tab" id="tab-sched" role="tabpanel">
-      <div class="sched">
-        <div>
-          <div class="allday" id="allday"></div>
-          <div class="tl" id="tl" aria-label="今日のタイムライン"></div>
-        </div>
-        <aside aria-label="時間の決まっていないもの">
-          <section class="w-sec" id="secMove"><h2>あなたの番 <span class="n"></span></h2><div class="body"></div></section>
-          <section class="w-sec" id="secTasks"><h2>今日のタスク <span class="n"></span></h2><div class="body"></div></section>
-          <section class="w-sec" id="secRoutine"><h2>定例 <span class="n"></span></h2><div class="body"></div></section>
-          <section class="w-sec" id="secOver"><h2>持ち越し <span class="n"></span></h2><div class="body"></div></section>
-          <section class="w-sec" id="secSoon"><h2>近いうち</h2><div class="body"></div></section>
-        </aside>
-      </div>
-    </div>
-
-    <div class="w-tab" id="tab-ideas" role="tabpanel" hidden>
-      <div class="ideas">
-        <section aria-label="話題">
-          <div class="topics-head"><h2>今日の話題</h2><button type="button" class="link" id="shuffle">別の話題にする</button></div>
-          <ul id="topics"></ul>
-        </section>
-        <section class="memo" aria-label="メモ">
-          <h2>メモ</h2>
-          <div class="ref" id="ideaRef" hidden><span></span><button type="button" class="link" id="ideaRefX">話題を外す</button></div>
-          <textarea id="ideaText" rows="5" placeholder="思いついたことを、そのまま"></textarea>
-          <div class="memo-act"><span class="hint" id="ideaHint">Ctrl＋Enter でも保存できます</span><button type="button" class="save" id="ideaSave">保存する</button></div>
-          <ol class="memos" id="ideaList"></ol>
-        </section>
-      </div>
-    </div>
-
-    <!-- 案件ノート：鍵の内側。本文は個人ドライブ（Cellar/notes.json） -->
-    <div class="w-tab" id="tab-notes" role="tabpanel" hidden>
-      <form class="nlock" id="nlock" autocomplete="off">
-        <p>案件ノートは、もう一段の鍵の内側です。</p>
-        <input id="nkey" type="password" aria-label="ノートの鍵">
-        <div class="row3"><button type="submit" class="save">開く</button><span class="state" id="nlockMsg"></span></div>
-      </form>
-      <div id="nbody" hidden>
-        <div class="nbooks" id="nbooks" role="tablist" aria-label="案件"></div>
-        <div class="nwrap">
-          <section aria-label="ノート">
-            <div class="nhead" id="nhead"></div>
-            <form class="nadd" id="nadd" autocomplete="off">
-              <input id="ntext" placeholder="1行書く（Enter で積む・書き換えない）" aria-label="1行書く">
-              <select id="ntask" aria-label="タスクに紐づける"></select>
-            </form>
-            <p class="ncam" id="ncam" hidden></p>
-            <ol class="nlines" id="nlines"></ol>
-          </section>
-          <aside class="ntasks" aria-label="この案件のタスク">
-            <section class="w-sec"><h2>この案件のタスク <span class="n"></span></h2><div id="ntasks"></div></section>
-          </aside>
-        </div>
-      </div>
-    </div>
-
-    <!-- 更新ノート（2026-10-26）：業務アプリの更新内容。選択肢と中身はサーバから -->
-    <div class="w-tab" id="tab-rel" role="tabpanel" hidden>
-      <div class="rl-bar">
-        <select id="rlApp" aria-label="アプリで絞る"></select>
-        <select id="rlState" aria-label="状態で絞る"></select>
-        <span class="gap"></span>
-        <button type="button" class="save" id="rlNew">新しく書く</button>
-      </div>
-      <div class="rl-latest" id="rlLatest" aria-label="アプリごとの最新の公開版"></div>
-      <form class="rl-ed" id="rlEd" autocomplete="off" hidden></form>
-      <div class="rl-bulk" id="rlBulk" hidden>
-        <span id="rlBulkN"></span>
-        <button type="button" class="act" data-st="公開">公開する</button>
-        <button type="button" class="act" data-st="取り下げ">取り下げる</button>
-        <button type="button" class="act" data-st="下書き">下書きに戻す</button>
-      </div>
-      <ol class="rl-list" id="rlList"></ol>
     </div>
 
     <!-- 見回り（v4・2026-10-29）：4アプリとシフト・収支計画表を読むだけ。書けるのは迷子の行の日付と担当者だけ
@@ -1019,7 +948,7 @@ a.ev:hover .ttl { text-decoration: underline; }
       <div class="am-det" id="amDet"></div>
     </div>
 
-    <div class="w-tab" id="tab-rounds" role="tabpanel" hidden>
+    <div class="w-tab" id="tab-rounds" role="tabpanel">
       <div class="lt-filter" id="rdIdx" role="group" aria-label="アプリで絞る"></div>
       <div class="lt-app" id="rdApp" hidden></div>
       <article class="letter" aria-label="Camille から Kent への見回りの便箋">
@@ -1030,6 +959,23 @@ a.ev:hover .ttl { text-decoration: underline; }
         <p class="lt-say lt-hello" id="rdHello"></p>
         <p class="lt-say" id="rdBack"></p>
         <div id="rdLead"></div>
+        <!-- v5（2026-11-07）：スケジュールを見回りに統合。自分の予定・今日のタスク・定例・持ち越し・近いうち（中身は前のスケジュールと同じ） -->
+        <section class="lt-sec lt-today" aria-labelledby="rdH7">
+          <h3 id="rdH7"><span class="ttl">今日の予定</span></h3>
+          <div class="sched">
+            <div>
+              <div class="allday" id="allday"></div>
+              <div class="tl" id="tl" aria-label="今日のタイムライン"></div>
+            </div>
+            <aside aria-label="時間の決まっていないもの">
+              <section class="w-sec" id="secMove"><h2>あなたの番 <span class="n"></span></h2><div class="body"></div></section>
+              <section class="w-sec" id="secTasks"><h2>今日のタスク <span class="n"></span></h2><div class="body"></div></section>
+              <section class="w-sec" id="secRoutine"><h2>定例 <span class="n"></span></h2><div class="body"></div></section>
+              <section class="w-sec" id="secOver"><h2>持ち越し <span class="n"></span></h2><div class="body"></div></section>
+              <section class="w-sec" id="secSoon"><h2>近いうち</h2><div class="body"></div></section>
+            </aside>
+          </div>
+        </section>
         <section class="lt-sec" aria-labelledby="rdH0">
           <h3 id="rdH0"><span class="ttl">承認すること</span> <small id="rdApprN"></small></h3>
           <p class="lt-margin" id="rdM0"></p>
@@ -1074,6 +1020,26 @@ a.ev:hover .ttl { text-decoration: underline; }
     <footer class="pulse" id="pulse" aria-label="仕組みの調子"></footer>
   </div>
 </main>
+
+<!-- アイデアの引き出し（v5・2026-11-07）：右から出てくる。開いているあいだ、メモは1分ごとに読み直し、話題は40秒ごとに入れ替わる -->
+<button type="button" class="id-tab" id="ideaTab" aria-controls="idrawer" aria-expanded="false">アイデア</button>
+<div class="id-scrim" id="idScrim" hidden></div>
+<aside class="idrawer" id="idrawer" aria-label="アイデア" aria-hidden="true">
+  <div class="id-head"><h2>アイデア</h2><small id="idAt"></small><span class="gap"></span><button type="button" class="link" id="ideaClose">閉じる</button></div>
+  <div class="ideas">
+        <section aria-label="話題">
+          <div class="topics-head"><h2>今日の話題</h2><button type="button" class="link" id="shuffle">別の話題にする</button><button type="button" class="link" id="ideaAuto" aria-pressed="true">自動で入れ替える</button></div>
+          <ul id="topics"></ul>
+        </section>
+        <section class="memo" aria-label="メモ">
+          <h2>メモ</h2>
+          <div class="ref" id="ideaRef" hidden><span></span><button type="button" class="link" id="ideaRefX">話題を外す</button></div>
+          <textarea id="ideaText" rows="5" placeholder="思いついたことを、そのまま"></textarea>
+          <div class="memo-act"><span class="hint" id="ideaHint">Ctrl＋Enter でも保存できます</span><button type="button" class="save" id="ideaSave">保存する</button></div>
+          <ol class="memos" id="ideaList"></ol>
+        </section>
+      </div>
+</aside>
 
 </div><!-- /#home -->
 
@@ -1150,25 +1116,6 @@ a.ev:hover .ttl { text-decoration: underline; }
   </div>
 </section>
 
-<!-- ───────── スマートキャンバス（国稀 常駐ボードの機能）。タブレットや2枚目の画面に開きっぱなしにする ───────── -->
-<section id="canvas" class="house" aria-label="キャンバス">
-  <canvas id="cvScene" aria-hidden="true"></canvas>
-  <div class="cv-sos" id="cvSos" role="status" aria-live="assertive" hidden><span id="cvSosWho"></span><span class="el" id="cvSosEl"></span></div>
-  <div class="cv" id="cv">
-    <div class="cv-time"><div class="cv-hm" id="cvHm"></div><div class="cv-date" id="cvDate"></div></div>
-    <div class="cv-wx" id="cvWx"></div>
-    <div class="cv-side" id="cvSide"></div>
-    <div class="cv-next" id="cvNext"></div>
-    <div class="cv-rail" id="cvRail" aria-hidden="true"></div>
-  </div>
-  <div class="cv-ctl" id="cvCtl">
-    <button type="button" id="cvChime" aria-pressed="false">SOS の音</button>
-    <button type="button" id="cvWake" aria-pressed="false">画面を点けたまま</button>
-    <button type="button" id="cvMail" aria-pressed="false">メールの件名</button>
-    <button type="button" id="cvBack">戻る</button>
-  </div>
-</section>
-
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1181,7 +1128,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-06 v4.9';
+var BUILD = '2026-11-07 v5.0';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1474,7 +1421,7 @@ $('#gateForm').addEventListener('submit', function (e) {
   e.preventDefault();
   var v = $('#gateIn').value.trim(); if (!v) return;
   token = v; save('token', v); $('#gate').hidden = true; $('#gateIn').value = '';
-  loadWork(); loadPrivate();
+  loadWork(); loadPrivate(); loadCanvas(); if (!$('#tab-rounds').hidden) openRounds();
 });
 
 /* ───────── 状態と読み込み ───────── */
@@ -1716,7 +1663,7 @@ function setHouse(hs, quiet) {
   house = hs;
   document.body.setAttribute('data-house', hs);
   if (hs === 'private') { if (heroIn) startMood(); renderClock(); } else stopMood();
-  if (hs === 'canvas') startCanvas(); else stopCanvas();
+  cvVis();
   if (hs !== 'room') { closeSecret(); dropRoom(); }
   if (hs !== 'private') { closeSheet(); closeDrawer(); closeTasting(); }
   if (!quiet) poke();
@@ -1725,7 +1672,6 @@ function setHouse(hs, quiet) {
 var heroIn = true;  // プライベートの1画面目が見えているか（見えていないときは動く背景を止める）
 function toWork(smooth) { var w = $('#work'); $('#home').scrollTo({ top: w.offsetTop, behavior: smooth ? 'smooth' : 'auto' }); }
 $('#toWork').addEventListener('click', function () { toWork(true); });
-$('#toCanvas').addEventListener('click', function () { setHouse('canvas'); });
 var idleT = null;
 function poke() {
   document.body.classList.remove('idle');
@@ -1926,32 +1872,26 @@ function renderPulse() {
 }
 function renderWork() { renderHead(); renderTimeline(); renderRail(); renderPulse(); renderCanvas(); }
 
-/* ───────── 仕事：ページ（スケジュール／アイデア） ───────── */
+/* ───────── 仕事：ページ（見回り／マップ）。v5 でスケジュールは見回りに入れ、アイデアは引き出しに。案件ノートと更新ノートは外した（サーバの口とデータは残す） ───────── */
 document.querySelectorAll('.w-nav [role=tab]').forEach(function (b) {
   b.addEventListener('click', function () { showTab(b.getAttribute('data-tab')); });
 });
 function showTab(tab) {
   document.querySelectorAll('.w-nav [role=tab]').forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-tab') === tab)); });
-  $('#tab-sched').hidden = tab !== 'sched';
-  $('#tab-ideas').hidden = tab !== 'ideas';
-  $('#tab-notes').hidden = tab !== 'notes';
-  $('#tab-rel').hidden = tab !== 'rel';
   $('#tab-rounds').hidden = tab !== 'rounds';
   $('#tab-map').hidden = tab !== 'map';
-  if (tab === 'map' && !AM.d) amLoad();
+  if (tab === 'map') amFresh();
   // スマホ幅ではタブの帯が横に流れるので、選んだタブを見えるところへ送る
   var nav = document.querySelector('.w-nav'), sb = nav.querySelector('[data-tab="' + tab + '"]');
   if (sb) { var nr = nav.getBoundingClientRect(), br = sb.getBoundingClientRect(); if (br.right > nr.right || br.left < nr.left) nav.scrollLeft += br.left - nr.left - 8; }
-  if (tab === 'ideas' && !S.ideas) loadIdeas();
-  if (tab === 'notes') showNotes();
-  if (tab === 'rel' && !RL.data) loadRel();
   if (tab === 'rounds') openRounds(); else closeRounds();
 }
 
 /* ───────── マップ（2026-11-01）─────────
    別アプリのアクセスマップのシートをサーバ経由で読んで描く。ここからは書かない。
    更新の控えは端末に置く（前に開いたときとの比べ）。最初の1回は控えを作るだけで光らない */
-var AM = { d: null, sel: '', seen: {}, busy: false };
+var AM = { d: null, sel: '', seen: {}, busy: false, t: 0, timer: null };
+var AM_EVERY = 5 * 60e3;
 var AM_SEEN_KEY = 'cellar.amSeen', AM_COLORS = ['--a-hub', '--a-haccp', '--a-brewery', '--a-kanri', '--a-shift'];
 function amEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 function amHref(u) { return /^https:\/\//.test(String(u)) ? amEsc(u) : '#'; }
@@ -1992,11 +1932,19 @@ function amClear(k) {
 }
 function amLoad() {
   if (AM.busy) return Promise.resolve();
-  AM.busy = true; $('#amRe').disabled = true; $('#amNote').textContent = '読み込み中…';
+  AM.busy = true; $('#amRe').disabled = true;
+  if (!AM.d) $('#amNote').textContent = '読み込み中…';
   return call('accessmap').then(function (d) {
-    AM.d = d; amSync(d); amRender();
+    AM.d = d; AM.t = Date.now(); amSync(d); amRender();
   }, function (e) { $('#amNote').textContent = 'マップを読めませんでした：' + e.message; }).then(function () { AM.busy = false; $('#amRe').disabled = false; });
 }
+// 向こうの地図が更新されたら追いつく：タブを開くたび・画面に戻るたびに1分たっていれば読み直し、開いているあいだは5分ごと
+function amShown() { return !$('#tab-map').hidden && document.visibilityState === 'visible'; }
+function amFresh() {
+  if (!AM.d || Date.now() - AM.t > 60e3) amLoad();
+  if (!AM.timer) AM.timer = setInterval(function () { if (amShown() && Date.now() - AM.t >= AM_EVERY - 5e3) amLoad(); }, 60e3);
+}
+document.addEventListener('visibilitychange', function () { if (amShown()) amFresh(); });
 function amPos(d) {
   var P = function (deg, r) { var a = deg * Math.PI / 180; return [r * Math.cos(a), r * Math.sin(a)]; };
   var pos = {}, deg = {}, solo = {}, app = {};
@@ -2065,10 +2013,14 @@ function amRender() {
   $('#amSvg').innerHTML = svg;
   amGo();
   var n = amNewCount();
-  $('#amNote').textContent = n ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + n + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。';
+  $('#amNote').textContent = amNoteText(n);
   $('#amSeen').hidden = !n;
   if (d.url) { $('#amOpen').href = d.url; $('#amOpen').hidden = false; }
   amDetail();
+}
+function amNoteText(n) {
+  var when = AM.d.at ? AM.d.at.slice(11) + ' 時点' + (AM.d.deployAt ? '（本番の版は ' + AM.d.deployAt.slice(5) + ' の記録）' : '') + '。' : '';
+  return when + (n ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + n + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。');
 }
 // 各アプリの入口。名前を押すとそのアプリが開く（GASエディタは小さく横に）
 function amGo() {
@@ -2089,6 +2041,12 @@ function amDetail() {
       var us = d.updates.filter(function (r) { return r[1] === a.n; }), rs = d.rels.filter(function (r) { return r[0] === a.k || r[1] === a.k; });
       if (rs.length) html += '<div class="am-h">直接の接続</div><ul class="am-list">' + rs.map(function (r) { return '<li><b>' + amEsc(amAppName(r[0])) + '</b> ↔ <b>' + amEsc(amAppName(r[1])) + '</b><br>' + amEsc(r[3]) + '</li>'; }).join('') + '</ul>';
       if (us.length) html += '<div class="am-h">更新</div><ul class="am-list">' + us.map(upRow).join('') + '</ul>';
+      var subs = (d.subs || []).filter(function (x) { return x.app === a.k; });
+      if (subs.length) html += '<div class="am-h">中の小さいアプリ（' + subs.length + '）</div><ul class="am-list">' + subs.map(function (x) {
+        var st = (d.stores || []).filter(function (y) { return y.sub === x.k; });
+        return '<li><b>' + amEsc(x.n) + '</b> <small>' + amEsc([x.kind, x.open].filter(String).join('・')) + '</small>' + (x.d ? '<br>' + amEsc(x.d) : '') +
+          (st.length ? '<br><small>' + st.map(function (y) { return amEsc(y.m + (y.tab ? '／' + y.tab : '') + (y.rw ? '（' + y.rw + '）' : '')); }).join('　') + '</small>' : '') + '</li>';
+      }).join('') + '</ul>';
       html += '<div class="am-h">マスター</div><ul class="am-list">' + d.masters.filter(function (m) { return m.u.indexOf(a.k) >= 0; }).map(function (m) { return '<li>' + amLink(m.url, m.n) + ' <small>' + amEsc((m.stamp || '').slice(0, 10)) + '</small></li>'; }).join('') + '</ul>';
     }
   } else if (k) {
@@ -2105,7 +2063,7 @@ function amPick(g) {
   var wasNew = k && amNodeNew(k);
   AM.sel = AM.sel === k ? '' : k;
   amRender();              // 光っていた行を詳しい欄で見せてから、控えを消す
-  if (wasNew) { amClear(k); var keep = AM.sel; [].forEach.call($('#amSvg').querySelectorAll('.am-n'), function (x) { if (x.getAttribute('data-k') === k) x.classList.remove('new'); }); amGo(); var c = amNewCount(); $('#amNote').textContent = c ? '光っているのは、この端末で前に開いたあとに更新されたところです（' + c + '件）。点を押すと消えます。' : '丸がアプリ、四角がマスターです。'; $('#amSeen').hidden = !c; AM.sel = keep; }
+  if (wasNew) { amClear(k); var keep = AM.sel; [].forEach.call($('#amSvg').querySelectorAll('.am-n'), function (x) { if (x.getAttribute('data-k') === k) x.classList.remove('new'); }); amGo(); var c = amNewCount(); $('#amNote').textContent = amNoteText(c); $('#amSeen').hidden = !c; AM.sel = keep; }
 }
 $('#amSvg').addEventListener('click', function (e) { amPick(e.target.closest('.am-n')); });
 $('#amSvg').addEventListener('keydown', function (e) { var g = e.target.closest('.am-n'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); amPick(g); } });
@@ -2319,18 +2277,31 @@ function renderRounds() {
 }
 
 /* ── 手を打つこと：区分×アプリの積み上げ横棒。行を押すとその区分の一覧 ── */
+// 同じタスクが同じ区分の2つの規則（例：期日が空＋14日だれも触っていない）に当たっても、1行にまとめる（v5）
+function rdMergeLost(items) {
+  var by = {}, out = [];
+  items.forEach(function (x) {
+    var k = x.app + '|' + x.id, y = by[k];
+    if (!y) { y = by[k] = Object.assign({}, x, { rules: [x.rule], notes: x.note ? [x.note] : [] }); out.push(y); return; }
+    if (y.rules.indexOf(x.rule) < 0) y.rules.push(x.rule);
+    if (x.note && y.notes.indexOf(x.note) < 0) y.notes.push(x.note);
+  });
+  return out;
+}
 function renderRoundsLost(lost, v) {
-  $('#rdLostN').textContent = lost.length + '件';
+  var uniq = {}; lost.forEach(function (x) { uniq[x.app + '|' + x.id] = 1; });
+  $('#rdLostN').textContent = Object.keys(uniq).length + '件';
   var rows = RD_CATS.map(function (c) {
-    var items = lost.filter(function (x) { return c.rules.indexOf(x.rule) >= 0; })
+    var items = rdMergeLost(lost.filter(function (x) { return c.rules.indexOf(x.rule) >= 0; }))
       .sort(function (a, b) { return String(a.due || '9').localeCompare(String(b.due || '9')); });
     var by = {}; items.forEach(function (x) { by[x.app] = (by[x.app] || 0) + 1; });
     return { c: c, items: items, by: by, n: items.length };
   });
   if (RD.cat < 0 || !rows[RD.cat] || !rows[RD.cat].n) { RD.cat = -1; for (var i = 0; i < rows.length; i++) if (rows[i].n) { RD.cat = i; break; } }
   var top = rows.slice().sort(function (a, b) { return b.n - a.n; })[0];
+  var nUniq = Object.keys(uniq).length;
   fill($('#rdLostSay'), [rdSay(lost.length
-    ? (RD.app ? rdAppLabel(RD.app) + 'で' : '') + '手を打つことは ' + lost.length + '件です。いちばん多いのは「' + top.c.label + '」の ' + top.n + '件です。'
+    ? (RD.app ? rdAppLabel(RD.app) + 'で' : '') + '手を打つことは ' + nUniq + '件です。いちばん多いのは「' + top.c.label + '」の ' + top.n + '件です。'
     : (RD.app ? rdAppLabel(RD.app) + 'には、' : '') + 'いま手を打つことはありません。')]);
   var box = $('#rdLostChart');
   if (!lost.length) { fill(box, []); fill($('#rdLostLegend'), []); fill($('#rdLost'), []); return; }
@@ -2374,11 +2345,12 @@ function renderRoundsLost(lost, v) {
   fill($('#rdLost'), r ? [h('div', { class: 'lt-list' }, [h('h4', null, ['「' + r.c.label + '」の ' + r.n + '件'])].concat(r.items.map(function (x) { return rdItem(x, v); })))] : []);
 }
 function rdItem(x, v) {
-  var meta = [rdAppLabel(x.app), v.rules[x.rule].label, x.due ? '期日 ' + fmtDay(x.due) : '', x.who ? '担当 ' + x.who : '', x.note].filter(Boolean).join('、');
+  var rules = x.rules || [x.rule], notes = x.notes || (x.note ? [x.note] : []);
+  var meta = [rdAppLabel(x.app), rules.map(function (r) { return v.rules[r].label; }).join('・'), x.due ? '期日 ' + fmtDay(x.due) : '', x.who ? '担当 ' + x.who : ''].concat(notes).filter(Boolean).join('、');
   var d = h('details', { class: 'lt-item', style: '--sw:' + rdColor(x.app) }, [h('summary', null, [h('span', { class: 'tt' }, [x.title]), h('span', { class: 'meta' }, [meta])])]);
   var box = h('div', { class: 'lt-do' });
   if (x.url) box.appendChild(h('a', { class: 'act', href: x.url, target: x.url === '#' ? null : '_blank', rel: 'noopener' }, ['開く']));
-  if (x.app === 'hub' && v.rules[x.rule].write) {
+  if (x.app === 'hub' && rules.some(function (r) { return v.rules[r].write; })) {
     // ハブの決まり：期限切れのタスクの期日を動かすときは理由が必須（ハブの口を通すので、ハブも同じことを確かめる）
     var late = !!x.due && x.due < todayJst();
     var date = h('input', { type: 'date', value: x.due && !late ? x.due : addDays(todayJst(), 1), 'aria-label': '新しい期日' });
@@ -2389,9 +2361,9 @@ function rdItem(x, v) {
       rdWrite(go, 'roundsdue', { id: x.id, date: date.value, reason: why ? why.value.trim() : '' }, '期日を ' + fmtDay(date.value) + ' にしました：' + x.title);
     });
     var f1 = h('div', { class: 'lt-form' }, [date, why, go]);
-    if (x.rule === 'moved') box.appendChild(h('p', { class: 'lt-note', style: 'flex-basis:100%;margin:0' }, ['期日の変更は ' + x.note + '。運営ルール K-2 の上限は2回です']));
+    if (rules.indexOf('moved') >= 0) box.appendChild(h('p', { class: 'lt-note', style: 'flex-basis:100%;margin:0' }, ['期日の変更は ' + (notes.filter(function (n) { return /回$/.test(n); })[0] || '2回以上') + '。運営ルール K-2 の上限は2回です']));
     box.appendChild(f1);
-    if ((x.rule === 'owner' || x.rule === 'off') && (v.staff || []).length) {
+    if ((rules.indexOf('owner') >= 0 || rules.indexOf('off') >= 0) && (v.staff || []).length) {
       var sel = rdSel(v.staff, '', '担当に足す人');
       var add = h('button', { type: 'button', class: 'act' }, ['担当に足す']);
       add.addEventListener('click', function () { if (!sel.value) { toast('足す人を選んでください', true); return; } rdWrite(add, 'roundsassign', { id: x.id, name: sel.value }, '担当に ' + sel.value + ' を足しました：' + x.title); });
@@ -3003,203 +2975,6 @@ function rdPlanChart(chart, blocks) {
   fill(chart, [svg]);
 }
 
-/* ───────── 更新ノート（2026-10-26）：業務アプリの更新内容を1か所で書く・直す・公開する ─────────
-   アプリ名などの選択肢はサーバが返す（公開ページに置かない）。ここで書いた・直したという記録は残さない：
-   端末にも置かない（書きかけ・絞り込みも覚えない）。公開した分は別のアプリがスタッフに見せる */
-var RL = { data: null, app: '', state: '', pick: {}, edit: null, rid: '', busy: false };
-function loadRel() {
-  fill($('#rlList'), [h('li', { class: 'empty' }, ['読み込み中…'])]);
-  return call('releases').then(function (d) { RL.data = d; renderRel(); },
-    function (e) { fill($('#rlList'), [h('li', { class: 'empty' }, ['更新ノートを読めませんでした：' + e.message])]); });
-}
-function relOpts(sel, list, first, cur) {
-  fill(sel, (first ? [h('option', { value: '' }, [first])] : []).concat(list.map(function (v) { return h('option', { value: v, selected: v === cur }, [v]); })));
-}
-function relPut(row) {
-  var rows = RL.data.rows;
-  for (var i = 0; i < rows.length; i++) if (rows[i].id === row.id) { rows[i] = row; return; }
-  rows.unshift(row);
-}
-function renderRel() {
-  if (!RL.data) return;
-  var o = RL.data.opts, rows = RL.data.rows;
-  relOpts($('#rlApp'), o.apps, 'すべてのアプリ', RL.app);
-  relOpts($('#rlState'), o.states, 'すべての状態', RL.state);
-  // アプリごとの最新の公開版（取り下げ・下書きは数えない）と、下書きの数
-  fill($('#rlLatest'), o.apps.filter(function (a) { return a !== '全アプリ'; }).map(function (a) {
-    var mine = rows.filter(function (r) { return r.app === a; });
-    var pub = mine.filter(function (r) { return r.state === '公開'; }).sort(function (x, y) { return x.date < y.date ? 1 : -1; })[0];
-    var drafts = mine.filter(function (r) { return r.state === '下書き'; }).length;
-    return h('span', null, [h('b', null, [a]), pub ? (pub.ver || '版なし') + '（' + fmtMD(pub.date) + '）' : '公開なし',
-      drafts ? h('em', null, ['下書き ' + drafts]) : null]);
-  }));
-  var list = rows.filter(function (r) { return (!RL.app || r.app === RL.app) && (!RL.state || r.state === RL.state); });
-  Object.keys(RL.pick).forEach(function (id) { if (!rows.some(function (r) { return r.id === id; })) delete RL.pick[id]; });
-  var n = Object.keys(RL.pick).length;
-  $('#rlBulk').hidden = !n; $('#rlBulkN').textContent = n + '件を選択中';
-  fill($('#rlList'), list.length ? list.map(function (r) {
-    var box = h('input', { type: 'checkbox', 'aria-label': '選ぶ：' + r.title, checked: !!RL.pick[r.id] });
-    box.addEventListener('change', function () { if (box.checked) RL.pick[r.id] = 1; else delete RL.pick[r.id]; renderRel(); });
-    return h('li', { 'data-st': r.state }, [box,
-      h('div', null, [
-        h('div', { class: 'meta' }, [h('span', { class: 'st' }, [r.state]), r.app, r.ver, r.kind, r.date ? fmtDay(r.date) : '公開日なし', r.big ? h('b', null, ['重要']) : null]),
-        h('div', { class: 'tt' }, [r.title || '（無題）']),
-        r.body ? h('div', { class: 'bd' }, [r.body]) : null,
-        r.memo ? h('div', { class: 'mm' }, ['開発メモ：' + r.memo]) : null
-      ]),
-      h('button', { type: 'button', class: 'link', onclick: function () { openRelEd(r); } }, ['直す'])]);
-  }) : [h('li', { class: 'empty' }, [rows.length ? '絞り込みに合うノートはありません' : 'まだノートはありません。「新しく書く」から'])]);
-}
-function openRelEd(row) {
-  var o = RL.data.opts, r = row || { title: '', app: RL.app || '', ver: '', date: '', kind: '', who: ['全員'], body: '', memo: '', big: false, link: '', state: '下書き' };
-  RL.edit = row ? row.id : 'new'; RL.rid = row ? '' : rid();
-  var f = $('#rlEd');
-  function field(label, el, wide) { return h('label', { class: wide ? 'wide' : null }, [h('span', null, [label]), el]); }
-  var app = h('select', { name: 'app', required: true }); relOpts(app, o.apps, 'アプリを選ぶ', r.app);
-  var kind = h('select', { name: 'kind' }); relOpts(kind, o.kinds, '区分なし', r.kind);
-  var who = h('div', { class: 'who' }, o.who.map(function (w) { return h('label', null, [h('input', { type: 'checkbox', name: 'who', value: w, checked: r.who.indexOf(w) >= 0 }), w]); }));
-  fill(f, [
-    h('h2', null, [row ? '直す（' + r.state + '）' : '新しく書く']),
-    field('件名（スタッフ向けの一言）', h('input', { name: 'title', maxlength: '200', value: r.title, required: true }), true),
-    field('アプリ', app), field('版', h('input', { name: 'ver', maxlength: '40', value: r.ver, placeholder: 'v127 など' })),
-    field('公開日', h('input', { name: 'date', type: 'date', value: r.date })), field('区分', kind),
-    field('対象', who, true),
-    field('本文（スタッフに見せる。使い方が変わる点を先に）', h('textarea', { name: 'body', rows: '4', maxlength: '4000' }, [r.body]), true),
-    field('開発メモ（自分だけ。各アプリには出ない）', h('textarea', { name: 'memo', rows: '3', maxlength: '4000' }, [r.memo]), true),
-    field('リンク（手順書・マニュアル）', h('input', { name: 'link', type: 'url', value: r.link, placeholder: 'https://' }), true),
-    h('label', { class: 'big' }, [h('input', { type: 'checkbox', name: 'big', checked: r.big }), '重要（各アプリで起動時に一度だけ全面に出す）']),
-    h('div', { class: 'row' }, [
-      h('button', { type: 'submit', class: 'save', value: 'save' }, [row ? '保存する' : '下書きで保存']),
-      row ? null : h('button', { type: 'submit', class: 'act', value: 'pub' }, ['保存して公開']),
-      h('button', { type: 'button', class: 'link', onclick: closeRelEd }, ['やめる']),
-      h('span', { class: 'state', id: 'rlEdMsg' }, [])])
-  ]);
-  f.hidden = false; f.elements.title.focus();
-  f.scrollIntoView({ block: 'nearest' });
-}
-function closeRelEd() { RL.edit = null; RL.rid = ''; $('#rlEd').hidden = true; fill($('#rlEd'), []); }
-$('#rlEd').addEventListener('submit', function (e) {
-  e.preventDefault();
-  if (RL.busy || !RL.edit) return;
-  var f = e.target, el = f.elements, pub = e.submitter && e.submitter.value === 'pub';
-  var who = Array.prototype.filter.call(f.querySelectorAll('input[name=who]'), function (x) { return x.checked; }).map(function (x) { return x.value; });
-  var args = { title: el.title.value.trim(), app: el.app.value, ver: el.ver.value.trim(), date: el.date.value, kind: el.kind.value,
-    who: JSON.stringify(who), body: el.body.value, memo: el.memo.value, link: el.link.value.trim(), big: el.big.checked };
-  if (!args.title || !args.app) { $('#rlEdMsg').textContent = '件名とアプリは要ります'; return; }
-  if (RL.edit === 'new') { args.rid = RL.rid; if (pub) args.state = '公開'; } else args.id = RL.edit;
-  RL.busy = true; $('#rlEdMsg').textContent = '保存しています…';
-  call('releaseSave', args, { long: true }).then(function (row) {
-    RL.busy = false; relPut(row); closeRelEd(); renderRel(); toast((row.state === '公開' ? '公開しました：' : '保存しました：') + row.title);
-  }, function (err) { RL.busy = false; $('#rlEdMsg').textContent = '保存できませんでした：' + err.message; });
-});
-$('#rlNew').addEventListener('click', function () { if (RL.data) openRelEd(null); });
-$('#rlApp').addEventListener('change', function () { RL.app = this.value; renderRel(); });
-$('#rlState').addEventListener('change', function () { RL.state = this.value; renderRel(); });
-Array.prototype.forEach.call(document.querySelectorAll('#rlBulk [data-st]'), function (b) {
-  b.addEventListener('click', function () {
-    var ids = Object.keys(RL.pick), st = b.getAttribute('data-st');
-    if (!ids.length || RL.busy) return;
-    RL.busy = true; b.classList.add('busy');
-    call('releaseState', { ids: JSON.stringify(ids), state: st }).then(function (d) {
-      RL.busy = false; b.classList.remove('busy'); d.rows.forEach(relPut); RL.pick = {}; renderRel(); toast(d.rows.length + '件を「' + st + '」にしました');
-    }, function (err) { RL.busy = false; b.classList.remove('busy'); toast('変えられませんでした：' + err.message, true); });
-  });
-});
-
-
-/* ───────── 案件ノート（2026-10-10）：大型案件ごとに1冊。開いてすぐ1行書ける。書き換えない・足していくだけ ─────────
-   鍵（NOTE_KEY。無ければ部屋の合図と同じ）の内側。本文は個人ドライブの Cellar/notes.json。
-   古い行は初期表示でぼかし、触ると見える（人前で開いても安全）。15分さわらないと鍵をかけ直す。
-   カミーユの「前回のメモ」はこの画面の中でだけ出す（Notion の便には引かない）。言い換えない・要約しない */
-var NOTE_BOOKS = ['HACCP', '乾燥機事業', '物販新ブランド', '冬の醸造限定品', 'マニュアル作成', 'イベント企画'];
-var BOOK_WORDS = {
-  'HACCP': ['HACCP', 'JFS', 'CCP', 'FS-', '衛生', '監査', '温度記録', '冷却記録', '官能検査', '水質', 'CIP', 'ATP', '防虫', 'アレルゲン'],
-  '乾燥機事業': ['乾燥機'],
-  '物販新ブランド': ['物販', '新ブランド', 'グッズ', '手ぬぐい', 'ステッカー'],
-  '冬の醸造限定品': ['限定醸造', '限定品', '冬の醸造', 'メルツェン', 'ヴァイツェン', 'FUYUGOMORI', 'ŌSHIBARE', 'OSHIBARE', 'マシケドロップス', 'ケラー'],
-  'マニュアル作成': ['マニュアル', '手順書'],
-  'イベント企画': ['イベント', '企画', '出店', '収穫祭', 'フェス', '祭', 'ツアー']
-};
-var NOTE = { key: '', data: null, book: load('nbook') || 'HACCP', tasks: null, timer: null, rid: '' };
-if (NOTE_BOOKS.indexOf(NOTE.book) < 0) NOTE.book = 'HACCP';
-function showNotes() {
-  $('#nlock').hidden = !!NOTE.key; $('#nbody').hidden = !NOTE.key;
-  if (NOTE.key) { renderNotes(); armNotes(); } else setTimeout(function () { $('#nkey').focus(); }, 50);
-}
-function armNotes() { clearTimeout(NOTE.timer); NOTE.timer = setTimeout(lockNotes, 15 * 60e3); }
-function lockNotes() { NOTE.key = ''; NOTE.data = null; fill($('#nlines'), []); fill($('#nhead'), []); $('#ntext').value = ''; showNotes(); }
-$('#tab-notes').addEventListener('pointerdown', function () { if (NOTE.key) armNotes(); });
-$('#nlock').addEventListener('submit', function (e) {
-  e.preventDefault();
-  var key = $('#nkey').value.trim(); if (!key) return;
-  $('#nlockMsg').textContent = '開いています…';
-  Promise.all([call('notes', { room: key }), call('tasks').catch(function () { return null; })]).then(function (r) {
-    NOTE.key = key; NOTE.data = r[0]; NOTE.tasks = r[1] && r[1].rows; $('#nkey').value = ''; $('#nlockMsg').textContent = ''; showNotes();
-  }, function (err) {
-    $('#nkey').value = '';
-    $('#nlockMsg').textContent = err.code === 'room' ? '鍵が違います' : err.code === 'room-locked' ? 'しばらく開けません（15分）' : '開けませんでした：' + err.message;
-  });
-});
-function bookData(name) { return ((NOTE.data && NOTE.data.books) || []).filter(function (b) { return b.name === name; })[0] || { name: name, head: { owner: '', next: '', waiting: '' }, lines: [] }; }
-function putBook(b) { var bs = NOTE.data.books; for (var i = 0; i < bs.length; i++) if (bs[i].name === b.name) { bs[i] = b; return; } bs.push(b); }
-function bookTasks(name) {
-  var words = BOOK_WORDS[name] || [];
-  return (NOTE.tasks || []).filter(function (r) { return hasWord(norm(r.title), words.map(norm)); });
-}
-function renderNotes() {
-  var b = bookData(NOTE.book), day = todayJst();
-  fill($('#nbooks'), NOTE_BOOKS.map(function (n) {
-    var c = bookData(n).lines.length;
-    return h('button', { type: 'button', role: 'tab', 'aria-selected': String(n === NOTE.book), onclick: function () { NOTE.book = n; save('nbook', n); renderNotes(); } },
-      [n, c ? h('span', { class: 'c' }, [String(c)]) : null]);
-  }));
-  // 頭：担当／次の確認日／待っているもの（ここだけは書き換えられる。預け帳の代わり）
-  var hd = b.head || {};
-  function headInput(key, type, label, cls) {
-    var inp = h('input', { type: type, value: hd[key] || '', class: cls || null, 'aria-label': label });
-    inp.addEventListener('change', function () {
-      var head = Object.assign({}, b.head || {}); head[key] = inp.value.trim();
-      call('notehead', Object.assign({ room: NOTE.key, book: b.name }, head)).then(function (nb) { putBook(nb); renderNotes(); toast('残しました：' + label); },
-        function (e) { toast('残せませんでした：' + e.message, true); });
-    });
-    return h('label', { class: key === 'next' && hd.next && hd.next <= day ? 'due' : null }, [label, inp]);
-  }
-  fill($('#nhead'), [headInput('owner', 'text', '担当'), headInput('next', 'date', '次の確認日'), headInput('waiting', 'text', '待っているもの', 'wide')]);
-  // タスクに紐づける（任意）
-  var tasks = bookTasks(b.name);
-  fill($('#ntask'), [h('option', { value: '' }, ['タスクなし'])].concat(tasks.map(function (r) { return h('option', { value: r.id }, [(r.title || '（無題）').slice(0, 24)]); })));
-  // 前回のメモ：今日より前の最新の1行を、そのまま引く
-  var last = b.lines[0], cam = $('#ncam');
-  cam.hidden = !last || last.at.slice(0, 10) >= day;
-  if (!cam.hidden) fill(cam, [h('b', null, ['カミーユ']), '前回は ' + stampOf(last.at) + ' に、ここまで書いていました。']);
-  // 行：最新3行はそのまま、それより前はぼかす（触ると見える）
-  var lines = b.lines;
-  fill($('#nlines'), lines.length ? lines.map(function (x, i) {
-    var li = h('li', { class: i >= 3 ? 'old' : null }, [h('span', { class: 'at' }, [stampOf(x.at)]),
-      h('span', { class: 'tx', title: i >= 3 ? '触ると見えます' : null }, [x.text, x.taskTitle ? h('span', { class: 'tk' }, ['タスク：' + x.taskTitle]) : null])]);
-    if (i >= 3) li.addEventListener('click', function () { li.classList.toggle('shown'); });
-    return li;
-  }) : [h('li', { class: 'more' }, [h('span'), h('span', { class: 'state' }, ['まだ何も書いていません。上の欄に1行どうぞ。'])])]);
-  // 右：この案件のタスク（日付・メモ件数）
-  $('.ntasks .n').textContent = tasks.length ? tasks.length + '件' : '';
-  fill($('#ntasks'), tasks.length ? tasks.map(function (r) {
-    var n = lines.filter(function (x) { return x.task === r.id; }).length;
-    return h('div', { class: 'time' }, [h('span', { class: 'h' }, [r.date ? fmtMD(r.date.start) : '']), titleNode(r), h('span', { class: 'cnt' }, [n ? 'メモ ' + n : ''])]);
-  }) : [state(NOTE.tasks ? '題名でこの案件に当たる未完了タスクはありません' : 'タスクを読めませんでした')]);
-}
-$('#nadd').addEventListener('submit', function (e) {
-  e.preventDefault();
-  var text = $('#ntext').value.trim(); if (!text || !NOTE.key) return;
-  var sel = $('#ntask'), taskId = sel.value, taskTitle = taskId ? sel.options[sel.selectedIndex].textContent : '';
-  NOTE.rid = NOTE.rid || rid();
-  $('#ntext').disabled = true;
-  call('noteadd', { room: NOTE.key, book: NOTE.book, text: text, task: taskId, taskTitle: taskTitle, rid: NOTE.rid }, { long: true }).then(function (nb) {
-    putBook(nb); NOTE.rid = ''; $('#ntext').value = ''; renderNotes();
-  }, function (err) { toast('積めませんでした：' + err.message + '（書いたものは残っています）', true); })
-    .then(function () { $('#ntext').disabled = false; $('#ntext').focus(); });
-});
-$('#ntext').addEventListener('input', function () { NOTE.rid = ''; });
-
 /* ───────── ギャラリー（2026-10-10）：部屋の奥の小さな画廊。写真1枚と一言を、油彩風の絵にして金の額に ───────── */
 var GAL_ROOMS = [['whisky', 'ウイスキーの間'], ['pipe', 'パイプの間'], ['music', '音楽の間'], ['study', '書斎']];
 var AGAIN_LABEL = { yes: 'また欲しい', maybe: 'どちらでも', no: 'もういい' };
@@ -3384,27 +3159,62 @@ var TOPICS = [
 var D_LABEL = { near: '仕事に近い', mid: '少し遠い', far: '関係ない' };
 var topicSeed = dayIndex();
 function topicPool() { var c = S.content && S.content.ideas; return c && c.length >= 6 ? c : TOPICS; }
-function renderTopics() {
+function renderTopics(swap) {
   var all = topicPool(), pick = [];
   ['near', 'mid', 'far'].forEach(function (d) {
     var pool = all.filter(function (t) { return t.d === d; });
     for (var i = 0; i < 2 && pool.length; i++) { var t = pool[(topicSeed * 2 + i) % pool.length]; if (pick.indexOf(t) < 0) pick.push(t); }
   });
-  fill($('#topics'), pick.map(function (t) {
-    return h('li', { class: 'd-' + t.d }, [h('div', { class: 'kind' }, [h('b', null, [D_LABEL[t.d] || '']), t.k || '']),
+  var ul = $('#topics');
+  ul.classList.remove('swap'); if (swap) { void ul.offsetWidth; ul.classList.add('swap'); }
+  fill(ul, pick.map(function (t, i) {
+    return h('li', { class: 'd-' + t.d, style: '--i:' + i }, [h('div', { class: 'kind' }, [h('b', null, [D_LABEL[t.d] || '']), t.k || '']),
       h('h3', null, [t.t]), h('p', null, [t.q]),
       h('button', { class: 'link', type: 'button', onclick: function () { setRef(t); $('#ideaText').focus(); } }, ['これでメモする'])]);
   }));
 }
-$('#shuffle').addEventListener('click', function () { topicSeed++; renderTopics(); });
+$('#shuffle').addEventListener('click', function () { topicSeed++; renderTopics(true); });
 var ideaRef = null;
 function setRef(t) { ideaRef = t; $('#ideaRef').hidden = !t; if (t) $('#ideaRef span').textContent = '話題：' + t.t; }
 $('#ideaRefX').addEventListener('click', function () { setRef(null); });
-function loadIdeas() {
-  fill($('#ideaList'), [h('li', { class: 'empty' }, ['読み込み中…'])]);
-  return call('ideas').then(function (d) { S.ideas = d; renderIdeas(); },
-    function (e) { fill($('#ideaList'), [h('li', { class: 'empty' }, ['メモを読めませんでした：' + e.message])]); });
+function loadIdeas(quiet) {
+  if (!quiet || !S.ideas) fill($('#ideaList'), [h('li', { class: 'empty' }, ['読み込み中…'])]);
+  return call('ideas').then(function (d) { S.ideas = d; IDEA.at = Date.now(); renderIdeas(); },
+    function (e) { if (!quiet || !S.ideas) fill($('#ideaList'), [h('li', { class: 'empty' }, ['メモを読めませんでした：' + e.message])]); });
 }
+/* 引き出し（v5）：開くと右から滑り出す。開いているあいだはメモを1分ごとに読み直し（別の端末で書いたものも入る）、
+   話題は40秒ごとに入れ替える（触っているあいだ・話題を選んだあと・「自動で入れ替える」を切ったときは止める） */
+var IDEA = { open: false, at: 0, listT: null, topicT: null, seen: null, hold: false };
+function ideaAuto() { return load('ideaAuto') !== '0'; }
+function openIdeas() {
+  if (IDEA.open) return;
+  IDEA.open = true;
+  var d = $('#idrawer'), sc = $('#idScrim');
+  sc.hidden = false; void sc.offsetWidth; sc.classList.add('on');
+  d.classList.add('open'); d.setAttribute('aria-hidden', 'false');
+  ['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).setAttribute('aria-expanded', 'true'); });
+  $('#ideaAuto').setAttribute('aria-pressed', String(ideaAuto()));
+  if (!S.ideas || Date.now() - IDEA.at > 60e3) loadIdeas(true);
+  IDEA.listT = setInterval(function () { if (!document.hidden) loadIdeas(true); }, 60e3);
+  IDEA.topicT = setInterval(function () { if (ideaAuto() && !IDEA.hold && !ideaRef && !document.hidden) { topicSeed++; renderTopics(true); } }, 40e3);
+  setTimeout(function () { $('#ideaClose').focus({ preventScroll: true }); }, 60);
+}
+function closeIdeas() {
+  if (!IDEA.open) return;
+  IDEA.open = false;
+  var d = $('#idrawer'), sc = $('#idScrim');
+  d.classList.remove('open'); d.setAttribute('aria-hidden', 'true'); sc.classList.remove('on');
+  setTimeout(function () { if (!IDEA.open) sc.hidden = true; }, 400);
+  ['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).setAttribute('aria-expanded', 'false'); });
+  clearInterval(IDEA.listT); clearInterval(IDEA.topicT);
+}
+['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).addEventListener('click', function () { if (IDEA.open) closeIdeas(); else openIdeas(); }); });
+$('#ideaClose').addEventListener('click', closeIdeas);
+$('#idScrim').addEventListener('click', closeIdeas);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && IDEA.open) closeIdeas(); });
+$('#ideaAuto').addEventListener('click', function () { save('ideaAuto', ideaAuto() ? '0' : null); $('#ideaAuto').setAttribute('aria-pressed', String(ideaAuto())); });
+['pointerenter', 'focusin'].forEach(function (ev) { $('#topics').addEventListener(ev, function () { IDEA.hold = true; }); });
+['pointerleave', 'focusout'].forEach(function (ev) { $('#topics').addEventListener(ev, function () { IDEA.hold = false; }); });
 var savingIdea = false, ideaRid = '';
 function saveIdea() {
   var text = $('#ideaText').value.trim();
@@ -3423,13 +3233,17 @@ $('#ideaText').addEventListener('keydown', function (e) { if (e.key === 'Enter' 
 $('#ideaText').addEventListener('input', function () { ideaRid = ''; });
 function renderIdeas() {
   var list = (S.ideas && S.ideas.items) || [];
+  // 前に描いたときに無かったメモは、そっと入ってくる（最初の1回は光らせない）
+  var before = IDEA.seen; IDEA.seen = {};
+  list.forEach(function (m) { IDEA.seen[m.id] = 1; });
+  $('#idAt').textContent = IDEA.at ? new Date(IDEA.at + 9 * 3600e3).toISOString().slice(11, 16) + ' に読みました' : '';
   if (!list.length) { fill($('#ideaList'), [h('li', { class: 'empty' }, ['まだメモはありません。話題から始めても、何もないところから書いても。'])]); return; }
   fill($('#ideaList'), list.map(function (m) {
     var del = h('button', { class: 'link', type: 'button' }, ['消す']);
     twoStep(del, '消す', function () {
       call('ideadel', { id: m.id }).then(function (d) { S.ideas = d; renderIdeas(); }, function (e) { toast('消せませんでした：' + e.message, true); });
     });
-    return h('li', null, [h('div', { class: 'meta' }, [h('span', null, [stampOf(m.at)]), del]),
+    return h('li', { class: before && !before[m.id] ? 'new' : null }, [h('div', { class: 'meta' }, [h('span', null, [stampOf(m.at)]), del]),
       m.topic ? h('div', { class: 'of' }, ['話題：' + m.topic]) : null, h('div', { class: 'body' }, [m.text])]);
   }));
 }
@@ -3603,6 +3417,7 @@ document.addEventListener('visibilitychange', function () {
 });
 if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
   heroIn = es[0].isIntersecting;
+  document.body.classList.toggle('in-work', !heroIn);
   if (house === 'private') { if (heroIn) startMood(); else stopMood(); }
   if (!heroIn) document.body.classList.remove('idle');
 }, { threshold: 0.04 }).observe($('#private'));
@@ -4169,35 +3984,56 @@ $('#rnext').addEventListener('click', function () { ROOM.n++; renderRoom(); });
    ・前に出すのは、時刻／天気と今日の気温／次の予定／今日のタスク・持ち越し・メール／一日のレール（自分＝塗り、全体＝中抜き）
    ・タクバンの SOS（help だけ）を6秒ごとにブラウザから直接読む。板の在りかは合言葉の内側（canvas）から。書き込みは一切しない
    ・焼き付きよけに、3分ごとに字の位置を数 px ずらす。画面に触れると下に操作が出る（音・点けたまま・メールの件名・戻る）
-   URL に ?view=canvas を付けると、最初からキャンバスで開く（タブレットのホーム画面用） */
-var CV = { raf: 0, last: 0, W: 0, H: 0, DPR: 1, drops: [], flakes: [], stars: [], sosT: null, dataT: null, driftT: null, uiT: null,
+   URL に ?view=canvas を付けると、最初からキャンバスの全画面で開く（タブレットのホーム画面用）
+   v5（2026-11-07）：仕事ページの中に置いて、いつも動かす。SOS はページを開いているあいだずっと読む。
+   絵を描くのは見えているときだけ（画面の外・部屋・ほかのタブでは止める）。全画面は「全画面」ボタンか Esc で行き来する */
+var CV = { on: false, full: false, vis: false, raf: 0, last: 0, W: 0, H: 0, DPR: 1, drops: [], flakes: [], stars: [], sosT: null, dataT: null, driftT: null, uiT: null,
   sos: { raisedAt: {}, on: [], ackAt: 0, ackWho: '', err: 0, lastRing: 0 }, wake: null, actx: null };
 var CH = ['hall', 'kitchen'], CH_NAMES = { hall: 'ホール', kitchen: 'キッチン' };
 function cvPref(k) { return load('cv' + k) === '1'; }
 function startCanvas() {
-  cvSize(); CV.last = 0;
-  if (!CV.raf) CV.raf = requestAnimationFrame(cvFrame);
-  renderCanvas(); loadCanvas();
-  clearInterval(CV.dataT); CV.dataT = setInterval(function () { if (!document.hidden) { loadCanvas(); loadWork(true); } }, 5 * 60e3);
-  clearInterval(CV.sosT); CV.sosT = setInterval(sosPoll, 6000);
-  clearInterval(CV.driftT); CV.driftT = setInterval(function () {
-    $('#cv').style.transform = 'translate(' + Math.round(Math.random() * 16 - 8) + 'px,' + Math.round(Math.random() * 12 - 6) + 'px)';
+  if (CV.on) return;
+  CV.on = true;
+  cvSize(); renderCanvas(); loadCanvas();
+  CV.dataT = setInterval(function () { if (!document.hidden) loadCanvas(); }, 5 * 60e3);
+  CV.sosT = setInterval(sosPoll, 6000);
+  CV.driftT = setInterval(function () {
+    $('#cv').style.transform = CV.full ? 'translate(' + Math.round(Math.random() * 16 - 8) + 'px,' + Math.round(Math.random() * 12 - 6) + 'px)' : '';
   }, 3 * 60e3);
-  if (cvPref('wake')) wakeOn();
-  paintCtl();
+  paintCtl(); cvVis();
 }
-function stopCanvas() {
-  cancelAnimationFrame(CV.raf); CV.raf = 0;
-  clearInterval(CV.sosT); clearInterval(CV.dataT); clearInterval(CV.driftT);
-  if (CV.wake) { try { CV.wake.release(); } catch (e) {} CV.wake = null; }
+// 見えているときだけ描く
+var cvSeen = false;
+function cvVis() {
+  CV.vis = CV.on && !document.hidden && house === 'private' && (CV.full || cvSeen);
+  if (CV.vis && !CV.raf) { CV.last = 0; CV.raf = requestAnimationFrame(cvFrame); }
 }
+if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { cvSeen = es[0].isIntersecting; cvVis(); }).observe($('#canvas'));
+else cvSeen = true;
+if ('ResizeObserver' in window) new ResizeObserver(function () { if (CV.on) cvSize(); }).observe($('#canvas'));
+function cvSetFull(on) {
+  CV.full = on;
+  $('#canvas').classList.toggle('full', on);
+  $('#cvFull').setAttribute('aria-pressed', String(on)); $('#cvFull').textContent = on ? '小さく' : '全画面';
+  if (!on) $('#cv').style.transform = '';
+  if (on && cvPref('wake') && !CV.wake) wakeOn();
+  if (!on && CV.wake) { try { CV.wake.release(); } catch (e) {} CV.wake = null; }
+  // ブラウザの全画面は、許される開き方のときだけ（GAS の枠の中では断られることがある。断られても画面いっぱいには広がる）
+  try {
+    if (on && !document.fullscreenElement && $('#canvas').requestFullscreen) $('#canvas').requestFullscreen().catch(function () {});
+    if (!on && document.fullscreenElement) document.exitFullscreen().catch(function () {});
+  } catch (e) {}
+  cvSize(); renderCanvas(); cvVis();
+}
+document.addEventListener('fullscreenchange', function () { if (!document.fullscreenElement && CV.full) cvSetFull(false); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CV.full) cvSetFull(false); });
 function loadCanvas() {
   if (!token) return Promise.resolve();
   return call('canvas').then(function (d) { S.canvas = d; renderCanvas(); if (!CV.sos.polled) sosPoll(); }, function () {});
 }
 // 前に出す字
 function renderCanvas() {
-  if (house !== 'canvas') return;
+  if (!CV.on) return;
   var d = jstNow(), hh = hourOf(d), day = todayJst();
   fill($('#cvHm'), [String(d.getUTCHours()), h('i', null, [':']), pad(d.getUTCMinutes())]);
   $('#cvDate').textContent = (d.getUTCMonth() + 1) + '月' + d.getUTCDate() + '日　' + WD[d.getUTCDay()] + '曜日' + (isClosedDay(day) ? '　定休日' : '');
@@ -4284,8 +4120,9 @@ function cvSize() {
   CV.stars = []; for (var i = 0; i < 90; i++) CV.stars.push({ x: Math.random(), y: Math.random() * .6, r: Math.random() * 1.2 + .3, p: Math.random() * 6.3 });
   CV.drops = []; CV.flakes = [];
 }
-window.addEventListener('resize', function () { if (house === 'canvas') cvSize(); });
+window.addEventListener('resize', function () { if (CV.on) cvSize(); });
 function cvFrame(t) {
+  if (!CV.vis) { CV.raf = 0; return; }
   CV.raf = requestAnimationFrame(cvFrame);
   if (reduce && CV.last && t - CV.last < 60000) return;   // 動きを減らす設定なら1分に1回だけ描く
   if (t - CV.last < 50) return;                            // 20コマ/秒
@@ -4339,7 +4176,7 @@ function cvFrame(t) {
 
 // タクバンの SOS（help だけ）。常駐ボードと同じ読み方：板の at は端末の時計でずれるので6時間以内だけ使う。解除は on が落ちたのを見て判定
 function sosPoll() {
-  if (house !== 'canvas' || !S.canvas || !S.canvas.sos) return;
+  if (!CV.on || !S.canvas || !S.canvas.sos) return;
   CV.sos.polled = true;
   var src = S.canvas.sos, get = src.exec === 'mock'
     ? Promise.resolve(JSON.stringify({ help: { hall: params.get('sos') === '1' ? { on: true, at: Date.now() - 95e3 } : false, kitchen: false } }))
@@ -4373,7 +4210,7 @@ function renderSos() {
     el.className = 'cv-sos ack'; el.hidden = false; cv.classList.add('sos');
   } else { el.hidden = true; cv.classList.remove('sos'); }
 }
-setInterval(function () { if (house === 'canvas' && (CV.sos.on.length || CV.sos.ackAt)) renderSos(); }, 1000);
+setInterval(function () { if (CV.on && (CV.sos.on.length || CV.sos.ackAt)) renderSos(); }, 1000);
 // 知らせの音（Android はふるえる）。ブラウザは最初の操作まで鳴らせないので、ボタンで入れる
 function chime() {
   if (!cvPref('chime')) return;
@@ -4396,7 +4233,7 @@ function wakeOn() {
   navigator.wakeLock.request('screen').then(function (l) { CV.wake = l; l.addEventListener('release', function () { CV.wake = null; paintCtl(); }); paintCtl(); },
     function () { toast('画面を点けたままにできませんでした（この開き方では許可が下りないことがあります）', true); save('cvwake', null); paintCtl(); });
 }
-document.addEventListener('visibilitychange', function () { if (!document.hidden && house === 'canvas' && cvPref('wake') && !CV.wake) wakeOn(); });
+document.addEventListener('visibilitychange', function () { cvVis(); if (!document.hidden && CV.full && cvPref('wake') && !CV.wake) wakeOn(); });
 function paintCtl() {
   $('#cvChime').setAttribute('aria-pressed', String(cvPref('chime')));
   $('#cvWake').setAttribute('aria-pressed', String(!!CV.wake || cvPref('wake')));
@@ -4405,10 +4242,10 @@ function paintCtl() {
 $('#cvChime').addEventListener('click', function () { var on = !cvPref('chime'); save('cvchime', on ? '1' : null); paintCtl(); if (on) chime(); });
 $('#cvWake').addEventListener('click', function () {
   if (cvPref('wake')) { save('cvwake', null); if (CV.wake) { try { CV.wake.release(); } catch (e) {} CV.wake = null; } paintCtl(); }
-  else { save('cvwake', '1'); wakeOn(); }
+  else { save('cvwake', '1'); if (CV.full) wakeOn(); else paintCtl(); }
 });
 $('#cvMail').addEventListener('click', function () { save('cvmail', cvPref('mail') ? null : '1'); paintCtl(); renderCanvas(); });
-$('#cvBack').addEventListener('click', function () { setHouse('private'); });
+$('#cvFull').addEventListener('click', function () { cvSetFull(!CV.full); });
 ['pointerdown', 'pointermove', 'touchstart'].forEach(function (ev) {
   $('#canvas').addEventListener(ev, function () {
     $('#canvas').classList.add('ui'); clearTimeout(CV.uiT); CV.uiT = setTimeout(function () { $('#canvas').classList.remove('ui'); }, 5000);
@@ -4532,7 +4369,7 @@ function mockRoute(p) {
             L2('nodue', 'hub', '（見本）衛生マニュアルの承認', { who: '見本B' }),
             L2('unlink', 'hub', '（見本）冬季限定のラベル案', { due: addDays(T, 6), who: '見本A' }), L2('dup', 'hub', '（見本）見積書を送る', { due: addDays(T, 1), who: '' }),
             L2('wait', 'brewery', '（見本）官能検査の承認待ち L-1020', { due: addDays(T, -9), who: '見本E', note: '9日' }),
-            L2('moved', 'hub', '（見本）作業の表まとめ', { due: addDays(T, 2), who: '見本A', note: '3回' }), L2('stale', 'hub', '（見本）古いタスク', { due: addDays(T, -28), note: '28日' }),
+            L2('moved', 'hub', '（見本）作業の表まとめ', { due: addDays(T, 2), who: '見本A', note: '3回' }), L2('stale', 'hub', '（見本）古いタスク', { id: 'r-old', due: addDays(T, -28), note: '28日' }), L2('moved', 'hub', '（見本）古いタスク', { id: 'r-old', due: addDays(T, -28), note: '2回' }),
             L2('off', 'hub', '（見本）冷蔵庫の点検', { due: addDays(T, 1), who: '見本C', note: '見本C は ' + fmtMD(addDays(T, 1)) + ' のシフトにいません' }),
             L2('confirm', 'brewery', '（見本）T3 °P 2.5→3.1', { note: '逆戻り・確認者が測り直す', who: '見本D' }),
             L2('incident', 'haccp', '（見本）雨漏り', { due: addDays(T, -9), note: '是正の確認' }), L2('gap', 'haccp', '開店前チェック 60%', { note: '抜け 10日・16日' })],
@@ -4705,7 +4542,9 @@ function mockRoute(p) {
     // 更新ノート（2026-10-26）。アプリ名は架空（本物はサーバの REL が返す）
     // マップ（2026-11-01）。名前はすべて架空（本物はサーバが返す）
     case 'accessmap':
-      return ok({ url: 'https://example.com/map',
+      return ok({ url: 'https://example.com/map', at: '2026-11-06 12:00', deployAt: '2026-11-06 11:45',
+        subs: [{ k: 'a.list', app: 'a', n: '（見本）一覧', open: '?view=list', kind: '画面', d: '（見本）一覧の画面' }, { k: 'a.job', app: 'a', n: '（見本）毎朝の処理', open: '', kind: '自動処理', d: '' }],
+        stores: [{ sub: 'a.list', m: '見本の共有マスター', tab: '', rw: '読む' }, { sub: 'a.job', m: '見本の表', tab: '見本シート', rw: '書く' }],
         apps: [{ k: 'a', n: '見本アプリA', c: 0, deg: -90, st: '稼働', ver: 'v3', url: 'https://example.com/a', gas: 'https://example.com/a-edit', d: '（見本）入口のアプリ', stamp: '2026-10-30 10:00' },
           { k: 'b', n: '見本アプリB', c: 1, deg: 30, st: '稼働', ver: 'v2', url: 'https://example.com/b', gas: '', d: '（見本）記録のアプリ', stamp: '2026-10-29 10:00' },
           { k: 'c', n: '見本アプリC', c: 2, deg: 150, st: '稼働', ver: 'v5', url: '', gas: '', d: '（見本）在庫のアプリ', stamp: '' }],
@@ -4790,7 +4629,7 @@ function mockPanel() {
 }
 
 /* ───────── 起動 ───────── */
-function tick() { renderHead(); renderTimeline(); renderTimecard(); if (house === 'private') renderClock(); if (house === 'canvas') renderCanvas(); }
+function tick() { renderHead(); renderTimeline(); renderTimecard(); if (house === 'private') renderClock(); if (CV.on) renderCanvas(); }
 renderTrivia(); renderTopics(); renderWork();
 var first = params.get('house');
 // ?view=canvas はタブレットのホーム画面用（最初からキャンバスで開く）
@@ -4810,12 +4649,15 @@ function applyMode() {
 document.querySelectorAll('#modeSw [data-mode]').forEach(function (b) { b.addEventListener('click', function () { modeSet(b.getAttribute('data-mode')); }); });
 applyMode();
 setInterval(applyMode, 60e3);
-setHouse(params.get('view') === 'canvas' ? 'canvas' : 'private', true);
+setHouse('private', true);
+startCanvas();
+if (params.get('view') === 'canvas') cvSetFull(true);
 if (first === 'work' || params.get('view') === 'work') setTimeout(function () { toWork(false); }, 0);
-// モックだけ：?mock=1&tab=rounds などで仕事ページのそのタブを開く
-if (MOCK && ['ideas', 'notes', 'rel', 'rounds'].indexOf(params.get('tab')) >= 0) {
+// モックだけ：?mock=1&tab=map で仕事ページのそのタブを、&ideas=1 でアイデアの引き出しを開く
+if (MOCK && params.get('ideas') === '1') setTimeout(openIdeas, 300);
+if (MOCK && ['rounds', 'map'].indexOf(params.get('tab')) >= 0) {
   showTab(params.get('tab'));
-  if (params.get('tab') !== 'ideas') setTimeout(function () {
+  setTimeout(function () {
     var nv = document.querySelector('.w-nav'), sb = nv.querySelector('[aria-selected="true"]');
     $('#home').scrollTo({ top: $('#home').scrollTop + nv.getBoundingClientRect().top - 8 });
     if (sb) nv.scrollLeft += sb.getBoundingClientRect().right - nv.getBoundingClientRect().right + 8;   // 開いた直後は帯の幅が決まっていないので、着いてから送る
@@ -4823,7 +4665,7 @@ if (MOCK && ['ideas', 'notes', 'rel', 'rounds'].indexOf(params.get('tab')) >= 0)
 }
 renderClock();
 if (MOCK) mockPanel();
-if (!token) showGate(); else { loadWork(); loadPrivate(); }
+if (!token) showGate(); else { loadWork(); loadPrivate(); openRounds(); }
 setInterval(tick, 15e3);
 setInterval(function () { if (house === 'private') sayCam(); }, 15 * 60e3);
 setInterval(function () { if (!document.hidden && token && house === 'private') loadWork(true); }, 5 * 60e3);
