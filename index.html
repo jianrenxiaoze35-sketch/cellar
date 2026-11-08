@@ -52,7 +52,7 @@ button, input, textarea { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--bottle); outline-offset: 2px; }
 .house { position: fixed; inset: 0; overflow: auto; transition: opacity 1.2s ease, visibility 0s linear 1.2s; opacity: 0; visibility: hidden; }
-body[data-house="private"] #home, body[data-house="room"] #room { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
+body[data-house="private"] #home, body[data-house="room"] #room, body[data-house="under"] #under { opacity: 1; visibility: visible; transition: opacity 1.2s ease, visibility 0s; }
 body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 
 /* ───────── ひとつのページ（2026-10-22）：上がプライベート、下へスクロールすると仕事 ───────── */
@@ -826,38 +826,244 @@ a.ev:hover .ttl { text-decoration: underline; }
 .lt-today .sched { margin-top: 10px; gap: 24px 32px; }
 .lt-today .w-sec h2 { font: 600 15px/1.5 var(--pen-font); color: var(--pen); }
 
-/* アイデアの引き出し（v5） */
-.idrawer { position: fixed; z-index: 45; top: 0; right: 0; bottom: 0; width: min(480px, 100%); overflow: auto; overscroll-behavior: contain;
-  background: var(--paper); color: var(--ink); border-left: 1px solid var(--rule); box-shadow: -18px 0 40px rgba(0, 0, 0, .18);
-  padding: max(18px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
-  transform: translateX(104%); visibility: hidden; transition: transform .5s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .5s; }
-.idrawer.open { transform: none; visibility: visible; transition: transform .5s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
-.idrawer .ideas { grid-template-columns: 1fr; gap: 22px; }
-.idrawer #topics { columns: auto; }
-.id-head { display: flex; align-items: baseline; gap: 10px; position: sticky; top: calc(-1 * max(18px, env(safe-area-inset-top))); z-index: 1; background: var(--paper);
-  padding: 6px 0 10px; margin-bottom: 6px; border-bottom: 1px solid var(--rule); }
-.id-head h2 { margin: 0; font-size: 17px; }
-.id-head small { color: var(--muted); font-size: 12px; }
-.id-head .gap { flex: 1; }
+/* アイデアの地下室への入口（v5.5）。前の引き出しのうち、話題とメモの動きは残す */
 .topics-head .link + .link { margin-left: 12px; }
 #ideaAuto[aria-pressed="false"] { opacity: .6; }
-.id-scrim { position: fixed; inset: 0; z-index: 44; background: rgba(8, 10, 14, .28); opacity: 0; transition: opacity .4s ease; }
-.id-scrim.on { opacity: 1; }
 .id-tab { position: fixed; z-index: 43; right: 0; top: 50%; transform: translate(100%, -50%); writing-mode: vertical-rl; letter-spacing: .3em;
   border: 1px solid var(--rule); border-right: 0; border-radius: 10px 0 0 10px; background: var(--sheet); color: var(--ink); padding: 16px 9px; cursor: pointer;
   font-size: 13px; box-shadow: -4px 0 14px rgba(0, 0, 0, .08); transition: transform .45s cubic-bezier(.2, .8, .2, 1); }
 body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
-.id-tab .n { display: block; margin-top: 8px; font-size: 11px; color: var(--amber); letter-spacing: 0; }
 @keyframes idIn { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
 @keyframes idSwap { 0% { opacity: 0; transform: translateY(10px); filter: blur(3px); } 100% { opacity: 1; transform: none; filter: none; } }
 @keyframes idNew { 0% { background: color-mix(in srgb, var(--amber) 30%, transparent); } 100% { background: transparent; } }
-.idrawer.open .ideas > section { animation: idIn .55s cubic-bezier(.2, .8, .2, 1) both; }
-.idrawer.open .ideas > section + section { animation-delay: .08s; }
 #topics.swap li { animation: idSwap .7s ease both; animation-delay: calc(var(--i, 0) * 70ms); }
 .memos li.new { animation: idIn .5s ease both, idNew 2.4s ease .3s both; }
+
+/* ───────── アイデアの地下室（v5.5・2026-11-08）：くすんだ白の壁に黒インク。壁は果てなく続き、どのマスにも額が掛かる ─────────
+   色は昼夜・端末の設定にかかわらずこの組（本人の指定）。ここの中では既存の部品（メモ・話題）も同じ色に寄せる */
+#under { --ug-wall: #E4DFD3; --ug-paper: #F1EDE3; --ug-mat: #F6F3EA; --ug-ink: #1C1A17; --ug-ink2: #56524A; --ug-rule: rgba(28, 26, 23, .17);
+  --paper: var(--ug-wall); --sheet: var(--ug-paper); --ink: var(--ug-ink); --muted: var(--ug-ink2); --rule: var(--ug-rule);
+  --bottle: var(--ug-ink); --steel: var(--ug-ink); --plum: var(--ug-ink); --amber: #7A6A4F;
+  background: var(--ug-wall); color: var(--ug-ink); overflow: hidden; overflow: clip; font-family: var(--mincho); color-scheme: light; }
+#under .save { background: var(--ug-ink); color: var(--ug-wall); }
+#under .link { color: var(--ug-ink); text-decoration: underline; text-decoration-color: var(--ug-rule); text-underline-offset: 3px; }
+#under .memo textarea { font-family: var(--mincho); }
+.ug-wall { position: absolute; inset: 0; overflow: hidden; cursor: grab; touch-action: none; outline: none; user-select: none; -webkit-user-select: none;
+  background-color: var(--ug-wall);
+  background-image: radial-gradient(rgba(28, 26, 23, .05) .8px, transparent 1.3px), radial-gradient(rgba(28, 26, 23, .035) .8px, transparent 1.3px),
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, .35), transparent 60%);
+  background-size: 7px 7px, 11px 13px, 100% 100%; }
+.ug-wall.drag { cursor: grabbing; }
+.ug-wall.arrive { animation: ugDown 1.3s cubic-bezier(.2, .8, .2, 1) both; }
+.ug-wall.jump .ug-layer { opacity: 0; transition: opacity .25s ease; }
+.ug-layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; transition: opacity .3s ease; }
+.ug-links { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
+.ug-links line { stroke: var(--ug-ink); stroke-opacity: .17; stroke-width: 1; vector-effect: non-scaling-stroke; transition: stroke-opacity .3s ease; }
+.ug-links line.person { stroke-dasharray: 5 5; stroke-opacity: .26; }
+.ug-links line.hot { stroke-opacity: .7; stroke-width: 1.5; }
+@keyframes ugDown { from { opacity: 0; transform: translateY(-5%); filter: blur(5px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* 額 */
+.ug-f { position: absolute; width: var(--w, 230px); transform: translate(-50%, -50%) rotate(var(--r, 0deg)); cursor: pointer; outline: none;
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1), opacity .3s ease; }
+.ug-f.vt { width: max-content; }
+.ug-f::before { content: ""; position: absolute; left: 50%; top: -32px; width: 64%; max-width: 120px; height: 32px; transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(to top right, transparent calc(50% - .7px), rgba(28, 26, 23, .5) 50%, transparent calc(50% + .7px)) left / 50% 100% no-repeat,
+    linear-gradient(to top left, transparent calc(50% - .7px), rgba(28, 26, 23, .5) 50%, transparent calc(50% + .7px)) right / 50% 100% no-repeat; }
+.ug-f::after { content: ""; position: absolute; left: 50%; top: -36px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--ug-ink); pointer-events: none; }
+.ug-f .fr { position: relative; background: var(--ug-mat); padding: 20px 20px 14px; box-shadow: 0 12px 24px rgba(28, 26, 23, .13), 0 2px 4px rgba(28, 26, 23, .12); }
+.ug-f .cat { font: 10.5px/1.4 var(--gothic); letter-spacing: .22em; color: var(--ug-ink2); margin-bottom: 8px; }
+.ug-f .q { font: 400 15.5px/1.9 var(--mincho); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ug-ink); }
+.ug-f.big .q { font-size: 20px; line-height: 1.7; }
+.ug-f.vt .q { writing-mode: vertical-rl; height: var(--h, 220px); margin: 0 auto; line-height: 1.95; }
+.ug-f .tq { margin-top: 8px; font: 13px/1.7 var(--gothic); color: var(--ug-ink2); }
+.ug-f .who { margin-top: 10px; font: 11.5px/1.5 var(--gothic); color: var(--ug-ink2); text-align: right; }
+.ug-f.vt .who { max-width: 12em; margin-left: auto; }
+.ug-f.s-thin .fr { border: 1px solid var(--ug-ink); outline: 1px solid var(--ug-ink); outline-offset: 5px; }
+.ug-f.s-black .fr { border: 11px solid var(--ug-ink); }
+.ug-f.s-wood .fr { border: 9px solid #3B3731; box-shadow: inset 0 0 0 1px #77705F, 0 12px 24px rgba(28, 26, 23, .15), 0 2px 4px rgba(28, 26, 23, .12); }
+.ug-f.s-plain .fr { border: 0; border-top: 3px solid var(--ug-ink); }
+.ug-f.s-oval .fr { border-radius: 50%; border: 1px solid var(--ug-ink); outline: 5px double var(--ug-ink); outline-offset: 4px; padding: 36px 30px 30px; text-align: center; }
+.ug-f.s-oval .who { text-align: center; }
+.ug-f.s-mine .fr { background: var(--ug-paper); border: 1px solid var(--ug-ink);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 calc(1.9em - 1px), var(--ug-rule) calc(1.9em - 1px) 1.9em); }
+.ug-f.s-mine.vt .fr { background-image: repeating-linear-gradient(to left, transparent 0 calc(1.95em - 1px), var(--ug-rule) calc(1.95em - 1px) 1.95em); }
+.ug-f.s-slip::before { display: none; }
+.ug-f.s-slip::after { top: -5px; width: 10px; height: 10px; margin-left: -5px; box-shadow: 1px 2px 2px rgba(0, 0, 0, .25); }
+.ug-f.s-slip .fr { background: #F4F0E4; padding: 18px 18px 12px; box-shadow: 0 6px 12px rgba(28, 26, 23, .12); border-bottom: 1px solid rgba(28, 26, 23, .12); }
+.ug-f.k-memo .fr { background: #EFEADB; }
+.ug-f.k-memo .q { font-size: 14px; }
+.ug-f.s-pic { width: 250px; }
+.ug-f.s-pic .fr { padding: 14px; border: 10px solid #2A2723; box-shadow: inset 0 0 0 1px #6F6858, 0 14px 26px rgba(28, 26, 23, .18), 0 2px 4px rgba(28, 26, 23, .14); }
+.ug-f.s-pic img { display: block; width: 100%; height: auto; max-height: 260px; object-fit: contain; background: #D8D2C4; filter: saturate(.85); -webkit-user-drag: none; }
+.ug-f.s-pic .cap { margin-top: 8px; font: 11.5px/1.5 var(--gothic); color: var(--ug-ink2); }
+.ug-f.s-pic .cap b { font: 500 13px/1.5 var(--mincho); color: var(--ug-ink); }
+.ug-f:hover, .ug-f:focus-visible { z-index: 2; transform: translate(-50%, -52%) rotate(0deg) scale(1.03); }
+.ug-f:focus-visible .fr { box-shadow: 0 0 0 3px var(--ug-wall), 0 0 0 5px var(--ug-ink); }
+.ug-f.sel { z-index: 3; transform: translate(-50%, -52%) rotate(0deg) scale(1.05); }
+.ug-f.found .fr { animation: ugFound 1.6s ease; }
+@keyframes ugFound { 0%, 100% { box-shadow: 0 12px 24px rgba(28, 26, 23, .13); } 30% { box-shadow: 0 0 0 4px var(--ug-wall), 0 0 0 6px var(--ug-ink), 0 18px 34px rgba(28, 26, 23, .25); } }
+
+/* カミーユ（インクは夜の海の青） */
+#under { --ug-blue: #1F3A5C; }
+.ug-f.s-cam::before { display: none; }
+.ug-f.s-cam::after { top: -5px; width: 9px; height: 9px; margin-left: -4.5px; background: var(--ug-blue); }
+.ug-f.s-cam .fr { background: #F5F2EA; border: 1px solid rgba(31, 58, 92, .45); padding: 16px 18px 14px; box-shadow: 0 8px 18px rgba(28, 26, 23, .12); }
+.ug-f.s-cam .cat { color: var(--ug-blue); letter-spacing: .12em; }
+.ug-f.s-cam .wt { font: 500 17px/1.5 var(--mincho); color: var(--ug-blue); }
+.ug-f.s-cam .q { margin-top: 6px; font: 400 14px/1.85 var(--pen-font, var(--mincho)); color: var(--ug-blue); }
+.ug-f.ink-b .q, .ug-f.ink-b .who { color: var(--ug-blue); }
+.ug-cam { position: absolute; z-index: 3; left: 16px; top: 108px; max-width: min(420px, calc(100% - 32px)); margin: 0; padding: 14px 18px 12px;
+  background: rgba(245, 242, 234, .96); border: 1px solid rgba(31, 58, 92, .4); color: var(--ug-blue); font: 400 15px/1.85 var(--pen-font, var(--mincho));
+  box-shadow: 6px 6px 0 rgba(31, 58, 92, .08); cursor: pointer; opacity: 0; transform: translateY(-6px); transition: opacity .7s ease, transform .7s ease; }
+.ug-cam::before { content: "Camille"; position: absolute; left: 12px; top: -9px; padding: 0 6px; background: var(--ug-wall); font: italic 12px/1.4 "Cormorant Garamond", var(--mincho); letter-spacing: .12em; }
+.ug-cam.on { opacity: 1; transform: none; }
+@media (max-width: 700px) { .ug-cam { top: 150px; } }
+.ug-letter[data-ink="b"] textarea, .ug-letter[data-ink="b"] .ug-ltitle { color: var(--ug-blue); caret-color: var(--ug-blue); }
+.ug-ink { display: inline-flex; border: 1px solid var(--ug-blue); border-radius: 999px; overflow: hidden; margin-left: auto; margin-right: 8px; }
+.ug-ink button { border: 0; background: none; padding: 2px 10px; cursor: pointer; font: 12.5px/1.6 var(--gothic); color: var(--ug-ink); }
+.ug-ink button[data-ink="b"] { color: var(--ug-blue); }
+.ug-ink button[aria-checked="true"] { background: var(--ug-ink); color: var(--ug-paper); }
+.ug-ink button[data-ink="b"][aria-checked="true"] { background: var(--ug-blue); }
+
+/* 作品カード（本文は置かず、出どころへ） */
+.ug-f.s-work::before { display: none; }
+.ug-f.s-work::after { top: -4px; width: 8px; height: 8px; margin-left: -4px; }
+.ug-f.s-work .fr { background: var(--ug-mat); border: 1px solid var(--ug-ink); border-left: 6px solid var(--ug-ink); padding: 14px 16px 12px; box-shadow: 0 6px 14px rgba(28, 26, 23, .12); }
+.ug-f.s-work .wt { font: 500 18px/1.5 var(--mincho); }
+.ug-f.s-work .who { text-align: left; margin-top: 4px; }
+.ug-f.s-work .wl { margin-top: 8px; font: 11px var(--gothic); color: var(--ug-ink2); letter-spacing: .06em; }
+
+/* 名札（真ん中の人） */
+.ug-f.s-plate::before { width: 50%; }
+.ug-f.s-plate .fr { background: var(--ug-ink); color: var(--ug-paper); padding: 18px 20px 16px; border: 1px solid #000; outline: 1px solid rgba(241, 237, 227, .35); outline-offset: -7px;
+  box-shadow: 0 14px 28px rgba(28, 26, 23, .25), 0 2px 4px rgba(28, 26, 23, .2); }
+.ug-f.s-plate .cat { color: rgba(241, 237, 227, .65); }
+.ug-f.s-plate .pn { font: 500 25px/1.35 var(--mincho); letter-spacing: .14em; }
+.ug-f.s-plate .py { margin-top: 2px; font: 12px var(--gothic); color: rgba(241, 237, 227, .7); letter-spacing: .08em; }
+.ug-f.s-plate .pd { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(241, 237, 227, .25); font: 12.5px/1.75 var(--gothic); color: rgba(241, 237, 227, .85); }
+.ug-focus .fq.pn { font-size: 26px; letter-spacing: .14em; }
+.ug-hpeople { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; }
+.ug-hpeople button { border: 1px solid rgba(28, 26, 23, .4); border-radius: 999px; background: none; padding: 1px 10px; cursor: pointer; font: 12.5px/1.7 var(--mincho); color: var(--ug-ink); }
+.ug-hpeople button:hover { background: rgba(28, 26, 23, .07); }
+
+/* 上の帯 */
+.ug-top { position: absolute; z-index: 3; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  padding: max(12px, env(safe-area-inset-top)) 16px 14px; background: linear-gradient(var(--ug-wall) 62%, rgba(228, 223, 211, 0)); pointer-events: none; }
+.ug-top > * { pointer-events: auto; }
+.ug-top h1 { margin: 0; font: 500 19px/1.3 var(--mincho); letter-spacing: .14em; white-space: nowrap; }
+.ug-sp { flex: 1; }
+.ug-btn { border: 1px solid var(--ug-ink); background: transparent; color: var(--ug-ink); border-radius: 999px; padding: 4px 14px; cursor: pointer;
+  font: 13px/1.5 var(--gothic); text-decoration: none; white-space: nowrap; }
+.ug-btn:hover { background: rgba(28, 26, 23, .06); }
+.ug-btn[aria-expanded="true"] { background: var(--ug-ink); color: var(--ug-wall); }
+.ug-find { border: 0; border-bottom: 1px solid var(--ug-ink); border-radius: 0; background: transparent; padding: 3px 2px; width: 13em; font: 14px var(--gothic); color: var(--ug-ink); }
+.ug-find::placeholder { color: var(--ug-ink2); }
+.ug-find:focus { outline: none; border-bottom-width: 2px; }
+.ug-chips { flex-basis: 100%; display: flex; gap: 4px 12px; overflow-x: auto; scrollbar-width: none; }
+.ug-chips::-webkit-scrollbar { display: none; }
+.ug-chips button { white-space: nowrap; border: 0; border-bottom: 1px solid transparent; background: none; padding: 2px 1px; font: 13px var(--gothic); color: var(--ug-ink2); cursor: pointer; }
+.ug-chips button small { font-size: 11px; }
+.ug-chips button[aria-pressed="true"] { color: var(--ug-ink); border-bottom-color: var(--ug-ink); }
+.ug-hint { position: absolute; z-index: 2; left: 50%; bottom: max(22px, env(safe-area-inset-bottom)); transform: translateX(-50%); margin: 0; padding: 5px 14px;
+  font: 12px var(--gothic); color: var(--ug-ink2); background: rgba(241, 237, 227, .9); border: 1px solid var(--ug-rule); border-radius: 999px; white-space: nowrap;
+  opacity: 0; transition: opacity .8s ease; pointer-events: none; }
+.ug-hint.on { opacity: 1; }
+.ug-empty { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; font: 15px var(--mincho); color: var(--ug-ink2); }
+.ug-zoom { position: absolute; z-index: 3; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 6px; transition: right .5s cubic-bezier(.2, .8, .2, 1); }
+.ug-zoom button { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--ug-ink); background: var(--ug-paper); color: var(--ug-ink); cursor: pointer; font: 16px/1 var(--gothic); }
+#under.desk .ug-zoom { right: calc(min(520px, 100%) + 16px); }
+
+/* 近くで見る */
+.ug-focus { position: absolute; z-index: 4; left: 16px; bottom: max(16px, env(safe-area-inset-bottom)); width: min(430px, calc(100% - 32px)); max-height: calc(100% - 150px);
+  overflow: auto; overscroll-behavior: contain; background: var(--ug-paper); border: 1px solid var(--ug-ink); box-shadow: 8px 8px 0 rgba(28, 26, 23, .1); padding: 16px 20px 18px;
+  animation: idIn .45s cubic-bezier(.2, .8, .2, 1) both; }
+.ug-focus .fh { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ug-focus .cat { font: 11px var(--gothic); letter-spacing: .22em; color: var(--ug-ink2); }
+.ug-focus .fimg { display: block; width: 100%; max-height: 46vh; object-fit: contain; margin: 10px 0 4px; background: #D8D2C4; }
+.ug-focus .fq { margin: 10px 0 6px; font: 400 19px/1.9 var(--mincho); white-space: pre-wrap; overflow-wrap: anywhere; }
+.ug-focus .fq.vt { writing-mode: vertical-rl; max-height: 22em; overflow-x: auto; margin-left: auto; }
+.ug-focus .fby { font: 13px/1.6 var(--gothic); color: var(--ug-ink2); text-align: right; }
+.ug-focus .fsub { margin: 8px 0 0; font: 13.5px/1.8 var(--gothic); color: var(--ug-ink2); }
+.ug-focus .ftags { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 10px; }
+.ug-focus .ftags button { border: 0; background: none; padding: 0; cursor: pointer; font: 13px var(--gothic); color: var(--ug-ink); }
+.ug-focus .facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.ug-focus .frel { margin-top: 16px; border-top: 1px solid var(--ug-rule); padding-top: 10px; }
+.ug-focus .frel h3 { margin: 0 0 4px; font: 500 13px var(--gothic); color: var(--ug-ink2); letter-spacing: .1em; }
+.ug-focus .frel ul { list-style: none; margin: 0; padding: 0; }
+.ug-focus .frel li { padding: 3px 0; }
+.ug-focus .frel .link { text-align: left; font: 14px/1.6 var(--mincho); }
+
+/* 机 */
+.ug-desk { position: absolute; z-index: 5; top: 0; right: 0; bottom: 0; width: min(520px, 100%); display: flex; flex-direction: column;
+  background: #DDD7CA; border-left: 1px solid var(--ug-ink); box-shadow: -14px 0 30px rgba(28, 26, 23, .12);
+  transform: translateX(104%); visibility: hidden; transition: transform .5s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .5s; }
+.ug-desk.open { transform: none; visibility: visible; transition: transform .5s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+.ug-dhead { display: flex; align-items: center; gap: 10px; padding: max(12px, env(safe-area-inset-top)) 18px 0; border-bottom: 1px solid var(--ug-rule); }
+.ug-tabs { display: flex; gap: 2px; flex: 1; }
+.ug-tabs button { border: 0; border-bottom: 2px solid transparent; background: none; padding: 8px 12px; cursor: pointer; font: 500 14px var(--mincho); color: var(--ug-ink2); }
+.ug-tabs button[aria-selected="true"] { color: var(--ug-ink); border-bottom-color: var(--ug-ink); }
+.ug-tabs small { margin-left: 4px; font: 11px var(--gothic); }
+.ug-pane { flex: 1; overflow: auto; overscroll-behavior: contain; padding: 18px 18px max(22px, env(safe-area-inset-bottom)); }
+.ug-pane .ideas { grid-template-columns: 1fr; gap: 22px; }
+.ug-pane #topics { columns: auto; }
+.ug-pane #idAt { display: block; color: var(--ug-ink2); font-size: 12px; margin-bottom: 6px; }
+@media (max-width: 700px) {
+  .ug-desk { top: auto; width: 100%; height: 88%; border-left: 0; border-top: 1px solid var(--ug-ink); box-shadow: 0 -14px 30px rgba(28, 26, 23, .14); transform: translateY(104%); }
+  #under.desk .ug-zoom { right: 16px; }
+  .ug-find { width: 100%; order: 5; flex-basis: 100%; }
+  .ug-top h1 { font-size: 16px; }
+  .ug-focus { max-height: 58%; }
+  .ug-hint { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 52px); }
+}
+
+/* 便箋 */
+.ug-letter { --lh: 2.15em; position: relative; background: var(--ug-paper); border: 1px solid rgba(28, 26, 23, .32); padding: 16px 22px 20px;
+  box-shadow: 0 1px 0 #fff inset, 5px 7px 0 -1px rgba(28, 26, 23, .08), 0 8px 22px rgba(28, 26, 23, .1); }
+.ug-letter::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--ug-rule); pointer-events: none; }
+.ug-lhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; font: 12px var(--gothic); color: var(--ug-ink2); }
+.ug-dir { display: inline-flex; border: 1px solid var(--ug-ink); border-radius: 999px; overflow: hidden; }
+.ug-dir button { border: 0; background: none; padding: 2px 12px; cursor: pointer; font: 12.5px/1.6 var(--gothic); color: var(--ug-ink); }
+.ug-dir button[aria-checked="true"] { background: var(--ug-ink); color: var(--ug-paper); }
+.ug-ltitle { display: block; width: 100%; border: 0; border-bottom: 1px solid var(--ug-ink); background: transparent; color: var(--ug-ink); padding: 4px 0; margin-bottom: 10px;
+  font: 500 19px/1.6 var(--mincho); border-radius: 0; }
+.ug-ltitle:focus { outline: none; border-bottom-width: 2px; }
+.ug-ltitle::placeholder, .ug-letter textarea::placeholder { color: rgba(28, 26, 23, .35); }
+.ug-from { display: flex; justify-content: space-between; gap: 8px; margin: -4px 0 8px; font: 12.5px/1.6 var(--gothic); color: var(--ug-ink2); }
+.ug-letter textarea { display: block; width: 100%; height: 26em; margin: 0; padding: 0; border: 0; border-radius: 0; outline: none; resize: vertical;
+  background-color: transparent; color: var(--ug-ink); font: 400 17px/var(--lh) var(--mincho); caret-color: var(--ug-ink);
+  background-image: linear-gradient(to bottom, transparent calc(var(--lh) - 1px), var(--ug-rule) calc(var(--lh) - 1px));
+  background-size: 100% var(--lh); background-attachment: local; }
+.ug-letter[data-dir="v"] textarea { writing-mode: vertical-rl; height: 25em; resize: none; overflow-x: auto; overflow-y: hidden;
+  background-image: linear-gradient(to left, transparent calc(var(--lh) - 1px), var(--ug-rule) calc(var(--lh) - 1px));
+  background-size: var(--lh) 100%; background-position: right top; }
+.ug-lact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 12px; }
+.ug-lact .hint { font: 12px var(--gothic); color: var(--ug-ink2); }
+.ug-vlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.ug-vlist li { background: var(--ug-paper); border: 1px solid rgba(28, 26, 23, .25); padding: 12px 16px; }
+.ug-vlist li.empty { background: none; border: 0; color: var(--ug-ink2); font-size: 14px; }
+.ug-vlist .vh { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.ug-vlist .vh b { font: 500 16px var(--mincho); }
+.ug-vlist .vh small { font: 11.5px var(--gothic); color: var(--ug-ink2); white-space: nowrap; }
+.ug-vlist .vb { margin-top: 6px; font: 15px/1.9 var(--mincho); white-space: pre-wrap; max-height: 7.6em; overflow: hidden; }
+.ug-vlist li.v .vb { writing-mode: vertical-rl; height: 10em; max-height: none; max-width: 100%; overflow: hidden; margin-left: auto; }
+.ug-vlist .vf { margin-top: 4px; font: 12px var(--gothic); color: var(--ug-ink2); }
+.ug-vlist .va { display: flex; gap: 14px; margin-top: 8px; }
+
+/* 額を掛ける */
+.ug-hang { position: absolute; z-index: 6; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(28, 26, 23, .3); }
+.ug-hform { width: min(460px, 100%); max-height: 100%; overflow: auto; background: var(--ug-paper); border: 1px solid var(--ug-ink); padding: 18px 22px 20px; box-shadow: 10px 10px 0 rgba(28, 26, 23, .14); }
+.ug-hform h2 { margin: 0 0 10px; font: 500 18px var(--mincho); letter-spacing: .1em; }
+.ug-hform label { display: block; margin: 0 0 10px; font: 12.5px/1.6 var(--gothic); color: var(--ug-ink2); }
+.ug-hform input:not([type="checkbox"]), .ug-hform select, .ug-hform textarea { display: block; width: 100%; margin-top: 2px; border: 1px solid rgba(28, 26, 23, .35); border-radius: 4px;
+  background: var(--ug-mat); color: var(--ug-ink); padding: 6px 8px; font: 15px/1.7 var(--mincho); }
+.ug-hform label.ck { display: flex; align-items: center; gap: 8px; color: var(--ug-ink); }
+.ug-hform .hint { margin: 4px 0 0; font: 12px/1.6 var(--gothic); color: var(--ug-ink2); }
+.ug-hact { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
 @media (prefers-reduced-motion: reduce) {
-  .idrawer, .idrawer.open, .id-tab, .id-scrim { transition: none; }
-  .idrawer.open .ideas > section, #topics.swap li, .memos li.new { animation: none; }
+  .id-tab, .ug-desk, .ug-desk.open, .ug-f, .ug-zoom { transition: none; }
+  #topics.swap li, .memos li.new, .ug-wall.arrive, .ug-focus, .ug-f.found .fr { animation: none; }
+  .ug-cam { transition: none; }
 }
 
 /* ───────── しらせ ───────── */
@@ -983,7 +1189,7 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
       <div class="mode-sw" id="modeSw" role="radiogroup" aria-label="昼と夜">
         <button type="button" role="radio" data-mode="auto" aria-checked="true">自動</button><button type="button" role="radio" data-mode="day" aria-checked="false">昼</button><button type="button" role="radio" data-mode="night" aria-checked="false">夜</button>
       </div>
-      <button type="button" class="act w-go" id="ideaOpen" aria-expanded="false" aria-controls="idrawer">アイデア</button>
+      <button type="button" class="act w-go" id="ideaOpen" aria-expanded="false" aria-controls="under" title="アイデアの地下室へ降りる">地下室へ</button>
     </header>
     <p class="w-cam"><b>カミーユ</b><span id="wCam"></span></p>
     <!-- タイムカード（2026-10-22）。記録は個人ドライブの Cellar/timecard.json -->
@@ -1121,12 +1327,60 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
   </div>
 </main>
 
-<!-- アイデアの引き出し（v5・2026-11-07）：右から出てくる。開いているあいだ、メモは1分ごとに読み直し、話題は40秒ごとに入れ替わる -->
-<button type="button" class="id-tab" id="ideaTab" aria-controls="idrawer" aria-expanded="false">アイデア</button>
-<div class="id-scrim" id="idScrim" hidden></div>
-<aside class="idrawer" id="idrawer" aria-label="アイデア" aria-hidden="true">
-  <div class="id-head"><h2>アイデア</h2><small id="idAt"></small><span class="gap"></span><button type="button" class="link" id="ideaClose">閉じる</button></div>
-  <div class="ideas">
+<!-- アイデアの地下室への入口（v5.5）：プライベートで仕事のところまで下りると右に出る -->
+<button type="button" class="id-tab" id="ideaTab" aria-controls="under" aria-expanded="false" title="アイデアの地下室へ降りる">地下室</button>
+
+</div><!-- /#home -->
+
+<!-- ───────── アイデアの地下室（v5.5・2026-11-08）─────────
+     壁の額：手持ちの言葉と絵（パブリックドメインだけ）＋本人が掛けた言葉（Drive の Cellar/quotes.json。公開ページには載らない）＋表紙の詩＋書いた詩＋話題＋好きなもの。
+     机：便箋（縦書き・横書き。Cellar/verses.json）・詩稿・メモ（前の「アイデア」の話題とメモ） -->
+<section id="under" class="house" aria-label="アイデアの地下室" aria-hidden="true">
+  <div class="ug-wall" id="ugWall" tabindex="0" aria-label="壁。ドラッグで歩き、Ctrl＋ホイールで寄る。矢印キーでも動く">
+    <div class="ug-layer" id="ugLayer"><svg class="ug-links" id="ugLinks" aria-hidden="true"></svg></div>
+  </div>
+  <header class="ug-top">
+    <button type="button" class="ug-btn" id="ugUp">↑ 上がる</button>
+    <h1>アイデアの地下室</h1>
+    <span class="ug-sp"></span>
+    <input type="search" class="ug-find" id="ugFind" placeholder="ことば・人・タグをさがす" aria-label="額をさがす">
+    <button type="button" class="ug-btn" id="ugHangBtn">額を掛ける</button>
+    <button type="button" class="ug-btn" id="ugDeskBtn" aria-expanded="false" aria-controls="ugDesk">机</button>
+    <nav class="ug-chips" id="ugChips" aria-label="額をしぼる"></nav>
+  </header>
+  <p class="ug-cam" id="ugCam" role="status" hidden></p>
+  <p class="ug-hint" id="ugHint">ドラッグで歩く ・ Ctrl＋ホイールで寄る ・ 額を押すと近くで見る</p>
+  <p class="ug-empty" id="ugEmpty" hidden></p>
+  <div class="ug-zoom" role="group" aria-label="壁の見え方">
+    <button type="button" id="ugOut" aria-label="遠くから見る">−</button><button type="button" id="ugHome" aria-label="きょうの壁にもどる">⌂</button><button type="button" id="ugIn" aria-label="近くで見る">＋</button>
+  </div>
+  <aside class="ug-focus" id="ugFocus" aria-label="額を近くで" hidden></aside>
+  <aside class="ug-desk" id="ugDesk" aria-label="机" aria-hidden="true">
+    <div class="ug-dhead">
+      <div class="ug-tabs" role="tablist" aria-label="机の上">
+        <button type="button" role="tab" id="ugT-paper" aria-controls="ugP-paper" aria-selected="true">便箋</button>
+        <button type="button" role="tab" id="ugT-drafts" aria-controls="ugP-drafts" aria-selected="false">詩稿<small id="ugVN"></small></button>
+        <button type="button" role="tab" id="ugT-memo" aria-controls="ugP-memo" aria-selected="false">メモ</button>
+      </div>
+      <button type="button" class="link" id="ugDeskX">閉じる</button>
+    </div>
+    <div class="ug-pane" role="tabpanel" id="ugP-paper" aria-labelledby="ugT-paper">
+      <div class="ug-letter" id="ugLetter" data-dir="v" data-ink="k">
+        <div class="ug-lhead"><span id="ugLDate"></span>
+          <div class="ug-ink" role="radiogroup" aria-label="インク"><button type="button" role="radio" data-ink="k" aria-checked="true">黒</button><button type="button" role="radio" data-ink="b" aria-checked="false">夜の海</button></div>
+          <div class="ug-dir" role="radiogroup" aria-label="書く向き"><button type="button" role="radio" data-dir="v" aria-checked="true">縦書き</button><button type="button" role="radio" data-dir="h" aria-checked="false">横書き</button></div>
+        </div>
+        <input type="text" class="ug-ltitle" id="ugTitle" maxlength="80" placeholder="題" aria-label="詩の題">
+        <div class="ug-from" id="ugFrom" hidden><span></span><button type="button" class="link" id="ugFromX">外す</button></div>
+        <textarea id="ugBody" aria-label="便箋" placeholder="ここに書く" spellcheck="false"></textarea>
+      </div>
+      <div class="ug-lact"><span class="hint" id="ugLHint">Ctrl＋Enter でも保存できます</span><span class="ug-sp"></span>
+        <button type="button" class="link" id="ugNew">新しい便箋</button><button type="button" class="save" id="ugSave">保存する</button></div>
+    </div>
+    <div class="ug-pane" role="tabpanel" id="ugP-drafts" aria-labelledby="ugT-drafts" hidden><ol class="ug-vlist" id="ugVList"></ol></div>
+    <div class="ug-pane" role="tabpanel" id="ugP-memo" aria-labelledby="ugT-memo" hidden>
+      <small id="idAt"></small>
+      <div class="ideas">
         <section aria-label="話題">
           <div class="topics-head"><h2>今日の話題</h2><button type="button" class="link" id="shuffle">別の話題にする</button><button type="button" class="link" id="ideaAuto" aria-pressed="true">自動で入れ替える</button></div>
           <ul id="topics"></ul>
@@ -1139,9 +1393,24 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
           <ol class="memos" id="ideaList"></ol>
         </section>
       </div>
-</aside>
-
-</div><!-- /#home -->
+    </div>
+  </aside>
+  <div class="ug-hang" id="ugHang" hidden>
+    <form class="ug-hform" id="ugHForm" aria-labelledby="ugHT" novalidate>
+      <h2 id="ugHT">額を掛ける</h2>
+      <label>だれの言葉<input id="ugHWho" maxlength="60" autocomplete="off"></label>
+      <div class="ug-hpeople" id="ugHPeople" aria-label="真ん中の人"></div>
+      <label>種類<select id="ugHCat"></select></label>
+      <label>言葉<textarea id="ugHText" rows="5" maxlength="800"></textarea></label>
+      <label>出典（作品名・場面）<input id="ugHSrc" maxlength="120" autocomplete="off"></label>
+      <label>タグ（空白か読点で区切る）<input id="ugHTags" placeholder="旅 光 創る" autocomplete="off"></label>
+      <label>絵や写真の URL（https・なくてもよい）<input id="ugHImg" type="url" inputmode="url" placeholder="https://" autocomplete="off"></label>
+      <label class="ck"><input type="checkbox" id="ugHV"> 縦書きで飾る</label>
+      <p class="hint">掛けた言葉は個人のドライブにだけ保存されます。公開ページには載りません。</p>
+      <div class="ug-hact"><span class="hint" id="ugHHint"></span><span class="ug-sp"></span><button type="button" class="link" id="ugHCancel">やめる</button><button type="submit" class="save" id="ugHSave">掛ける</button></div>
+    </form>
+  </div>
+</section>
 
 <!-- ───────── カミーユの部屋（器だけ。中身は合図のあと GAS から） ───────── -->
 <section id="room" class="house" aria-label="カミーユの部屋">
@@ -1228,7 +1497,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-07 v5.3';
+var BUILD = '2026-11-08 v5.5';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -1807,6 +2076,7 @@ function setHouse(hs, quiet) {
   if (hs === 'private') { if (heroIn) startMood(); renderClock(); } else stopMood();
   cvVis();
   if (hs !== 'room') { closeSecret(); dropRoom(); }
+  if (hs !== 'under' && UG.open) closeUnder();
   if (hs !== 'private') { closeSheet(); closeDrawer(); closeTasting(); }
   if (!quiet) poke();
 }
@@ -2240,11 +2510,11 @@ function rdAge(at) {
 }
 // 迷子の11の規則を、意味で5つに分ける（上から急ぐ順）。short はチャートの行の名前
 var RD_CATS = [
-  { label: '人が決まっていない', short: '人が決まっていない', rules: ['owner', 'off'], hot: true },
+  { label: '担当がその日いない', short: '担当がその日いない', rules: ['owner', 'off'], hot: true },   // v5.4：担当者の無いタスクは見回りに含めない
   { label: '衛生と記録', short: '衛生と記録', rules: ['incident', 'gap', 'confirm'], hot: true },
   { label: '誰かを待っている', short: '誰かを待っている', rules: ['wait'] },
   { label: '日付が決まらない・動いている', short: '日付が動いている', rules: ['nodue', 'moved', 'stale'] },
-  { label: '整理するもの', short: '整理するもの', rules: ['unlink', 'dup'] }
+  { label: '整理するもの', short: '整理するもの', rules: ['unlink', 'dup'] }   // v5.4：unlink（結びついていない）はサーバが出さない。残るのは個人と全体の同じ題名だけ
 ];
 var RD_APP_KEYS = ['hub', 'haccp', 'brewery', 'kanri', 'shift'];
 var RD_APP_SHORT = { hub: 'ハブ', haccp: 'HACCP', brewery: '台帳', kanri: '会計', shift: 'シフト' };   // 狭い幅のチャートの行の名前   // 色の順（分類色の1〜5番）。絞っても色は変えない
@@ -2397,7 +2667,8 @@ function renderRounds() {
       title: down ? '読めませんでした' : null, onclick: function () { RD.app = key; RD.cat = -1; renderRounds(); rdFade(document.querySelector('.letter')); } },
       [key ? h('i', { 'aria-hidden': 'true' }) : null, label, h('b', null, [down ? '!' : String(n)])]);
   };
-  fill($('#rdIdx'), [chip('', 'すべて', v.lost.length)].concat(v.tiles.map(function (t) { return chip(t.key, t.label, t.lost, !t.ok); })));
+  var allN = {}; v.lost.forEach(function (x) { allN[x.app + '|' + x.id] = 1; });
+  fill($('#rdIdx'), [chip('', 'すべて', Object.keys(allN).length)].concat(v.tiles.map(function (t) { return chip(t.key, t.label, t.lost, !t.ok); })));
   var cur = RD.app ? v.tiles.filter(function (t) { return t.key === RD.app; })[0] : null;
   $('#rdApp').hidden = !cur;
   if (cur) {
@@ -3390,36 +3661,13 @@ function loadIdeas(quiet) {
   return call('ideas').then(function (d) { S.ideas = d; IDEA.at = Date.now(); renderIdeas(); },
     function (e) { if (!quiet || !S.ideas) fill($('#ideaList'), [h('li', { class: 'empty' }, ['メモを読めませんでした：' + e.message])]); });
 }
-/* 引き出し（v5）：開くと右から滑り出す。開いているあいだはメモを1分ごとに読み直し（別の端末で書いたものも入る）、
+/* 地下室（v5.5）：前の引き出しの代わり。降りているあいだはメモを1分ごとに読み直し（別の端末で書いたものも入る）、
    話題は40秒ごとに入れ替える（触っているあいだ・話題を選んだあと・「自動で入れ替える」を切ったときは止める） */
 var IDEA = { open: false, at: 0, listT: null, topicT: null, seen: null, hold: false };
 function ideaAuto() { return load('ideaAuto') !== '0'; }
-function openIdeas() {
-  if (IDEA.open) return;
-  IDEA.open = true;
-  var d = $('#idrawer'), sc = $('#idScrim');
-  sc.hidden = false; void sc.offsetWidth; sc.classList.add('on');
-  d.classList.add('open'); d.setAttribute('aria-hidden', 'false');
-  ['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).setAttribute('aria-expanded', 'true'); });
-  $('#ideaAuto').setAttribute('aria-pressed', String(ideaAuto()));
-  if (!S.ideas || Date.now() - IDEA.at > 60e3) loadIdeas(true);
-  IDEA.listT = setInterval(function () { if (!document.hidden) loadIdeas(true); }, 60e3);
-  IDEA.topicT = setInterval(function () { if (ideaAuto() && !IDEA.hold && !ideaRef && !document.hidden) { topicSeed++; renderTopics(true); } }, 40e3);
-  setTimeout(function () { $('#ideaClose').focus({ preventScroll: true }); }, 60);
-}
-function closeIdeas() {
-  if (!IDEA.open) return;
-  IDEA.open = false;
-  var d = $('#idrawer'), sc = $('#idScrim');
-  d.classList.remove('open'); d.setAttribute('aria-hidden', 'true'); sc.classList.remove('on');
-  setTimeout(function () { if (!IDEA.open) sc.hidden = true; }, 400);
-  ['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).setAttribute('aria-expanded', 'false'); });
-  clearInterval(IDEA.listT); clearInterval(IDEA.topicT);
-}
-['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).addEventListener('click', function () { if (IDEA.open) closeIdeas(); else openIdeas(); }); });
-$('#ideaClose').addEventListener('click', closeIdeas);
-$('#idScrim').addEventListener('click', closeIdeas);
-document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && IDEA.open) closeIdeas(); });
+function openIdeas() { openUnder(); }
+function closeIdeas() { closeUnder(); }
+['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).addEventListener('click', function () { if (UG.open) closeUnder(); else openUnder(); }); });
 $('#ideaAuto').addEventListener('click', function () { save('ideaAuto', ideaAuto() ? '0' : null); $('#ideaAuto').setAttribute('aria-pressed', String(ideaAuto())); });
 ['pointerenter', 'focusin'].forEach(function (ev) { $('#topics').addEventListener(ev, function () { IDEA.hold = true; }); });
 ['pointerleave', 'focusout'].forEach(function (ev) { $('#topics').addEventListener(ev, function () { IDEA.hold = false; }); });
@@ -3444,6 +3692,7 @@ function renderIdeas() {
   // 前に描いたときに無かったメモは、そっと入ってくる（最初の1回は光らせない）
   var before = IDEA.seen; IDEA.seen = {};
   list.forEach(function (m) { IDEA.seen[m.id] = 1; });
+  if (UG.open && (!before || Object.keys(before).length !== list.length || list.some(function (m) { return !before[m.id]; }))) { UG.dirty = true; ugRefresh(); }
   $('#idAt').textContent = IDEA.at ? new Date(IDEA.at + 9 * 3600e3).toISOString().slice(11, 16) + ' に読みました' : '';
   if (!list.length) { fill($('#ideaList'), [h('li', { class: 'empty' }, ['まだメモはありません。話題から始めても、何もないところから書いても。'])]); return; }
   fill($('#ideaList'), list.map(function (m) {
@@ -3455,6 +3704,847 @@ function renderIdeas() {
       m.topic ? h('div', { class: 'of' }, ['話題：' + m.topic]) : null, h('div', { class: 'body' }, [m.text])]);
   }));
 }
+
+/* ───────── アイデアの地下室（v5.5・2026-11-08・本人の指示） ─────────
+   壁は果てなく続く格子で、どのマスにも額が1つ掛かる。並びは日ごとに変わる（⌂ で今日の場所に戻る）。
+   同じ人・同じタグの額は細いインクの線でつながる（Obsidian のグラフのように。人どうしは点線）。額を押すと近くで見て、つながる額へ渡れる。
+   手持ちの言葉と絵は、保護期間の切れたもの（パブリックドメイン）だけ。外国語の訳はこの画面のもの。
+   本人が掛けた言葉・表紙の詩・書いた詩・メモは合言葉の内側で読み、このファイルには入れない */
+var UG_CATS = [['poet', '詩人'], ['singer', '歌手・音楽家'], ['artist', '芸術家'], ['politician', '政治家'], ['scholar', '研究者'], ['writer', '作家・思想家'], ['other', 'そのほか']];
+var UG_CAT = {}; UG_CATS.forEach(function (c) { UG_CAT[c[0]] = c[1]; });
+var UG_KIND = { topic: 'トピック', fav: '好きなもの', mine: 'わたしの詩', memo: 'メモ', plate: '真ん中の人', work: '作品', cam: 'カミーユ' };
+// c 種類／w だれ／s 出典／t 言葉／g タグ／v 縦書きで飾る
+var UG_QUOTES = [
+  { c: 'poet', w: '宮沢賢治', s: '「雨ニモマケズ」', t: '雨ニモマケズ\n風ニモマケズ\n雪ニモ夏ノ暑サニモマケヌ\n丈夫ナカラダヲモチ', g: ['生きる', '自然'], v: 1 },
+  { c: 'poet', w: '宮沢賢治', s: '『農民芸術概論綱要』', t: '世界がぜんたい幸福にならないうちは個人の幸福はあり得ない', g: ['働く', '生きる'] },
+  { c: 'poet', w: '宮沢賢治', s: '『春と修羅』序', t: 'わたくしといふ現象は\n仮定された有機交流電燈の\nひとつの青い照明です', g: ['光', '問い'] },
+  { c: 'poet', w: '石川啄木', s: '『一握の砂』', t: 'はたらけど\nはたらけど猶わが生活楽にならざり\nぢつと手を見る', g: ['働く'], v: 1 },
+  { c: 'poet', w: '石川啄木', s: '『一握の砂』', t: 'ふるさとの訛なつかし\n停車場の人ごみの中に\nそを聴きにゆく', g: ['ふるさと', '言葉'], v: 1 },
+  { c: 'poet', w: '萩原朔太郎', s: '「旅上」', t: 'ふらんすへ行きたしと思へども\nふらんすはあまりに遠し\nせめては新しき背広をきて\nきままなる旅にいでてみん。', g: ['旅'] },
+  { c: 'poet', w: '高村光太郎', s: '「道程」', t: '僕の前に道はない\n僕の後ろに道は出来る', g: ['道', '創る'] },
+  { c: 'poet', w: '北原白秋', s: '「落葉松」', t: 'からまつの林を過ぎて、\nからまつをしみじみと見き。\nからまつはさびしかりけり。\nたびゆくはさびしかりけり。', g: ['旅', '自然'], v: 1 },
+  { c: 'poet', w: '北原白秋', s: '「邪宗門秘曲」', t: 'われは思ふ、末世の邪宗、切支丹でうすの魔法。', g: ['言葉', '夜'], v: 1 },
+  { c: 'poet', w: '島崎藤村', s: '「初恋」', t: 'まだあげ初めし前髪の\n林檎のもとに見えしとき', g: ['美'], v: 1 },
+  { c: 'poet', w: '松尾芭蕉', s: '', t: '古池や蛙飛びこむ水の音', g: ['自然', '時'], v: 1 },
+  { c: 'poet', w: '松尾芭蕉', s: '『おくのほそ道』', t: '月日は百代の過客にして、行かふ年も又旅人也。', g: ['旅', '時'], v: 1 },
+  { c: 'poet', w: '与謝蕪村', s: '', t: '菜の花や月は東に日は西に', g: ['光', '自然'], v: 1 },
+  { c: 'poet', w: '正岡子規', s: '', t: '柿くへば鐘が鳴るなり法隆寺', g: ['旅', '食'], v: 1 },
+  { c: 'poet', w: '種田山頭火', s: '', t: '分け入つても分け入つても青い山', g: ['道', '自然'], v: 1 },
+  { c: 'poet', w: '尾崎放哉', s: '', t: '咳をしても一人', g: ['夜'], v: 1 },
+  { c: 'poet', w: '与謝野晶子', s: '『みだれ髪』', t: 'その子二十櫛にながるる黒髪のおごりの春のうつくしきかな', g: ['美'], v: 1 },
+  { c: 'poet', w: 'ライナー・マリア・リルケ', s: '『若き詩人への手紙』', t: 'いまは、問いそのものを生きてください。', g: ['問い', '生きる'] },
+  { c: 'poet', w: 'ウィリアム・ブレイク', s: '「無垢の予兆」', t: '一粒の砂に世界を\n一輪の野の花に天を見る', g: ['自然', '美'] },
+  { c: 'poet', w: 'ウォルト・ホイットマン', s: '「ぼく自身の歌」', t: 'ぼくは大きい。ぼくは多くのものを含んでいる。', g: ['生きる'] },
+  { c: 'poet', w: 'エミリー・ディキンソン', s: '', t: '「希望」は羽をもつもの', g: ['光'] },
+  { c: 'poet', w: 'アルチュール・ランボー', s: 'イザンバールへの手紙', t: 'わたしとは、一個の他者なのです。', g: ['問い', '言葉'] },
+  { c: 'poet', w: 'ゲーテ', s: '『ファウスト』', t: '時よ止まれ、おまえは実に美しい。', g: ['時', '美'] },
+  { c: 'singer', w: 'ベートーヴェン', s: '弦楽四重奏曲第16番の終楽章に書き込んだ言葉', t: 'そうでなければならないか？\nそうでなければならない！', g: ['問い', '創る', '音楽'] },
+  { c: 'singer', w: 'モーツァルト', s: '父への手紙（1777年）', t: 'わたしは詩人ではないので、思いを詩に書くことはできません。でも音でなら言えます。わたしは音楽家ですから。', g: ['言葉', '創る', '音楽'] },
+  { c: 'artist', w: 'フィンセント・ファン・ゴッホ', s: '弟テオへの手紙（1880年）', t: '神を知るいちばんの方法は、たくさんのものを愛することだと思う。', g: ['生きる', '美'] },
+  { c: 'artist', w: 'パウル・クレー', s: '「創造的信条告白」', t: '芸術は、見えるものを写すのではない。見えるようにするのだ。', g: ['創る', '美', '美術'] },
+  { c: 'artist', w: 'ポール・セザンヌ', s: 'エミール・ベルナールへの手紙（1904年）', t: '自然を、円筒と球と円錐によって扱いなさい。', g: ['自然', '創る', '美術'] },
+  { c: 'artist', w: '葛飾北斎', s: '臨終のことば', t: '天我をして五年の命を保たしめば、真正の画工となるを得べし', g: ['創る', '時'], v: 1 },
+  { c: 'artist', w: 'レオナルド・ダ・ヴィンチ', s: '手稿', t: 'よく過ごした一日が安らかな眠りをくれるように、よく使った一生は安らかな死をくれる。', g: ['生きる', '時'] },
+  { c: 'artist', w: '岡倉天心', s: '『茶の本』', t: '茶道とは、日々のありふれた暮らしのなかに美を見いだし、それを敬う営みである。', g: ['美', '暮らし'] },
+  { c: 'artist', w: '世阿弥', s: '『風姿花伝』', t: '秘すれば花なり', g: ['美', '創る'], v: 1 },
+  { c: 'politician', w: 'エイブラハム・リンカーン', s: 'ゲティスバーグ演説', t: '人民の、人民による、人民のための政治', g: ['言葉'] },
+  { c: 'politician', w: '坂本龍馬', s: '姉・乙女への手紙', t: '日本を今一度せんたくいたし申候', g: ['創る', '道'], v: 1 },
+  { c: 'politician', w: '勝海舟', s: '福沢諭吉への返書', t: '行蔵は我に存す、毀誉は他人の主張、我に与らず我に関せずと存候', g: ['道'], v: 1 },
+  { c: 'politician', w: '上杉鷹山', s: '', t: '為せば成る　為さねば成らぬ何事も\n成らぬは人の為さぬなりけり', g: ['働く', '道'], v: 1 },
+  { c: 'politician', w: 'ウィンストン・チャーチル', s: 'ロンドン市長官邸での演説（1942年）', t: 'これは終わりではない。終わりの始まりですらない。だがおそらく、始まりの終わりである。', g: ['時', '道'] },
+  { c: 'politician', w: 'フランクリン・ルーズベルト', s: '就任演説（1933年）', t: 'わたしたちが恐れなければならないただ一つのものは、恐れそのものである。', g: ['生きる'] },
+  { c: 'scholar', w: 'ルイ・パスツール', s: 'リール大学での講演（1854年）', t: '観察の場では、偶然は準備のできた心にしか味方しない。', g: ['学ぶ', '科学', '醸造'] },
+  { c: 'scholar', w: 'アイザック・ニュートン', s: 'ロバート・フックへの手紙（1675年）', t: 'わたしが遠くまで見渡せたのだとすれば、それは巨人たちの肩の上に立っていたからです。', g: ['学ぶ', '科学'] },
+  { c: 'scholar', w: 'アルベルト・アインシュタイン', s: 'インタビュー（1929年）', t: '想像力は、知識よりも大切だ。', g: ['創る', '学ぶ', '科学'] },
+  { c: 'scholar', w: 'ガリレオ・ガリレイ', s: '『偽金鑑識官』', t: '自然という大きな書物は、数学の言葉で書かれている。', g: ['自然', '数学', '言葉'] },
+  { c: 'scholar', w: 'チャールズ・ダーウィン', s: '『種の起源』の結び', t: 'この生命の見方には、壮大なものがある。', g: ['自然', '生きる', '科学'] },
+  { c: 'scholar', w: '寺田寅彦', s: '「科学者とあたま」', t: 'いわゆる頭のいい人は、言わば足の早い旅人のようなものである。', g: ['学ぶ', '旅', '科学'] },
+  { c: 'scholar', w: '中谷宇吉郎', s: '『雪』', t: '雪は天から送られた手紙である', g: ['自然', '科学', '言葉'], v: 1 },
+  { c: 'writer', w: '谷崎潤一郎', s: '『陰翳礼讃』', t: '美は物体にあるのではなく、物体と物体との作り出す陰翳のあや、明暗にあると考える。', g: ['美', '光', '夜'], u: 'https://www.aozora.gr.jp/cards/001383/files/56642_59575.html' },
+  { c: 'writer', w: '谷崎潤一郎', s: '『陰翳礼讃』', t: '陰翳の作用を離れて美はないと思う。', g: ['美', '光'], u: 'https://www.aozora.gr.jp/cards/001383/files/56642_59575.html' },
+  { c: 'writer', w: '夏目漱石', s: '『草枕』', t: '智に働けば角が立つ。情に棹させば流される。意地を通せば窮屈だ。とかくに人の世は住みにくい。', g: ['生きる', '働く'] },
+  { c: 'writer', w: '福沢諭吉', s: '『学問のすゝめ』', t: '天は人の上に人を造らず人の下に人を造らずと云えり', g: ['学ぶ'], v: 1 },
+  { c: 'writer', w: '芥川龍之介', s: '『侏儒の言葉』', t: '人生は一箱のマッチに似ている。重大に扱うのはばかばかしい。重大に扱わねば危険である。', g: ['生きる'] },
+  { c: 'writer', w: '兼好法師', s: '『徒然草』', t: 'つれづれなるままに、日暮らし硯にむかひて', g: ['言葉', '時', '創る'], v: 1 },
+  { c: 'writer', w: '鴨長明', s: '『方丈記』', t: 'ゆく河の流れは絶えずして、しかももとの水にあらず。', g: ['時', '自然'], v: 1 },
+  { c: 'writer', w: '清少納言', s: '『枕草子』', t: '春はあけぼの。やうやう白くなりゆく山ぎは、すこしあかりて', g: ['光', '自然', '美'], v: 1 },
+  { c: 'writer', w: 'ヘンリー・デイヴィッド・ソロー', s: '『森の生活』', t: 'わたしが森へ行ったのは、思慮深く生きたかったからだ。', g: ['自然', '生きる', '暮らし'] }
+];
+// 北原白秋（1942年没・著作権なし）の詩の最初の連。青空文庫（https://www.aozora.gr.jp/index_pages/person106.html）から 2026-11-08 に取った。u はその本文
+var UG_AOZORA = [
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「邪宗門扉銘」", "t": "ここ過ぎて曲節の悩みのむれに、\nここ過ぎて官能の愉楽のそのに、\nここ過ぎて神経のにがき魔睡に。", "g": [], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「空に真赤な」", "t": "空に真赤な雲のいろ。\n玻璃に真赤な酒の色。\nなんでこの身が悲しかろ。\n空に真赤な雲のいろ。", "g": ["酒"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「天鵝絨のにほひ」", "t": "やはらかに腐れつつゆく暗の室。\nその片隅の薄あかり、背にうけて\n天鵝絨の赤きふくらみうちかつぎ、\nにほふともなく在るとなく、蹲み居れば。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「WHISKY.」", "t": "夕暮のものあかき空、\nその空に百舌啼きしきる。\nWhisky の罎の列\n冷やかに拭く少女、\n見よ、あかき夕暮の空、\nその空に百舌啼きしきる。", "g": ["酒"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「黄金向日葵」", "t": "あはれ、あはれ、黄金向日葵\n汝また太陽にも倦きしか、\n南国の空の真昼を\nかなしげに疲れて見ゆる。", "g": ["光", "花"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「窓」", "t": "かかる窓ありとも知らず、昨日まで過ぎし河岸。\n今日は見よ、\n色赤き花に日の照り、かなしくも依依児匂ふ。\nあはれまた病める Piano も……", "g": ["光", "花"], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『邪宗門』「夕日のにほひ」", "t": "晩春の夕日の中に、\n順礼の子はひとり頬をふくらませ、\n濁りたる眼をあげて管うち吹ける。\n腐れゆく襤褸のにほひ、\n酢と石油……にじむ素足に\n落ちちれる果実の皮、赤くうすく、あるは汚なく……", "g": ["光"], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/4850_13918.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「序詩」", "t": "思ひ出は首すぢの赤い螢の\n午後のおぼつかない觸覺のやうに、\nふうわりと青みを帶びた\n光るとも見えぬ光？", "g": ["光", "思い出"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「金の入日に繻子の黒」", "t": "金の入日に繻子の黒――\n黒い喪服を身につけて、\nいとつつましうひとはゆく。\n海のあなたの故郷は今日も入日のさみしかろ。\n夏のゆく日の東京に\n茴香艸の花つけて淡い粉ふるこのごろを、\nほんに品よきかの國のわかい王もさみしかろ。\n心ままなる歌ひ女のエロル夫人もさみしかろ。", "g": ["光", "海", "花"], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「初戀」", "t": "薄らあかりにあかあかと\n踊るその子はただひとり。\n薄らあかりに涙して\n消ゆるその子もただひとり。\n薄らあかりに、おもひでに、\n踊るそのひと、そのひとり。", "g": ["光", "思い出"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「カステラ」", "t": "カステラの縁の澁さよな、\n褐色の澁さよな、\n粉のこぼれが眼について、\nほろほろと泣かるる。\nまあ、何とせう、\n赤い夕日に、うしろ向いて\nひとり植ゑた石竹。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「糸車」", "t": "糸車、糸車、しづかにふかき手のつむぎ\nその糸車やはらかにめぐる夕ぞわりなけれ。\n金と赤との南瓜のふたつ轉がる板の間に、\n「共同醫館」の板の間に、\nひとり坐りし留守番のその媼こそさみしけれ。", "g": [], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「螢」", "t": "夏の日なかのヂキタリス、\n釣鐘状に汗つけて\n光るこころもいとほしや。\nまたその陰影にひそみゆく\n螢のむしのしをらしや。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「青いとんぼ」", "t": "青いとんぼの眼を見れば\n緑の、銀の、エメロウド、\n青いとんぼの薄き翅\n燈心草の穗に光る。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「柳河」", "t": "もうし、もうし、柳河じや、\n柳河じや。\n銅の鳥居を見やしやんせ。\n欄干橋をみやしやんせ。\n（馭者は喇叭の音をやめて、\n赤い夕日に手をかざす。）", "g": ["光", "ふるさと"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「紺屋のおろく」", "t": "にくいあん畜生は紺屋のおろく、\n猫を擁えて夕日の濱を\n知らぬ顏して、しやなしやなと。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「曼珠沙華」", "t": "GONSHAN. GONSHAN. 何處へゆく、\n赤い、御墓の曼珠沙華、\n曼珠沙華、\nけふも手折りに來たわいな。", "g": ["花"], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「夜」", "t": "夜は黒…………銀箔の裏面の黒。\n滑らかな瀉海の黒、\nさうして芝居の下幕の黒、\n幽靈の髮の黒。", "g": ["夜", "海"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「青い鳥」", "t": "せんだんの葉越しに、\n青い鳥が鳴いた。\n『たつた、ひとつ知つてるよ。』つて、\nさもさもうれしさうに、かなしさうに。", "g": [], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『思ひ出』「水ヒアシンス」", "t": "月しろか、いな、さにあらじ。\n薄ら日か、いな、さにあらじ。\nあはれ、その仄のにほひの\nなどもさはいまも身に沁む。", "g": ["夜", "光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/2415_45802.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「公園の薄暮」", "t": "ほの青き銀色の空気に、\nそことなく噴水の水はしたたり、\n薄明ややしばしさまかえぬほど、\nふくらなる羽毛頸巻のいろなやましく女ゆきかふ。", "g": [], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「片恋」", "t": "あかしやの金と赤とがちるぞえな。\nかはたれの秋の光にちるぞえな。\n片恋の薄着のねるのわがうれひ\n「曳舟」の水のほとりをゆくころを。\nやはらかな君が吐息のちるぞえな。\nあかしやの金と赤とがちるぞえな。", "g": ["光", "恋"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「雪の日」", "t": "淡青い雪は\n冷めたい硝子戸のそとに。……", "g": ["自然"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「夜ふる雪」", "t": "蛇目の傘にふる雪は\nむらさきうすくふりしきる。", "g": ["自然"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「花火」", "t": "花火があがる、\n銀と緑の孔雀玉……パツとしだれてちりかかる。\n紺青の夜の薄あかり、\nほんにゆかしい歌麿の舟のけしきにちりかかる。", "g": ["夜", "光", "花"], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「銀座の雨」", "t": "雨……雨……雨……\n雨は銀座に新らしく\nしみじみとふる、さくさくと、\nかたい林檎の香のごとく、\n舗石の上、雪の上。", "g": ["自然", "雨"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「薄荷酒」", "t": "「思ひ出」の頁に\nさかづきひとつうつして、\nちらちらと、こまごまと、\n薄荷酒を注げば、\n緑はゆれて、かげのかげ、仄かなわが詩に啜り泣く、\nそなたのこころ、薄荷ざけ。", "g": ["酒", "思い出"], "v": 0, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『東京景物詩及其他』「かるい背広を」", "t": "かるい背広を身につけて、\n今宵またゆく都川、\n恋か、ねたみか、吊橋の\n瓦斯の薄黄が気にかかる。", "g": ["恋"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49617_34958.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「曇り日のオホーツク海」", "t": "光なし、燻し空には\n日の在処、ただ明るのみ。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「汐首岬」", "t": "たうたうと波騒ぐ汐首岬、\n鮮やけし、雑草の青、さみどり、\nああ、げに、いにしへのアイヌ・モシリ、\n言問へよ、今にして辺の岬岬。", "g": ["海"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「樺太の山中にて」", "t": "尾白鷲眼を放つ梢には\n横雲の縹雲ほのあかりぬ。", "g": ["光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「トラピストの牛」", "t": "月夜であります。\n月夜であります。\n月夜である。", "g": ["夜"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「月から見た地球」", "t": "月から観た地球は、円かな、\n紫の光であつた、\n深いにほひの。", "g": ["夜", "光"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「落葉松林の中」", "t": "柔かなは春さきの落葉松の山、\nややかすむ洩れ陽のすぢ、\n渓あひの枯草、\n鉱泉をあたたむる人が薪割り、\n午すぎの煙筒の煙。", "g": [], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『海豹と雲』「月夜の池」", "t": "わしは観た、月のおもてに\nげつそりと痩せた笑を。", "g": ["夜"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/52353_48552.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『緑の種子』「緑の種子」", "t": "種子はこれ感覚の粋、\n緑は金の陰影にして、幽かに泣くはわが心。", "g": [], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/55752_61609.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『緑の種子』「ペンギン」", "t": "見知らぬ海と空とに\n鳴いてゐる、鳴いてゐる、ペンギン、\nなにを鳴くのか、ペンギン、\n光と陰影の申子。", "g": ["光", "海"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/55752_61609.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『第二邪宗門』「わかき喇叭」", "t": "苦しげに喇叭吹く息、\n苦しげに喇叭吹く息、\n汝はゆきていづくにかへる。", "g": [], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49619_39687.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『第二邪宗門』「青き酒」", "t": "青き酒、――\nなど、汝は否む。これやわが深みの炎、\nまた永久の秘密の徴、われと聴く\n激しき恋の凱歌に沈みにし色。", "g": ["酒", "恋"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49619_39687.html"},
+  {"c": "poet", "w": "北原白秋", "s": "『第二邪宗門』「燕」", "t": "燕は翔る、水無月の\n雲の旗手の濡髪に。――\n暗き港はあかあかと\n霽れぬ、滴る帆の雫。", "g": ["夜"], "v": 1, "u": "https://www.aozora.gr.jp/cards/000106/files/49619_39687.html"}
+];
+// 真ん中の人の作品（著作権が残る／存命なので本文は置かない。名前・年・事実と、読める・聴ける出どころへのリンクだけ。2026-11-08 に確かめた）
+var UG_WP = 'https://ja.wikipedia.org/wiki/';
+var UG_WORKS = [
+  { w: '友川カズキ', t: '生きてるって言ってみろ', y: '', k: '曲', d: '代表曲。3枚目のアルバム『千羽鶴を口に咥えた日々』に入り、のちにドラマの主題歌にもなった。', u: UG_WP + '%E5%8F%8B%E5%B7%9D%E3%82%AB%E3%82%BA%E3%82%AD' },
+  { w: '友川カズキ', t: '夜へ急ぐ人', y: '1977', k: '曲', d: 'ちあきなおみに書いた曲。その年の紅白で歌われ、大きな反響を呼んだ。', u: UG_WP + '%E5%8F%8B%E5%B7%9D%E3%82%AB%E3%82%BA%E3%82%AD' },
+  { w: '友川カズキ', t: '中原中也作品集', y: '', k: 'アルバム', d: '中学生で出会った中原中也の詩に、曲をつけて歌った一枚。', u: UG_WP + '%E5%8F%8B%E5%B7%9D%E3%82%AB%E3%82%BA%E3%82%AD' },
+  { w: '友川カズキ', t: '吹雪の海に黒豹が', y: '1981', k: '詩集', d: '最初の詩集（無明舎出版）。', u: UG_WP + '%E5%8F%8B%E5%B7%9D%E3%82%AB%E3%82%BA%E3%82%AD' },
+  { w: '友川カズキ', t: '朝の骨', y: '1982', k: '詩集', d: '無明舎出版の2冊目の詩集。', u: UG_WP + '%E5%8F%8B%E5%B7%9D%E3%82%AB%E3%82%BA%E3%82%AD' },
+  { w: '友川カズキ', t: 'イカを買いに行く', y: '2024', k: 'アルバム', d: 'デビュー50年の年に出た、8年ぶりのスタジオアルバム。', u: UG_WP + '%E5%8F%8B%E5%B7%9D%E3%82%AB%E3%82%BA%E3%82%AD' },
+  { w: '吉田一穂', t: '海の聖母', y: '1926', k: '詩集', d: '第一詩集。古平町にはこの詩集の「漁歌」の碑がある。', u: UG_WP + '%E5%90%89%E7%94%B0%E4%B8%80%E7%A9%82' },
+  { w: '吉田一穂', t: '故園の書', y: '1930', k: '詩集', d: '第二詩集。', u: UG_WP + '%E5%90%89%E7%94%B0%E4%B8%80%E7%A9%82' },
+  { w: '吉田一穂', t: '稗子伝', y: '1936', k: '詩集', d: '第三詩集。', u: UG_WP + '%E5%90%89%E7%94%B0%E4%B8%80%E7%A9%82' },
+  { w: '吉田一穂', t: '未来者', y: '1948', k: '詩集', d: 'いちばん評価の高い「白鳥」（3連・36行）を収める。', u: UG_WP + '%E5%90%89%E7%94%B0%E4%B8%80%E7%A9%82' },
+  { w: '吉田一穂', t: '羅甸薔薇', y: '1950', k: '詩集', d: '第五詩集。', u: UG_WP + '%E5%90%89%E7%94%B0%E4%B8%80%E7%A9%82' },
+  { w: '吉田一穂', t: '白鳥古丹', y: '', k: 'ことば', d: '少年の日を過ごした古平を、一穂はこう呼んで愛した。古平に碑がある。', u: UG_WP + '%E5%90%89%E7%94%B0%E4%B8%80%E7%A9%82' },
+  { w: '西脇順三郎', t: 'Spectrum', y: '1925', k: '英文詩集', d: 'ロンドンで自費出版した英語の詩集。英国の新聞の書評に取り上げられた。', u: UG_WP + '%E8%A5%BF%E8%84%87%E9%A0%86%E4%B8%89%E9%83%8E' },
+  { w: '西脇順三郎', t: 'Ambarvalia', y: '1933', k: '詩集', d: '萩原朔太郎や室生犀星が高く評価した詩集。「ギリシア的抒情詩」を含む。', u: UG_WP + '%E8%A5%BF%E8%84%87%E9%A0%86%E4%B8%89%E9%83%8E' },
+  { w: '西脇順三郎', t: '旅人かへらず', y: '1947', k: '詩集', d: '自分の内にいるもう一人を「幻影の人」と名づけて追いはじめた詩集。', u: UG_WP + '%E8%A5%BF%E8%84%87%E9%A0%86%E4%B8%89%E9%83%8E' },
+  { w: '西脇順三郎', t: '近代の寓話', y: '1953', k: '詩集', d: '『旅人かへらず』に続く詩集。', u: UG_WP + '%E8%A5%BF%E8%84%87%E9%A0%86%E4%B8%89%E9%83%8E' },
+  { w: '西脇順三郎', t: '第三の神話', y: '', k: '詩集', d: '読売文学賞。', u: UG_WP + '%E8%A5%BF%E8%84%87%E9%A0%86%E4%B8%89%E9%83%8E' },
+  { w: '西脇順三郎', t: '失われた時', y: '', k: '長編詩集', d: '1960年代。プルーストやジョイスの手法を取り入れた長い詩。', u: UG_WP + '%E8%A5%BF%E8%84%87%E9%A0%86%E4%B8%89%E9%83%8E' },
+  { w: '田村隆一', t: '四千の日と夜', y: '1956', k: '詩集', d: '最初の詩集。1945〜1955年の詩を収める。', u: UG_WP + '%E7%94%B0%E6%9D%91%E9%9A%86%E4%B8%80' },
+  { w: '田村隆一', t: '言葉のない世界', y: '1962', k: '詩集', d: '高村光太郎賞。', u: UG_WP + '%E7%94%B0%E6%9D%91%E9%9A%86%E4%B8%80' },
+  { w: '田村隆一', t: '奴隷の歓び', y: '1984', k: '詩集', d: '読売文学賞。', u: UG_WP + '%E7%94%B0%E6%9D%91%E9%9A%86%E4%B8%80' },
+  { w: '田村隆一', t: 'ハミングバード', y: '1992', k: '詩集', d: '現代詩人賞。', u: UG_WP + '%E7%94%B0%E6%9D%91%E9%9A%86%E4%B8%80' },
+  { w: '田村隆一', t: '帰ってきた旅人', y: '1998', k: '詩集', d: '亡くなったあとに出た、最後の詩集。最期の日、冷や酒を一合飲んで「うまい」と言ったという。', u: UG_WP + '%E7%94%B0%E6%9D%91%E9%9A%86%E4%B8%80' },
+  { w: '田村隆一', t: '青いライオンと金色のウイスキー', y: '1975', k: 'エッセイ', d: '酒の詩人の随筆集。『ウィスキー讃歌』（1979）もある。', u: UG_WP + '%E7%94%B0%E6%9D%91%E9%9A%86%E4%B8%80' },
+  { w: 'ボブ・ディラン', t: "Blowin' in the Wind", y: '1963', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/blowin-wind/' },
+  { w: 'ボブ・ディラン', t: 'Girl from the North Country', y: '1963', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/girl-north-country/' },
+  { w: 'ボブ・ディラン', t: "A Hard Rain's a-Gonna Fall", y: '1963', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/hard-rains-gonna-fall/' },
+  { w: 'ボブ・ディラン', t: "Don't Think Twice, It's All Right", y: '1963', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/dont-think-twice-its-all-right/' },
+  { w: 'ボブ・ディラン', t: "The Times They Are a-Changin'", y: '1964', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/times-they-are-changin/' },
+  { w: 'ボブ・ディラン', t: 'Mr. Tambourine Man', y: '1965', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/mr-tambourine-man/' },
+  { w: 'ボブ・ディラン', t: "It's Alright, Ma (I'm Only Bleeding)", y: '1965', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/its-alright-ma-im-only-bleeding/' },
+  { w: 'ボブ・ディラン', t: 'Visions of Johanna', y: '1966', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/visions-johanna/' },
+  { w: 'ボブ・ディラン', t: "Knockin' on Heaven's Door", y: '1973', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/knockin-heavens-door/' },
+  { w: 'ボブ・ディラン', t: 'Forever Young', y: '1974', k: '曲', d: '歌詞は公式サイトで。', u: 'https://www.bobdylan.com/songs/forever-young/' }
+];
+// タルコフスキーの映画に出てくる絵（2026-11-08 本人の希望）。映画の場面写真は著作物なので置かず、映画が映した古い絵（パブリックドメイン）を掛ける
+var UG_FILM_ARTS = [
+  { title: '雪中の狩人', who: 'ピーテル・ブリューゲル（父）', year: '1565', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg/960px-Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg', talk: '『惑星ソラリス』（1972）で、宇宙ステーションの図書室に掛かっている絵。カメラが雪の村の細部をゆっくりとたどる。' },
+  { title: 'マギの礼拝（未完）', who: 'レオナルド・ダ・ヴィンチ', year: '1481年ごろ', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Leonardo_da_Vinci_-_Adorazione_dei_Magi_-_Google_Art_Project.jpg/960px-Leonardo_da_Vinci_-_Adorazione_dei_Magi_-_Google_Art_Project.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Adorazione_dei_Magi_-_Google_Art_Project.jpg', talk: '『サクリファイス』（1986）の始まり。この絵の細部の上に題名が出る。' },
+  { title: 'ジネーヴラ・デ・ベンチの肖像', who: 'レオナルド・ダ・ヴィンチ', year: '1474〜78年ごろ', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Leonardo_da_Vinci_-_Ginevra_de%27_Benci_-_Google_Art_Project.jpg/960px-Leonardo_da_Vinci_-_Ginevra_de%27_Benci_-_Google_Art_Project.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Ginevra_de%27_Benci_-_Google_Art_Project.jpg', talk: '『鏡』（1975）で、少年がレオナルドの画集をめくる場面に出てくる。' },
+  { title: '出産の聖母', who: 'ピエロ・デッラ・フランチェスカ', year: '1460年ごろ', img: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Madonna_del_parto_piero_della_Francesca.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Madonna_del_parto_piero_della_Francesca.jpg', talk: '『ノスタルジア』（1983）の始まり近く。トスカーナの礼拝堂に、この聖母を訪ねる場面がある。' },
+  { title: '至聖三者（三位一体）', who: 'アンドレイ・ルブリョフ', year: '1411年ごろ', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Rublev_Troitsa.jpg/960px-Rublev_Troitsa.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Rublev_Troitsa.jpg', talk: '『アンドレイ・ルブリョフ』（1966）は白黒で進み、最後に色がついて、ルブリョフのイコンを映して終わる。' },
+  { title: 'ゲントの祭壇画（洗礼者ヨハネ）', who: 'ファン・エイク兄弟', year: '1432', img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Ghent_Altarpiece_C_-_John_the_Baptist.jpg/960px-Ghent_Altarpiece_C_-_John_the_Baptist.jpg',
+    page: 'https://commons.wikimedia.org/wiki/File:Ghent_Altarpiece_C_-_John_the_Baptist.jpg', talk: '『ストーカー』（1979）で、ゾーンの水の底に沈んでいる絵の断片がこの祭壇画。' }
+];
+// 壁の真ん中の人（2026-11-08 本人の指示）。名札だけを置く（紹介はこの画面の言葉）。白秋のほかは著作権が残る／存命なので、
+// 言葉は本人が「額を掛ける」から入れる（個人のドライブ。公開ページには載らない）。歌詞をこのファイルに書かない
+var UG_CENTER = [
+  { w: '友川カズキ', c: 'singer', y: '1950–', d: '秋田・八竜生まれの歌い手、詩人、画家。中学で中原中也に出会って詩を書きはじめた。大の競輪好き。' },
+  { w: '吉田一穂', c: 'poet', y: '1898–1973', d: '北海道・木古内に生まれ、古平で育った詩人。「極北の詩人」とも呼ばれる。詩集『海の聖母』『未来者』。' },
+  { w: '西脇順三郎', c: 'poet', y: '1894–1982', d: '新潟・小千谷出身の詩人、英文学者。日本のシュルレアリスムの中心にいた人。詩集『Ambarvalia』『旅人かへらず』。' },
+  { w: '北原白秋', c: 'poet', y: '1885–1942', d: '福岡・柳川出身の詩人。詩集『邪宗門』『思ひ出』。童謡もたくさん書いた。' },
+  { w: '田村隆一', c: 'poet', y: '1923–1998', d: '東京・巣鴨生まれ、詩誌『荒地』の詩人。詩集『四千の日と夜』。クリスティーの翻訳と、酒の随筆でも知られる。' },
+  { w: 'ボブ・ディラン', c: 'singer', y: '1941–', d: 'アメリカのシンガーソングライター。2016年、ノーベル文学賞。' }
+];
+var UG_SLOT_TAG = { midnight: '夜', night: '夜', late: '夜', dawn: '朝', morning: '朝', forenoon: '昼', noon: '昼', afternoon: '昼', evening: '夕べ', closed: '休日' };
+var UG_CW = 380, UG_CH = 400, UG_ZMIN = .4, UG_ZMAX = 1.8;
+var UG = { open: false, tx: 0, ty: 0, z: 1, items: null, dirty: true, pool: [], K: 1, nodes: {}, range: '', filter: '', find: '',
+  selEl: null, selK: null, hot: null, raf: 0, glide: 0, ptr: {}, pinch: null, drag: null, desk: false, tab: 'paper', hintT: null, viewed: false, pend: null };
+function ugHash(n) { n = n | 0; n = (n ^ 61) ^ (n >>> 16); n = (n + (n << 3)) | 0; n = n ^ (n >>> 4); n = Math.imul(n, 0x27d4eb2d); n = n ^ (n >>> 15); return (n >>> 0) / 4294967296; }
+function ugStrHash(s) { var x = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619); } return x >>> 0; }
+function ugCanon(s) { return norm(s).replace(/[\s　・「」『』()（）]/g, ''); }
+function ugMod(a, n) { return ((a % n) + n) % n; }
+function ugReduced() { return window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; }
+
+/* 壁に掛けるもの（作るたびに同じ並び。新しく足したものだけ、どこかに差し込まれる） */
+function ugBuild() {
+  var out = [], seen = {};
+  function add(it) {
+    it.t = String(it.t || ''); if (!it.t.trim() && !it.img) return;
+    var tc = ugCanon(it.t).replace(/[、。,.!?！？…―ー-]/g, '');
+    var k = it.kind === 'q' && tc.length >= 6 ? 'q|' + tc.slice(0, 24) : it.kind + '|' + tc.slice(0, 60) + '|' + ugCanon(it.who);
+    if (seen[k]) return; seen[k] = 1;
+    it.key = it.key || k; it.tags = (it.tags || []).filter(Boolean); out.push(it);
+  }
+  UG_CENTER.forEach(function (p) { add({ key: 'n' + p.w, kind: 'plate', cat: p.c, who: p.w, src: p.y, t: p.w, talk: p.d, tags: [], center: p }); });
+  UG_QUOTES.forEach(function (q, i) { add({ key: 'b' + i, kind: 'q', cat: q.c, who: q.w, src: q.s || '', t: q.t, tags: q.g, v: q.v ? 1 : 0, page: q.u || '', pd: q.u ? 1 : 0 }); });
+  Object.keys(POEMS).forEach(function (slot) {
+    if (!Array.isArray(POEMS[slot])) return;
+    POEMS[slot].forEach(function (p, i) { add({ key: 'p' + slot + i, kind: 'q', cat: 'poet', who: POEMS.by, src: p.t ? '「' + p.t + '」' : '', t: (p.l || []).join('\n'), tags: [UG_SLOT_TAG[slot]], v: 1 }); });
+  });
+  ((S.poems && S.poems.items) || []).forEach(function (x) { add({ key: 'c' + x.id, kind: 'q', cat: 'poet', who: x.poet, src: x.title ? '「' + x.title + '」' : '', t: x.lines, tags: ['表紙'], v: 1 }); });
+  ((S.quotes && S.quotes.items) || []).forEach(function (x) {
+    add({ key: 'u' + x.id, kind: x.img ? 'fav' : 'q', cat: x.cat, who: x.who, src: x.src || '', t: x.text, tags: x.tags || [], v: x.v ? 1 : 0, img: safeUrl(x.img), own: x });
+  });
+  ((S.verses && S.verses.items) || []).forEach(function (x) { add({ key: 'v' + x.id, kind: 'mine', who: x.title || '無題', src: stampOf(x.up || x.at), t: x.body, tags: [], v: x.dir === 'h' ? 0 : 1, verse: x }); });
+  topicPool().forEach(function (t, i) { add({ key: 't' + i + '|' + t.t, kind: 'topic', who: t.k || '', t: t.t, q: t.q, tags: [t.k, t.t], topic: t }); });
+  UG_AOZORA.forEach(function (q, i) { add({ key: 'z' + i, kind: 'q', cat: q.c, who: q.w, src: q.s, t: q.t, tags: q.g, v: q.v ? 1 : 0, page: q.u, pd: 1 }); });
+  UG_WORKS.forEach(function (x) { add({ key: 'w' + x.w + x.t, kind: 'work', cat: '', who: x.w, src: x.y, t: x.t, q: x.k, talk: x.d, page: x.u, tags: [x.k] }); });
+  var uc = S.undercam || {};
+  (uc.shelf || []).forEach(function (x) { add({ key: 'cs' + x.t, kind: 'cam', who: 'Camille', t: x.t, talk: x.d, tags: x.g || [], camShelf: 1 }); });
+  (uc.notes || []).forEach(function (x) { add({ key: 'cn' + x.id, kind: 'cam', who: 'Camille', t: x.title, talk: x.text, src: x.day ? fmtDay(x.day) : '', tags: ['ひとネタ'] }); });
+  UG_FILM_ARTS.forEach(function (a) { add({ key: 'f' + a.title, kind: 'fav', who: a.who, src: a.year, t: a.title, img: a.img, page: a.page, talk: a.talk, tags: ['美術', 'タルコフスキー'] }); });
+  artPool().forEach(function (a) { add({ key: 'a' + a.title, kind: 'fav', who: a.who, src: a.year, t: a.title, img: safeUrl(a.img), page: a.page, talk: a.talk, tags: ['美術'] }); });
+  ((S.content && S.content.songs) || []).forEach(function (x) { add({ kind: 'fav', who: x.artist, t: x.title, talk: x.talk, tags: ['音楽'], song: 1 }); });
+  ((S.content && S.content.hobby) || []).forEach(function (x) { add({ kind: 'fav', who: '', t: x.title, talk: x.talk, tags: [] }); });
+  ((S.ideas && S.ideas.items) || []).slice(0, 40).forEach(function (m) { add({ key: 'm' + m.id, kind: 'memo', who: stampOf(m.at), t: m.text, tags: m.topic ? [m.topic] : [], memo: m }); });
+  out.forEach(function (it) {
+    it.pk = (it.kind === 'q' || it.kind === 'fav' || it.kind === 'plate' || it.kind === 'work') && it.who ? ugCanon(it.who) : '';
+    it.mid = !!it.pk && UG_CENTER.some(function (p) { return ugCanon(p.w) === it.pk; });
+    it.tk = it.tags.map(ugCanon).filter(Boolean); it.h = ugStrHash(it.key);
+  });
+  return out.sort(function (a, b) { return a.h - b.h; });
+}
+function ugMatch(it) {
+  var f = UG.filter;
+  if (f) {
+    var k = f.slice(0, 1), v = f.slice(2);
+    if (k === 'c' && !(it.kind === 'q' && it.cat === v) && !(it.own && it.own.cat === v)) return false;
+    if (k === 'k' && it.kind !== v) return false;
+    if (k === 't' && it.tk.indexOf(ugCanon(v)) < 0) return false;
+    if (k === 'p' && it.pk !== ugCanon(v)) return false;
+  }
+  if (UG.find) {
+    var hay = norm([it.t, it.who, it.src, it.q, it.talk, it.tags.join(' '), it.kind === 'q' ? UG_CAT[it.cat] : UG_KIND[it.kind]].join(' '));
+    if (norm(UG.find).split(/\s+/).some(function (w) { return w && hay.indexOf(w) < 0; })) return false;
+  }
+  return true;
+}
+function ugRefresh() {
+  if (!UG.items || UG.dirty) { UG.items = ugBuild(); UG.dirty = false; }
+  var plain = !UG.filter && !UG.find, extra = [];
+  UG.pool = [];
+  UG.items.filter(ugMatch).forEach(function (it) {
+    if (plain && it.kind === 'plate') return;
+    UG.pool.push(it);
+    if (plain && it.mid) extra.push(it);
+  });
+  // 写しは逆順で後ろへ（元の位置からいつも半周ほど離れる）
+  UG.pool = UG.pool.concat(extra.reverse());
+  if (!UG.pool.length) UG.pool = UG.items.filter(function (it) { return it.kind === 'plate' && ugMatch(it); });
+  var n = UG.pool.length;
+  UG.K = n > 4 ? Math.round(n * .382) : 1;
+  ugClear(); ugChips();
+  $('#ugEmpty').hidden = n > 0;
+  $('#ugEmpty').textContent = UG.find || UG.filter ? '合う額が見つかりません。' : 'この壁には、まだ何も掛かっていません。';
+  ugPaint();
+}
+function ugClear() {
+  Object.keys(UG.nodes).forEach(function (k) { UG.nodes[k].remove(); });
+  UG.nodes = {}; UG.range = ''; UG.selEl = null;
+  var sv = $('#ugLinks'); while (sv.firstChild) sv.removeChild(sv.firstChild);
+}
+
+/* 1マス：少しずらし、少し傾け、1段おきに半分ずらす（サロンの壁のように） */
+function ugCell(i, j) {
+  var r1 = ugHash(i * 73856093 ^ j * 19349663), r2 = ugHash(i * 83492791 ^ j * 297121507 ^ 7), r3 = ugHash((i + 31) * 265443576 ^ j * 40503);
+  return { x: i * UG_CW + (r1 - .5) * 70 + (ugMod(j, 2) ? UG_CW * .32 : 0), y: j * UG_CH + (r2 - .5) * 60, r: (r3 - .5) * 2.6, s: r3 };
+}
+var UG_STYLES = ['thin', 'black', 'wood', 'thin', 'plain', 'black', 'wood'];
+function ugThumb(u) { return String(u || '').replace(/\/960px-/, '/500px-'); }
+function ugFrame(it, i, j) {
+  var c = ugCell(i, j), lines = it.t.replace(/\r\n?/g, '\n').split('\n'), cap = it.kind === 'mine' ? 9 : 8;
+  var txt = lines.slice(0, cap).join('\n');
+  if (txt.length > 200) txt = txt.slice(0, 200) + '…'; else if (lines.length > cap) txt += '\n…';
+  var maxLen = Math.max.apply(null, txt.split('\n').map(function (l) { return l.length; })), total = txt.replace(/\n/g, '').length, style;
+  if (it.kind === 'plate') style = 'plate';
+  else if (it.kind === 'work') style = 'work';
+  else if (it.kind === 'cam') style = 'cam';
+  else if (it.img) style = 'pic';
+  else if (it.kind === 'topic' || it.kind === 'memo' || it.kind === 'fav') style = 'slip';
+  else if (it.kind === 'mine') style = 'mine';
+  else { style = UG_STYLES[Math.floor(c.s * UG_STYLES.length)]; if (total <= 36 && c.s > .8) style = 'oval'; }
+  var vt = it.v && style !== 'pic' && style !== 'slip' && style !== 'oval' && style !== 'plate' && style !== 'work' && style !== 'cam';
+  var rot = style === 'slip' ? c.r * 1.8 : c.r * .6;
+  var stl = 'left:' + c.x.toFixed(0) + 'px;top:' + c.y.toFixed(0) + 'px;--r:' + rot.toFixed(2) + 'deg;';
+  if (vt) stl += '--h:' + Math.max(110, Math.min(290, maxLen * 18 + 14)) + 'px;';
+  else if (style === 'plate') stl += '--w:240px;';
+  else if (style === 'cam') stl += '--w:250px;';
+  else if (style === 'work') stl += '--w:' + Math.max(200, Math.min(300, 90 + it.t.length * 11)) + 'px;';
+  else if (style !== 'pic') stl += '--w:' + Math.round(Math.max(190, Math.min(330, 64 + Math.min(maxLen, 17) * 16.4)) + (style === 'oval' ? 56 : 0)) + 'px;';
+  var label = it.kind === 'q' ? (UG_CAT[it.cat] || 'そのほか') : UG_KIND[it.kind], kids;
+  if (style === 'cam') {
+    kids = [h('div', { class: 'cat' }, [it.camShelf ? 'Camille の好きなもの' : 'Camille のひとネタ' + (it.src ? '・' + it.src : '')]), h('div', { class: 'wt' }, [it.t]),
+      it.talk ? h('div', { class: 'q' }, [it.talk.length > 90 ? it.talk.slice(0, 90) + '…' : it.talk]) : null];
+  } else if (style === 'work') {
+    kids = [h('div', { class: 'cat' }, [it.q + (it.src ? '・' + it.src : '')]), h('div', { class: 'wt' }, [/^[\x20-\x7e]+$/.test(it.t) ? it.t : '『' + it.t + '』']),
+      h('div', { class: 'who' }, [it.who]), h('div', { class: 'wl' }, ['出どころで読む・聴く ↗'])];
+  } else if (style === 'plate') {
+    kids = [h('div', { class: 'cat' }, [UG_CAT[it.cat] || '']), h('div', { class: 'pn' }, [it.who]), h('div', { class: 'py' }, [it.src]), h('div', { class: 'pd' }, [it.talk])];
+  } else if (style === 'pic') {
+    var img = h('img', { src: ugThumb(it.img), alt: it.t + '（' + it.who + '）', loading: 'lazy', decoding: 'async', draggable: 'false', referrerpolicy: 'no-referrer' });
+    img.addEventListener('error', function () { if (img.src !== it.img) img.src = it.img; }, { once: true });
+    kids = [img, h('div', { class: 'cap' }, [h('b', null, [it.t]), it.who ? '　' + it.who : '', it.src ? '　' + it.src : ''])];
+  } else {
+    var who = it.kind === 'q' ? it.who + (it.src ? '　' + it.src : '') : it.kind === 'topic' ? '' : it.song ? '♪ ' + it.who : it.who;
+    kids = [h('div', { class: 'cat' }, [it.kind === 'topic' && it.who ? label + '・' + it.who : label]), h('div', { class: 'q' }, [txt]),
+      it.q ? h('div', { class: 'tq' }, [it.q]) : null, who ? h('div', { class: 'who' }, [who]) : null];
+  }
+  var el = h('div', { class: 'ug-f k-' + it.kind + ' s-' + style + (it.verse && it.verse.ink === 'b' ? ' ink-b' : '') + (vt ? ' vt' : '') + (total <= 18 && !vt && style !== 'pic' ? ' big' : ''),
+    role: 'button', tabindex: '0', 'aria-label': label + '：' + (it.who ? it.who + '　' : '') + it.t.slice(0, 60), style: stl }, [h('div', { class: 'fr' }, kids)]);
+  el._it = it; el._x = c.x; el._y = c.y;
+  return el;
+}
+// きょうの壁の真ん中：入口のマスのまわりに名札を掛ける（しぼっていないときだけ）
+var UG_RING = [[0, 0], [1, 0], [0, -1], [1, -1], [0, 1], [1, 1]];
+function ugAt(i, j, n) {
+  if (!UG.filter && !UG.find) {
+    var hi = ugMod(dayIndex(), 211), plates = (UG.items || []).filter(function (it) { return it.kind === 'plate'; });
+    for (var r = 0; r < UG_RING.length && r < plates.length; r++) if (i === hi + UG_RING[r][0] && j === UG_RING[r][1]) return plates[r];
+  }
+  var k = ugMod(i + j * UG.K, n), it = UG.pool[k];
+  if (n > 3) {
+    var left = UG.pool[ugMod(i - 1 + j * UG.K, n)], up = UG.pool[ugMod(i + (j - 1) * UG.K, n)];
+    for (var t = 1; t < 4 && (it === left || it === up); t++) it = UG.pool[ugMod(k + t * 7, n)];
+  }
+  return it;
+}
+function ugSched() { if (!UG.raf) UG.raf = requestAnimationFrame(ugPaint); }
+function ugPaint() {
+  UG.raf = 0;
+  var wall = $('#ugWall'), W = wall.clientWidth || innerWidth, H = wall.clientHeight || innerHeight, z = UG.z;
+  $('#ugLayer').style.transform = 'translate(' + UG.tx.toFixed(1) + 'px,' + UG.ty.toFixed(1) + 'px) scale(' + z.toFixed(3) + ')';
+  wall.style.backgroundPosition = UG.tx.toFixed(0) + 'px ' + UG.ty.toFixed(0) + 'px, ' + (UG.tx * .97).toFixed(0) + 'px ' + (UG.ty * .97).toFixed(0) + 'px, 0 0';
+  var n = UG.pool.length; if (!n) return;
+  var x0 = -UG.tx / z, y0 = -UG.ty / z, x1 = x0 + W / z, y1 = y0 + H / z;
+  var i0 = Math.floor(x0 / UG_CW) - 1, i1 = Math.ceil(x1 / UG_CW) + 1, j0 = Math.floor(y0 / UG_CH) - 1, j1 = Math.ceil(y1 / UG_CH) + 1;
+  var rk = i0 + ',' + i1 + ',' + j0 + ',' + j1;
+  if (rk === UG.range) return;
+  UG.range = rk;
+  var need = {}, layer = $('#ugLayer'), changed = false;
+  for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) {
+    var k = i + ',' + j; need[k] = 1;
+    if (!UG.nodes[k]) { var el = ugFrame(ugAt(i, j, n), i, j); el._k = k; UG.nodes[k] = el; layer.appendChild(el); changed = true; }
+  }
+  Object.keys(UG.nodes).forEach(function (k) { if (!need[k]) { if (UG.nodes[k] === UG.selEl) UG.selEl = null; UG.nodes[k].remove(); delete UG.nodes[k]; changed = true; } });
+  if (changed) ugLinks();
+}
+/* つながり：見えている額どうしで、同じ人（点線）か同じタグ（実線）のうち近いものへ2本まで */
+function ugLinks() {
+  var sv = $('#ugLinks'), els = Object.keys(UG.nodes).map(function (k) { return UG.nodes[k]; }), seen = {}, out = [], lim = Math.pow(UG_CW * 3.2, 2);
+  els.forEach(function (a) {
+    var best = [], ia = a._it;
+    if (!ia.pk && !ia.tk.length) return;
+    els.forEach(function (b) {
+      var ib = b._it; if (ia === ib) return;
+      var person = !!ia.pk && ia.pk === ib.pk, tag = !person && ia.tk.some(function (t) { return ib.tk.indexOf(t) >= 0; });
+      if (!person && !tag) return;
+      var dx = a._x - b._x, dy = a._y - b._y, d = dx * dx + dy * dy;
+      if (d <= lim) best.push({ b: b, d: d, p: person });
+    });
+    best.sort(function (x, y) { return x.d - y.d; }).slice(0, 2).forEach(function (e) {
+      var key = a._k < e.b._k ? a._k + '>' + e.b._k : e.b._k + '>' + a._k;
+      if (!seen[key]) { seen[key] = 1; out.push({ a: a, b: e.b, p: e.p }); }
+    });
+  });
+  while (sv.firstChild) sv.removeChild(sv.firstChild);
+  out.slice(0, 260).forEach(function (l) {
+    var ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', l.a._x); ln.setAttribute('y1', l.a._y); ln.setAttribute('x2', l.b._x); ln.setAttribute('y2', l.b._y);
+    if (l.p) ln.setAttribute('class', 'person');
+    ln._a = l.a._k; ln._b = l.b._k; sv.appendChild(ln);
+  });
+  ugHot();
+}
+function ugHot(k) {
+  if (k !== undefined) UG.hot = k;
+  var on = UG.hot || UG.selK;
+  [].forEach.call($('#ugLinks').childNodes, function (ln) { ln.classList.toggle('hot', !!on && (ln._a === on || ln._b === on)); });
+}
+
+/* 歩く・寄る */
+function ugZoomAt(nz, px, py) {
+  nz = Math.max(UG_ZMIN, Math.min(UG_ZMAX, nz));
+  var wx = (px - UG.tx) / UG.z, wy = (py - UG.ty) / UG.z;
+  UG.z = nz; UG.tx = px - wx * nz; UG.ty = py - wy * nz; ugSched();
+}
+function ugView() { var w = $('#ugWall'), W = w.clientWidth || innerWidth; return { W: W - (UG.desk && innerWidth > 700 ? Math.min(520, innerWidth) : 0), H: w.clientHeight || innerHeight }; }
+function ugZoomCenter(f) { var v = ugView(); ugGlide(null, null, Math.max(UG_ZMIN, Math.min(UG_ZMAX, UG.z * f)), 260); }
+function ugGlide(tx, ty, z, ms, done) {
+  cancelAnimationFrame(UG.glide);
+  var v = ugView(), s = { tx: UG.tx, ty: UG.ty, z: UG.z };
+  if (z != null && tx == null) { var wx = (v.W / 2 - UG.tx) / UG.z, wy = (v.H / 2 - UG.ty) / UG.z; tx = v.W / 2 - wx * z; ty = v.H / 2 - wy * z; }
+  var e = { tx: tx, ty: ty, z: z == null ? UG.z : z }, t0 = performance.now(); ms = ms || 380;
+  if (ugReduced()) { UG.tx = e.tx; UG.ty = e.ty; UG.z = e.z; ugPaint(); if (done) done(); return; }
+  (function step(now) {
+    var k = Math.min(1, (now - t0) / ms), q = 1 - Math.pow(1 - k, 3);
+    UG.tx = s.tx + (e.tx - s.tx) * q; UG.ty = s.ty + (e.ty - s.ty) * q; UG.z = s.z + (e.z - s.z) * q; ugPaint();
+    if (k < 1) UG.glide = requestAnimationFrame(step); else if (done) done();
+  })(t0);
+}
+function ugCenterOn(x, y, z) { var v = ugView(); z = z || UG.z; return { tx: v.W / 2 - x * z, ty: v.H / 2 + 30 - y * z, z: z }; }
+// きょうの壁：日ごとに入口の場所が変わる
+function ugHomeView(animate) {
+  var c = ugCell(ugMod(dayIndex(), 211), 0), v = ugCenterOn(c.x + UG_CW / 2, c.y + UG_CH / 2, innerWidth <= 700 ? .7 : 1);
+  if (animate) ugGlide(v.tx, v.ty, v.z, 520); else { UG.tx = v.tx; UG.ty = v.ty; UG.z = v.z; }
+}
+// 額へ渡る：いまの場所の近くで、その額が掛かっているマスを探す（遠ければ一瞬で移る）
+function ugGoTo(it) {
+  // 名札は、きょうの壁の真ん中に掛かっている
+  if (it.kind === 'plate' && !UG.filter && !UG.find) {
+    var r = UG_RING[(UG.items || []).filter(function (x) { return x.kind === 'plate'; }).indexOf(it)];
+    if (r) { var hi = ugMod(dayIndex(), 211), pc = ugCell(hi + r[0], r[1]), pt = ugCenterOn(pc.x, pc.y); UG.pend = (hi + r[0]) + ',' + r[1]; ugGlide(pt.tx, pt.ty, null, 560, ugPickPend); return; }
+  }
+  var k = UG.pool.indexOf(it);
+  if (k < 0) { UG.filter = ''; UG.find = ''; $('#ugFind').value = ''; ugRefresh(); k = UG.pool.indexOf(it); if (k < 0) return; }
+  var n = UG.pool.length, v = ugView(), cx = (v.W / 2 - UG.tx) / UG.z, cy = (v.H / 2 - UG.ty) / UG.z;
+  var ci = Math.round(cx / UG_CW), cj = Math.round(cy / UG_CH), best = null;
+  for (var j = cj - 2; j <= cj + 2; j++) {
+    var d = ugMod(k - (ci + j * UG.K), n); if (d > n / 2) d -= n;
+    var cost = Math.abs(d) + Math.abs(j - cj) * 1.2;
+    if (!best || cost < best.c) best = { i: ci + d, j: j, c: cost };
+  }
+  var c = ugCell(best.i, best.j), to = ugCenterOn(c.x, c.y), wall = $('#ugWall');
+  UG.pend = best.i + ',' + best.j;
+  if (innerWidth <= 700 && UG.desk) ugDesk(false);
+  if (Math.abs(best.i - ci) > 7 && !ugReduced()) {
+    wall.classList.add('jump');
+    setTimeout(function () { UG.tx = to.tx; UG.ty = to.ty; ugPaint(); wall.classList.remove('jump'); ugPickPend(); }, 260);
+  } else ugGlide(to.tx, to.ty, null, 560, ugPickPend);
+}
+function ugPickPend() {
+  var el = UG.nodes[UG.pend]; UG.pend = null;
+  if (!el) return;
+  ugFocus(el); el.classList.add('found'); setTimeout(function () { el.classList.remove('found'); }, 1700);
+}
+
+/* しぼる */
+function ugChips() {
+  var all = UG.items || [], cnt = {};
+  all.forEach(function (it) { var k = it.kind === 'q' ? 'c:' + it.cat : 'k:' + it.kind; cnt[k] = (cnt[k] || 0) + 1; });
+  var defs = [['', 'すべて', all.length]]
+    .concat(UG_CATS.map(function (c) { return ['c:' + c[0], c[1], cnt['c:' + c[0]] || 0]; }))
+    .concat(['work', 'cam', 'topic', 'fav', 'mine', 'memo'].map(function (k) { return ['k:' + k, UG_KIND[k], cnt['k:' + k] || 0]; }))
+    .filter(function (d) { return d[0] === '' || d[2] > 0 || UG.filter === d[0]; });
+  var people = UG_CENTER.map(function (p) { var k = ugCanon(p.w); return ['p:' + p.w, p.w, all.filter(function (it) { return it.pk === k && it.kind !== 'plate'; }).length]; });
+  defs.splice.apply(defs, [1, 0].concat(people));
+  defs.splice(1 + people.length, 0, ['t:タルコフスキー', 'タルコフスキー', all.filter(function (it) { return it.tk.indexOf('タルコフスキー') >= 0; }).length]);
+  if (/^[tp]:/.test(UG.filter) && !defs.some(function (d) { return d[0] === UG.filter; })) defs.push([UG.filter, (UG.filter[0] === 't' ? '#' : '') + UG.filter.slice(2) + ' ✕', '']);
+  fill($('#ugChips'), defs.map(function (d) {
+    return h('button', { type: 'button', 'aria-pressed': String(UG.filter === d[0]), onclick: function () { ugSetFilter(UG.filter === d[0] ? '' : d[0]); } },
+      [d[1], d[2] !== '' ? h('small', null, [' ' + d[2]]) : null]);
+  }));
+}
+function ugSetFilter(f) { UG.filter = f || ''; ugUnfocus(); ugRefresh(); }
+
+/* 近くで見る */
+function ugBtn(label, fn) { return h('button', { type: 'button', class: 'ug-btn', onclick: fn }, [label]); }
+function ugShort(it, n) { var l = it.t.replace(/\s+/g, ' ').trim(); n = n || 26; return l.length > n ? l.slice(0, n) + '…' : l; }
+function ugRefName(it) { if (it.kind === 'plate') return it.who; if (it.kind === 'work') return it.who + '『' + it.t + '』'; return it.who && it.kind !== 'topic' ? it.who + '「' + ugShort(it, 20) + '」' : ugShort(it, 30); }
+function ugRelated(it) {
+  return (UG.items || []).filter(function (x) { return x !== it; }).map(function (x) {
+    return { x: x, s: (it.pk && x.pk === it.pk ? 3 : 0) + x.tk.filter(function (t) { return it.tk.indexOf(t) >= 0; }).length };
+  }).filter(function (o) { return o.s > 0; }).sort(function (a, b) { return b.s - a.s || a.x.h - b.x.h; }).slice(0, 10).map(function (o) { return o.x; });
+}
+function ugFocus(el) {
+  var it = el._it, f = $('#ugFocus');
+  if (UG.selEl) UG.selEl.classList.remove('sel');
+  UG.selEl = el; UG.selK = el._k; el.classList.add('sel'); ugHot();
+  if (innerWidth <= 700 && UG.desk) ugDesk(false);
+  var label = it.kind === 'q' ? (UG_CAT[it.cat] || 'そのほか') : UG_KIND[it.kind];
+  if (it.kind === 'plate') label = '真ん中の人・' + (UG_CAT[it.cat] || '');
+  if (it.kind === 'cam') label = it.camShelf ? 'Camille の好きなもの' : 'Camille のひとネタ';
+  var kids = [h('div', { class: 'fh' }, [h('span', { class: 'cat' }, [label]), h('button', { type: 'button', class: 'link', onclick: ugUnfocus }, ['閉じる'])])];
+  if (it.img) kids.push(h('img', { class: 'fimg', src: it.img, alt: it.t + '（' + it.who + '）', referrerpolicy: 'no-referrer' }));
+  kids.push(h('div', { class: 'fq' + (it.v && !it.img ? ' vt' : '') + (it.kind === 'plate' ? ' pn' : '') }, [it.t]));
+  if (it.q && it.kind !== 'work') kids.push(h('p', { class: 'fsub' }, [it.q]));
+  var by = it.kind === 'plate' ? it.src : [it.who, it.src].filter(Boolean).join('　');
+  if (it.kind === 'work') by = it.who + (it.src ? '　' + it.src : '') + '　' + it.q;
+  if (it.kind === 'cam') by = '';
+  if (by && it.kind !== 'topic') kids.push(h('div', { class: 'fby' }, [(it.kind === 'q' || it.kind === 'fav') && !it.song ? '— ' + by : it.song ? '♪ ' + by : by]));
+  if (it.talk) kids.push(h('p', { class: 'fsub' }, [it.talk]));
+  if (it.verse && it.verse.from) kids.push(h('p', { class: 'fsub' }, [it.verse.from + ' から']));
+  if (it.tags.length) kids.push(h('div', { class: 'ftags' }, it.tags.map(function (t) { return h('button', { type: 'button', onclick: function () { ugSetFilter('t:' + t); } }, ['#' + t]); })));
+  var acts = [];
+  if (it.kind === 'q' || it.kind === 'fav' || it.kind === 'plate' || it.kind === 'work') acts.push(ugBtn(it.kind === 'plate' ? 'この人から詩を書く' : it.kind === 'work' ? 'この作品から詩を書く' : 'この言葉から詩を書く', function () { ugWriteFrom(it); }));
+  if (it.kind === 'topic') acts.push(ugBtn('これでメモする', function () { ugDesk(true, 'memo'); setRef(it.topic); $('#ideaText').focus(); }));
+  else if (it.kind === 'q' || it.kind === 'fav') acts.push(ugBtn('この言葉でメモ', function () { ugDesk(true, 'memo'); setRef({ t: ugRefName(it) }); $('#ideaText').focus(); }));
+  if (it.kind === 'plate') acts.push(ugBtn(it.who + ' の言葉を掛ける', function () { ugHangOpen(null, it.center); }));
+  if (it.kind === 'mine') acts.push(ugBtn('便箋で開く', function () { ugOpenVerse(it.verse); }));
+  if (it.kind === 'cam') acts.push(ugBtn('これでメモする', function () { ugDesk(true, 'memo'); setRef({ t: 'Camille「' + it.t + '」' }); $('#ideaText').focus(); }));
+  if (it.kind === 'cam' && /インク|青/.test(it.t)) acts.push(ugBtn('このインクで書く', function () { ugDesk(true, 'paper'); ugInkSet('b'); $('#ugBody').focus(); }));
+  if (it.kind === 'memo') acts.push(ugBtn('机のメモを見る', function () { ugDesk(true, 'memo'); }));
+  if (it.page) acts.push(h('a', { class: 'ug-btn', href: safeUrl(it.page), target: '_blank', rel: 'noopener' },
+    [it.img ? '絵の出どころ' : it.kind === 'work' ? (/bobdylan\.com/.test(it.page) ? '公式サイトで歌詞を読む ↗' : '出どころを開く ↗') : it.pd ? '青空文庫で全文を読む ↗' : '出どころ']));
+  if (it.pk) acts.push(ugBtn(it.who + ' だけ', function () { ugSetFilter('p:' + it.who); }));
+  if (it.own) {
+    acts.push(ugBtn('直す', function () { ugHangOpen(it.own); }));
+    var del = h('button', { type: 'button', class: 'ug-btn' }, ['外す']);
+    twoStep(del, '外す', function () {
+      call('quotedel', { id: it.own.id }).then(function (d) { S.quotes = d; UG.dirty = true; ugUnfocus(); ugRefresh(); toast('額を外しました'); },
+        function (e) { toast('外せませんでした：' + e.message, true); });
+    });
+    acts.push(del);
+  }
+  kids.push(h('div', { class: 'facts' }, acts));
+  var rel = ugRelated(it);
+  if (rel.length) kids.push(h('div', { class: 'frel' }, [h('h3', null, ['つながる額']), h('ul', null, rel.map(function (r) {
+    return h('li', null, [h('button', { type: 'button', class: 'link', onclick: function () { ugGoTo(r); } }, [(r.who && r.kind !== 'topic' ? r.who + '：' : '') + ugShort(r)])]);
+  }))]));
+  fill(f, kids); f.hidden = false; f.scrollTop = 0;
+}
+function ugUnfocus() {
+  $('#ugFocus').hidden = true;
+  if (UG.selEl) UG.selEl.classList.remove('sel');
+  UG.selEl = null; UG.selK = null; ugHot(null);
+}
+
+/* 机：便箋・詩稿・メモ */
+function ugDesk(open, tab) {
+  UG.desk = open;
+  var d = $('#ugDesk');
+  d.classList.toggle('open', open); d.setAttribute('aria-hidden', String(!open));
+  $('#under').classList.toggle('desk', open);
+  $('#ugDeskBtn').setAttribute('aria-expanded', String(open));
+  if (tab) ugTab(tab); else if (open && UG.tab === 'paper') ugPaperInit();
+  if (open && innerWidth <= 700) $('#ugFocus').hidden = true;
+}
+function ugTab(tab) {
+  UG.tab = tab;
+  ['paper', 'drafts', 'memo'].forEach(function (k) { $('#ugT-' + k).setAttribute('aria-selected', String(k === tab)); $('#ugP-' + k).hidden = k !== tab; });
+  if (tab === 'drafts') ugRenderVerses();
+  if (tab === 'paper') ugPaperInit();
+  save('ugTab', tab === 'paper' ? null : tab);
+}
+var VS = { id: '', rid: '', dir: 'v', ink: '', from: '', dirty: false, busy: false, init: false, t: null };
+function ugInkSet(ink, quiet) {
+  VS.ink = ink === 'b' ? 'b' : '';
+  $('#ugLetter').setAttribute('data-ink', VS.ink || 'k');
+  [].forEach.call(document.querySelectorAll('#ugLetter .ug-ink [role="radio"]'), function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-ink') === 'b') === (VS.ink === 'b'))); });
+  save('ugInk', VS.ink || null);
+  if (!quiet) { VS.dirty = true; ugDraftSave(); }
+}
+function ugPaperInit() {
+  if (VS.init) return;
+  VS.init = true;
+  var d = null; try { d = JSON.parse(load('ugDraft') || 'null'); } catch (e) {}
+  VS.dir = load('ugDir') === 'h' ? 'h' : 'v';
+  VS.ink = load('ugInk') === 'b' ? 'b' : '';
+  if (d && (d.body || d.title)) {
+    if (d.ink != null) VS.ink = d.ink === 'b' ? 'b' : '';
+    $('#ugTitle').value = d.title || ''; $('#ugBody').value = d.body || '';
+    VS.id = d.id || ''; VS.from = d.from || ''; VS.dir = d.dir === 'h' ? 'h' : 'v'; VS.dirty = !!d.dirty;
+  }
+  ugDirSet(VS.dir, true); ugInkSet(VS.ink, true); ugFromShow(); ugLDate(); ugCount();
+}
+function ugDirSet(dir, quiet) {
+  VS.dir = dir === 'h' ? 'h' : 'v';
+  $('#ugLetter').setAttribute('data-dir', VS.dir);
+  [].forEach.call(document.querySelectorAll('#ugLetter .ug-dir [role="radio"]'), function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-dir') === VS.dir)); });
+  save('ugDir', VS.dir === 'h' ? 'h' : null);
+  if (!quiet) { VS.dirty = true; ugDraftSave(); }
+}
+function ugFromShow() { $('#ugFrom').hidden = !VS.from; $('#ugFrom span').textContent = VS.from ? VS.from + ' から' : ''; }
+function ugLDate() {
+  var v = VS.id && S.verses && (S.verses.items || []).filter(function (x) { return x.id === VS.id; })[0];
+  $('#ugLDate').textContent = v ? '詩稿　' + stampOf(v.up || v.at) : fmtDay(todayJst());
+}
+function ugCount() { var n = $('#ugBody').value.replace(/\s/g, '').length; $('#ugLHint').textContent = n ? n + '字' + (VS.dirty ? '・まだ保存していません' : '') : 'Ctrl＋Enter でも保存できます'; }
+function ugDraftSave() {
+  ugCount(); clearTimeout(VS.t);
+  VS.t = setTimeout(function () {
+    var b = $('#ugBody').value, t = $('#ugTitle').value;
+    if (!b.trim() && !t.trim()) save('ugDraft', null);
+    else save('ugDraft', JSON.stringify({ id: VS.id, title: t, body: b, dir: VS.dir, ink: VS.ink, from: VS.from, dirty: VS.dirty }));
+  }, 500);
+}
+function ugPaperClear() {
+  VS.id = ''; VS.rid = ''; VS.from = ''; VS.dirty = false;
+  $('#ugTitle').value = ''; $('#ugBody').value = ''; save('ugDraft', null);
+  ugFromShow(); ugLDate(); ugCount();
+}
+function ugUnsaved() { return VS.dirty && !!$('#ugBody').value.trim(); }
+// 書きかけがあるときだけ、2回押しにする
+function ugArm(btn, label, warn, fn, need) {
+  btn.addEventListener('click', function () {
+    if (need() && !btn.dataset.armed) { btn.dataset.armed = '1'; btn.textContent = warn; setTimeout(function () { delete btn.dataset.armed; btn.textContent = label; }, 3000); return; }
+    delete btn.dataset.armed; btn.textContent = label; fn();
+  });
+}
+function ugWriteFrom(it) {
+  ugDesk(true, 'paper');
+  VS.from = ugRefName(it); VS.dirty = VS.dirty || !!$('#ugBody').value.trim(); ugFromShow(); ugDraftSave();
+  setTimeout(function () { $('#ugBody').focus(); }, 80);
+}
+function ugOpenVerse(v) {
+  ugDesk(true, 'paper');
+  VS.id = v.id; VS.rid = ''; VS.from = v.from || ''; VS.dirty = false;
+  $('#ugTitle').value = v.title || ''; $('#ugBody').value = v.body || '';
+  ugDirSet(v.dir, true); ugInkSet(v.ink, true); ugFromShow(); ugLDate(); ugCount(); save('ugDraft', null);
+  setTimeout(function () { $('#ugBody').focus(); }, 80);
+}
+function ugSaveVerse() {
+  var body = $('#ugBody').value, title = $('#ugTitle').value.trim();
+  if (!body.trim()) { $('#ugLHint').textContent = '便箋が白紙です'; return; }
+  if (VS.busy) return;
+  VS.busy = true;
+  if (!VS.id) VS.rid = VS.rid || rid();
+  $('#ugSave').classList.add('busy'); $('#ugLHint').textContent = '保存しています…';
+  var sentBody = body, sentTitle = title;
+  call('versesave', { id: VS.id, rid: VS.id ? '' : VS.rid, title: title, body: body, dir: VS.dir, ink: VS.ink, from: VS.from }, { long: true }).then(function (d) {
+    S.verses = { items: d.items || [] }; VS.id = d.id || VS.id; VS.rid = '';
+    VS.dirty = $('#ugBody').value !== sentBody || $('#ugTitle').value.trim() !== sentTitle;
+    if (VS.dirty) ugDraftSave(); else save('ugDraft', null);
+    UG.dirty = true; if (UG.open) ugRefresh();
+    ugVN(); ugLDate(); if (UG.tab === 'drafts') ugRenderVerses();
+    $('#ugLHint').textContent = '保存しました。詩稿と壁に入りました';
+    ugCamLine('saved', { n: sentBody.replace(/\s+$/, '').split('\n').length, title: sentTitle || '無題' });
+  }, function (e) {
+    // 別の端末で消した詩の書きかけだった：新しい詩として保存し直す（字は失わない）
+    if (VS.id && /その詩はありません/.test(e.message)) { VS.id = ''; VS.rid = ''; VS.retry = true; return; }
+    $('#ugLHint').textContent = '保存できませんでした：' + e.message + '（便箋の字は残っています）';
+  })
+    .then(function () { VS.busy = false; $('#ugSave').classList.remove('busy'); if (VS.retry) { VS.retry = false; ugSaveVerse(); } });
+}
+function ugVN() { var n = ((S.verses && S.verses.items) || []).length; $('#ugVN').textContent = n ? String(n) : ''; }
+function ugRenderVerses() {
+  var ul = $('#ugVList');
+  ugVN();
+  if (!S.verses) { fill(ul, [h('li', { class: 'empty' }, ['読み込み中…'])]); return; }
+  var list = (S.verses.items || []).slice().sort(function (a, b) { return String(b.up || b.at || '').localeCompare(String(a.up || a.at || '')); });
+  if (!list.length) { fill(ul, [h('li', { class: 'empty' }, ['まだ詩稿はありません。便箋に書いて「保存する」と、ここと壁に入ります。'])]); return; }
+  fill(ul, list.map(function (v) {
+    var open = h('button', { type: 'button', class: 'link' }, ['便箋で開く']);
+    ugArm(open, '便箋で開く', '書きかけは消えます。もう一度押すと開く', function () { ugOpenVerse(v); }, function () { return ugUnsaved() && VS.id !== v.id; });
+    var onWall = h('button', { type: 'button', class: 'link', onclick: function () {
+      if (!UG.items || UG.dirty) ugRefresh();
+      var it = (UG.items || []).filter(function (x) { return x.verse && x.verse.id === v.id; })[0]; if (it) ugGoTo(it);
+    } }, ['壁で見る']);
+    var del = h('button', { type: 'button', class: 'link' }, ['消す']);
+    twoStep(del, '消す', function () {
+      call('versedel', { id: v.id }).then(function (d) {
+        S.verses = d; if (VS.id === v.id) { VS.id = ''; VS.dirty = true; ugDraftSave(); ugLDate(); }
+        UG.dirty = true; ugRefresh(); ugRenderVerses();
+      }, function (e) { toast('消せませんでした：' + e.message, true); });
+    });
+    return h('li', { class: v.dir === 'h' ? 'h' : 'v' }, [
+      h('div', { class: 'vh' }, [h('b', null, [v.title || '無題']), h('small', null, [stampOf(v.up || v.at) + '・' + (v.dir === 'h' ? '横書き' : '縦書き')])]),
+      h('div', { class: 'vb' }, [v.body]), v.from ? h('div', { class: 'vf' }, [v.from + ' から']) : null,
+      h('div', { class: 'va' }, [open, onWall, del])]);
+  }));
+}
+
+/* 額を掛ける・直す */
+var HG = { id: '', rid: '', busy: false };
+function ugHangOpen(own, who) {
+  HG.id = own ? own.id : ''; HG.rid = '';
+  fill($('#ugHPeople'), UG_CENTER.map(function (p) {
+    return h('button', { type: 'button', onclick: function () { $('#ugHWho').value = p.w; $('#ugHCat').value = p.c; $('#ugHText').focus(); } }, [p.w]);
+  }));
+  fill($('#ugHCat'), UG_CATS.map(function (c) { return h('option', { value: c[0] }, [c[1]]); }));
+  $('#ugHWho').value = own ? own.who : '';
+  $('#ugHCat').value = own ? own.cat : (UG.filter.indexOf('c:') === 0 ? UG.filter.slice(2) : 'poet');
+  $('#ugHText').value = own ? own.text : ''; $('#ugHSrc').value = own ? own.src || '' : '';
+  $('#ugHTags').value = own ? (own.tags || []).join(' ') : ''; $('#ugHImg').value = own ? own.img || '' : ''; $('#ugHV').checked = own ? !!own.v : false;
+  $('#ugHT').textContent = own ? '額を直す' : '額を掛ける'; $('#ugHSave').textContent = own ? '直す' : '掛ける'; $('#ugHHint').textContent = '';
+  if (who && !own) { $('#ugHWho').value = who.w; $('#ugHCat').value = who.c; }
+  $('#ugHang').hidden = false;
+  setTimeout(function () { (who ? $('#ugHText') : $('#ugHWho')).focus(); }, 30);
+}
+function ugHangClose() { $('#ugHang').hidden = true; }
+$('#ugHForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (HG.busy) return;
+  var img = $('#ugHImg').value.trim();
+  var a = { id: HG.id, cat: $('#ugHCat').value, who: $('#ugHWho').value.trim(), text: $('#ugHText').value, src: $('#ugHSrc').value.trim(),
+    tags: $('#ugHTags').value, img: img, v: $('#ugHV').checked ? '1' : '' };
+  if (!a.who || !a.text.trim()) { $('#ugHHint').textContent = 'だれの言葉かと、言葉を入れてください'; return; }
+  if (img && !/^https:\/\//.test(img)) { $('#ugHHint').textContent = '絵の URL は https から始まるものにしてください'; return; }
+  if (!HG.id) a.rid = HG.rid = HG.rid || rid();
+  HG.busy = true; $('#ugHSave').classList.add('busy'); $('#ugHHint').textContent = HG.id ? '直しています…' : '掛けています…';
+  var id = HG.id || HG.rid, edit = !!HG.id;
+  call('quotesave', a, { long: true }).then(function (d) {
+    S.quotes = d; UG.dirty = true; ugHangClose(); ugUnfocus(); ugRefresh();
+    var it = UG.items.filter(function (x) { return x.own && x.own.id === id; })[0]; if (it) ugGoTo(it);
+    if (edit) toast('額を直しました'); else ugCamLine('hang', { who: a.who });
+  }, function (e2) { $('#ugHHint').textContent = (edit ? '直せませんでした：' : '掛けられませんでした：') + e2.message; })
+    .then(function () { HG.busy = false; $('#ugHSave').classList.remove('busy'); });
+});
+$('#ugHCancel').addEventListener('click', ugHangClose);
+$('#ugHang').addEventListener('click', function (e) { if (e.target === $('#ugHang')) ugHangClose(); });
+
+/* カミーユのひとこと */
+var UC = { n: 0, t: null };
+function ugCamLine(kind, vars) {
+  var ls = ((S.undercam || {}).lines || {})[kind];
+  if (!ls || !ls.length) return;
+  var pick = ls[ugMod(dayIndex() + UC.n++, ls.length)];
+  if (kind === 'arrive' && /\{who\}/.test(pick) && !(vars && vars.who)) pick = ls[ugMod(dayIndex() + UC.n++, ls.length)];
+  var text = pick.replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] != null ? String(vars[k]) : ''; }).replace(/「」/g, '');
+  var box = $('#ugCam');
+  fill(box, [h('span', null, [text])]); box.hidden = false; box.classList.remove('off'); void box.offsetWidth; box.classList.add('on');
+  clearTimeout(UC.t); UC.t = setTimeout(ugCamHide, kind === 'late' ? 14000 : 9000);
+}
+function ugCamHide() { var b = $('#ugCam'); b.classList.remove('on'); clearTimeout(UC.t); setTimeout(function () { if (!b.classList.contains('on')) b.hidden = true; }, 700); }
+function ugCamArrive() {
+  var plates = (UG.items || []).filter(function (it) { return it.kind === 'plate'; });
+  var hh = +new Date(Date.now() + 9 * 3600e3).toISOString().slice(11, 13);
+  if (hh < 4 && load('ugLate') !== todayJst()) { save('ugLate', todayJst()); ugCamLine('late'); return; }
+  ugCamLine('arrive', { who: plates.length ? plates[0].who : '' });
+}
+$('#ugCam').addEventListener('click', ugCamHide);
+['#ugBody', '#ugTitle', '#ideaText', '#ugFind'].forEach(function (k) { $(k).addEventListener('focus', ugCamHide); });
+
+/* 降りる・上がる */
+function openUnder() {
+  if (UG.open) return;
+  UG.open = true; IDEA.open = true;
+  setHouse('under');
+  $('#under').setAttribute('aria-hidden', 'false');
+  ['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).setAttribute('aria-expanded', 'true'); });
+  $('#ideaAuto').setAttribute('aria-pressed', String(ideaAuto()));
+  var w = $('#ugWall'); w.classList.remove('arrive'); void w.offsetWidth; w.classList.add('arrive');
+  if (!UG.viewed) { UG.viewed = true; ugHomeView(); var t = load('ugTab'); if (t === 'drafts' || t === 'memo') UG.tab = t; }
+  UG.dirty = true; ugRefresh();
+  if (!S.undercam) call('undercam').then(function (d) { S.undercam = d; UG.dirty = true; if (UG.open) { ugRefresh(); ugCamArrive(); } }, function () {});
+  else setTimeout(ugCamArrive, 900);
+  if (!S.quotes) call('quotes').then(function (d) { S.quotes = d; UG.dirty = true; if (UG.open) ugRefresh(); }, function () {});
+  if (!S.verses) call('verses').then(function (d) { S.verses = d; UG.dirty = true; ugVN(); if (UG.open) ugRefresh(); if (UG.tab === 'drafts') ugRenderVerses(); ugLDate(); },
+    function (e) { if (UG.tab === 'drafts') fill($('#ugVList'), [h('li', { class: 'empty' }, ['詩稿を読めませんでした：' + e.message])]); });
+  if (!S.ideas || Date.now() - IDEA.at > 60e3) loadIdeas(true);
+  clearInterval(IDEA.listT); clearInterval(IDEA.topicT);
+  IDEA.listT = setInterval(function () { if (!document.hidden) loadIdeas(true); }, 60e3);
+  IDEA.topicT = setInterval(function () { if (ideaAuto() && !IDEA.hold && !ideaRef && !document.hidden) { topicSeed++; renderTopics(true); } }, 40e3);
+  clearTimeout(UG.hintT); $('#ugHint').classList.add('on');
+  UG.hintT = setTimeout(function () { $('#ugHint').classList.remove('on'); }, 7000);
+  setTimeout(function () { w.focus({ preventScroll: true }); }, 80);
+}
+function closeUnder() {
+  if (!UG.open) return;
+  UG.open = false; IDEA.open = false;
+  ugHangClose(); clearInterval(IDEA.listT); clearInterval(IDEA.topicT); cancelAnimationFrame(UG.glide);
+  ['#ideaOpen', '#ideaTab'].forEach(function (k) { $(k).setAttribute('aria-expanded', 'false'); });
+  $('#under').setAttribute('aria-hidden', 'true');
+  if (VS.dirty) ugDraftSave();
+  if (house === 'under') setHouse('private');
+}
+$('#ugUp').addEventListener('click', closeUnder);
+$('#ugDeskBtn').addEventListener('click', function () { ugDesk(!UG.desk, UG.desk ? null : UG.tab); });
+$('#ugDeskX').addEventListener('click', function () { ugDesk(false); });
+$('#ugHangBtn').addEventListener('click', function () { ugHangOpen(null); });
+['paper', 'drafts', 'memo'].forEach(function (k) { $('#ugT-' + k).addEventListener('click', function () { ugTab(k); }); });
+[].forEach.call(document.querySelectorAll('#ugLetter .ug-ink [role="radio"]'), function (b) { b.addEventListener('click', function () { ugInkSet(b.getAttribute('data-ink')); $('#ugBody').focus(); }); });
+[].forEach.call(document.querySelectorAll('#ugLetter .ug-dir [role="radio"]'), function (b) { b.addEventListener('click', function () { ugDirSet(b.getAttribute('data-dir')); $('#ugBody').focus(); }); });
+['#ugTitle', '#ugBody'].forEach(function (k) { $(k).addEventListener('input', function () { VS.dirty = true; ugDraftSave(); }); });
+$('#ugBody').addEventListener('keydown', function (e) { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ugSaveVerse(); } });
+$('#ugSave').addEventListener('click', ugSaveVerse);
+$('#ugFromX').addEventListener('click', function () { VS.from = ''; VS.dirty = true; ugFromShow(); ugDraftSave(); });
+ugArm($('#ugNew'), '新しい便箋', '書きかけがあります。もう一度押すと新しい便箋に', function () { ugPaperClear(); $('#ugTitle').focus(); }, ugUnsaved);
+$('#ugIn').addEventListener('click', function () { ugZoomCenter(1.25); });
+$('#ugOut').addEventListener('click', function () { ugZoomCenter(1 / 1.25); });
+$('#ugHome').addEventListener('click', function () { ugUnfocus(); ugHomeView(true); });
+var ugFindT = null;
+$('#ugFind').addEventListener('input', function () { clearTimeout(ugFindT); ugFindT = setTimeout(function () { UG.find = $('#ugFind').value.trim(); ugUnfocus(); ugRefresh(); }, 250); });
+(function () {
+  var wall = $('#ugWall'), layer = $('#ugLayer');
+  wall.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    cancelAnimationFrame(UG.glide);
+    UG.ptr[e.pointerId] = { x: e.clientX, y: e.clientY };
+    try { wall.setPointerCapture(e.pointerId); } catch (x) {}
+    var ids = Object.keys(UG.ptr);
+    if (ids.length === 1) UG.drag = { x: e.clientX, y: e.clientY, tx: UG.tx, ty: UG.ty, moved: false, el: e.target.closest ? e.target.closest('.ug-f') : null };
+    else if (ids.length === 2) {
+      var a = UG.ptr[ids[0]], b = UG.ptr[ids[1]], r = wall.getBoundingClientRect();
+      UG.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, z: UG.z, wx: ((a.x + b.x) / 2 - r.left - UG.tx) / UG.z, wy: ((a.y + b.y) / 2 - r.top - UG.ty) / UG.z };
+      if (UG.drag) UG.drag.moved = true;
+    }
+  });
+  wall.addEventListener('pointermove', function (e) {
+    if (!UG.ptr[e.pointerId]) return;
+    UG.ptr[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(UG.ptr);
+    if (UG.pinch && ids.length >= 2) {
+      var a = UG.ptr[ids[0]], b = UG.ptr[ids[1]], r = wall.getBoundingClientRect();
+      var nz = Math.max(UG_ZMIN, Math.min(UG_ZMAX, UG.pinch.z * (Math.hypot(a.x - b.x, a.y - b.y) || 1) / UG.pinch.d));
+      UG.z = nz; UG.tx = (a.x + b.x) / 2 - r.left - UG.pinch.wx * nz; UG.ty = (a.y + b.y) / 2 - r.top - UG.pinch.wy * nz; ugSched();
+      return;
+    }
+    var g = UG.drag; if (!g) return;
+    var dx = e.clientX - g.x, dy = e.clientY - g.y;
+    if (!g.moved && dx * dx + dy * dy > 36) { g.moved = true; wall.classList.add('drag'); }
+    if (g.moved) { UG.tx = g.tx + dx; UG.ty = g.ty + dy; ugSched(); }
+  });
+  function up(e) {
+    if (!UG.ptr[e.pointerId]) return;
+    delete UG.ptr[e.pointerId];
+    var g = UG.drag, rest = Object.keys(UG.ptr);
+    if (!rest.length) {
+      UG.pinch = null; UG.drag = null; wall.classList.remove('drag');
+      if (g && !g.moved && e.type === 'pointerup') { if (g.el) ugFocus(g.el); else ugUnfocus(); }
+    } else if (UG.pinch) { UG.pinch = null; var p = UG.ptr[rest[0]]; UG.drag = { x: p.x, y: p.y, tx: UG.tx, ty: UG.ty, moved: true }; }
+  }
+  wall.addEventListener('pointerup', up); wall.addEventListener('pointercancel', up);
+  wall.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var r = wall.getBoundingClientRect();
+    if (e.ctrlKey || e.metaKey) ugZoomAt(UG.z * Math.exp(-e.deltaY * (e.deltaMode ? .05 : .0022)), e.clientX - r.left, e.clientY - r.top);
+    else {
+      var k = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? r.height : 1, dx = e.deltaX, dy = e.deltaY;
+      if (e.shiftKey && !dx) { dx = dy; dy = 0; }
+      UG.tx -= dx * k; UG.ty -= dy * k; ugSched();
+    }
+  }, { passive: false });
+  wall.addEventListener('keydown', function (e) {
+    var f = e.target.closest && e.target.closest('.ug-f');
+    if (f && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); ugFocus(f); return; }
+    var m = { ArrowLeft: [160, 0], ArrowRight: [-160, 0], ArrowUp: [0, 160], ArrowDown: [0, -160] }[e.key];
+    if (m) { e.preventDefault(); ugGlide(UG.tx + m[0], UG.ty + m[1], null, 220); return; }
+    if (e.key === '+' || e.key === '=') ugZoomCenter(1.25);
+    else if (e.key === '-') ugZoomCenter(1 / 1.25);
+    else if (e.key === '0') ugHomeView(true);
+  });
+  // キーボードで額に移ったとき、ブラウザが勝手に壁をスクロールしないように（代わりに壁を歩かせる）
+  wall.addEventListener('scroll', function () { wall.scrollLeft = 0; wall.scrollTop = 0; });
+  $('#under').addEventListener('scroll', function () { $('#under').scrollLeft = 0; $('#under').scrollTop = 0; });
+  layer.addEventListener('focusin', function (e) {
+    var f = e.target.closest && e.target.closest('.ug-f'); if (!f) return;
+    ugHot(f._k);
+    var r = f.getBoundingClientRect(), v = ugView();
+    if (r.left < 0 || r.right > v.W || r.top < 90 || r.bottom > v.H) { var to = ugCenterOn(f._x, f._y); ugGlide(to.tx, to.ty, null, 260); }
+  });
+  layer.addEventListener('pointerover', function (e) { var f = e.target.closest && e.target.closest('.ug-f'); if (f) ugHot(f._k); });
+  layer.addEventListener('pointerout', function (e) { var f = e.target.closest && e.target.closest('.ug-f'); if (f && !f.contains(e.relatedTarget)) ugHot(null); });
+})();
+window.addEventListener('resize', function () { if (UG.open) { UG.range = ''; ugSched(); } });
+document.addEventListener('keydown', function (e) {
+  if (!UG.open || e.key !== 'Escape') return;
+  if (!$('#ugHang').hidden) { ugHangClose(); return; }
+  if (!$('#ugFocus').hidden) { ugUnfocus(); return; }
+  if (UG.desk) { ugDesk(false); return; }
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) { e.target.blur(); return; }
+  closeUnder();
+});
 
 /* ───────── プライベート：時計・光・絵・ひとこと・豆知識 ───────── */
 var LAT = 43.852, LON = 141.523;  // 増毛
@@ -4561,6 +5651,8 @@ function mockInit() {
       ov({ title: 'ご予約 7名様', cat: '顧客予約', date: dt(d(3), '19:30'), visit: true })
     ],
     routines: {}, ideas: [], talks: [], rid: {},
+    quotes: [{ id: 'mq1', at: T + 'T21:00', cat: 'singer', who: '見本の歌い手', text: '（見本）ここに掛けた言葉が\n壁の額になります', src: '見本の曲の前の語り', tags: ['夜', '見本'], v: 0, img: '' }],
+    verses: [{ id: 'mv1', at: T + 'T22:10', title: '見本の詩', body: '（見本）便箋に書いた詩は\n　詩稿と壁に入ります', dir: 'v', from: '' }],
     notes: { books: {} }, gallery: [], galimg: {}, answers: [],
     poems: [{ id: 'mp1', at: T + 'T20:00', poet: '見本の詩人', title: '見本', lines: '（見本）ここに貼った詩句が\n縦に並びます', slot: '' }],
     tastings: [{ id: 'mt1', at: T + 'T20:00', date: addDays(T, -3), kind: 'ウイスキー', name: '見本のシングルモルト 12年', maker: '見本の蒸留所', style: 'スペイサイド', where: '自宅', abv: 43, look: '琥珀', nose: '干しぶどう、蜂蜜', palate: '甘く、なめらか', finish: '中くらい', tags: ['シェリー', '蜂蜜'], score: 4, again: 'yes', memo: '' }]
@@ -4644,11 +5736,11 @@ function mockRoute(p) {
             haccp: { can: true, me: '小沢健人', items: [
               { key: 'k1', name: '井水の濁度', step: '受水', ver: 'v2', by: '小沢健人', why: '（見本）基準の見直し', at: addDays(T, -5) + 'T10:00', state: '未承認', self: true, ids: ['h1'], cols: [{ f: '上限', a: '2', b: '1' }] },
               { key: 'k2', name: '残留塩素', step: '受水', ver: 'v3', by: '見本E', why: '（見本）機器の更新', at: addDays(T, -4) + 'T09:00', state: '未承認', self: false, ids: ['h3'], cols: [{ f: '下限', a: '0.1', b: '0.2' }] }] } },
-          lost: [L2('owner', 'hub', '（見本）仕込み表の更新', { due: addDays(T, 1) }), L2('owner', 'hub', '（見本）グラスの発注', { due: addDays(T, 3) }),
+          lost: [L2('moved', 'hub', '（見本）仕込み表の更新', { due: addDays(T, 1), who: '見本A', note: '2回' }), L2('nodue', 'hub', '（見本）グラスの発注', { who: '見本B' }),
             L2('nodue', 'hub', '（見本）衛生マニュアルの承認', { who: '見本B' }),
-            L2('unlink', 'hub', '（見本）冬季限定のラベル案', { due: addDays(T, 6), who: '見本A' }), L2('dup', 'hub', '（見本）見積書を送る', { due: addDays(T, 1), who: '' }),
+            L2('dup', 'hub', '（見本）見積書を送る', { due: addDays(T, 1), who: '' }),
             L2('wait', 'brewery', '（見本）官能検査の承認待ち L-1020', { due: addDays(T, -9), who: '見本E', note: '9日' }),
-            L2('moved', 'hub', '（見本）作業の表まとめ', { due: addDays(T, 2), who: '見本A', note: '3回' }), L2('stale', 'hub', '（見本）古いタスク', { id: 'r-old', due: addDays(T, -28), note: '28日' }), L2('moved', 'hub', '（見本）古いタスク', { id: 'r-old', due: addDays(T, -28), note: '2回' }),
+            L2('moved', 'hub', '（見本）作業の表まとめ', { due: addDays(T, 2), who: '見本A', note: '3回' }), L2('nodue', 'hub', '（見本）古いタスク', { id: 'r-old', note: '' }), L2('moved', 'hub', '（見本）古いタスク', { id: 'r-old', due: addDays(T, -28), note: '2回' }),
             L2('off', 'hub', '（見本）冷蔵庫の点検', { due: addDays(T, 1), who: '見本C', note: '見本C は ' + fmtMD(addDays(T, 1)) + ' のシフトにいません' }),
             L2('confirm', 'brewery', '（見本）T3 °P 2.5→3.1', { note: '逆戻り・確認者が測り直す', who: '見本D' }),
             L2('incident', 'haccp', '（見本）雨漏り', { due: addDays(T, -9), note: '是正の確認' }), L2('gap', 'haccp', '開店前チェック 60%', { note: '抜け 10日・16日' })],
@@ -4817,6 +5909,35 @@ function mockRoute(p) {
       return ok({ items: db.poems });
     }
     case 'poemdel': db.poems = db.poems.filter(function (x) { return x.id !== p.id; }); return ok({ items: db.poems });
+    case 'undercam': return ok({ shelf: [{ t: '（見本）好きなもの', d: '（見本）ここにカミーユの言葉が入ります。', g: ['夜'] }, { t: '（見本）夜の海のような青', d: '（見本）インクの話。', g: ['言葉'] }],
+      lines: { arrive: ['（見本）今日の真ん中は{who}です。'], saved: ['（見本）{n}行、受け取りました。'], hang: ['（見本）{who}を掛けました。'], late: ['（見本）0時を回りました。'] },
+      notes: [{ id: 'mn1', title: '（見本）ひとネタの題', text: '（見本）調べた事実と、カミーユの感想。', day: T }], err: '' });
+    case 'quotes': return ok({ items: db.quotes });
+    case 'quotesave': {
+      if (!String(p.who || '').trim()) return ng('だれの言葉かを入れてください');
+      if (!String(p.text || '').trim()) return ng('言葉を入れてください');
+      var qv = { cat: ['poet', 'singer', 'artist', 'politician', 'scholar', 'writer', 'other'].indexOf(p.cat) >= 0 ? p.cat : 'other', who: String(p.who).trim().slice(0, 60),
+        text: String(p.text).trim().slice(0, 800), src: String(p.src || '').trim().slice(0, 120), v: p.v === '1' ? 1 : 0,
+        img: /^https:\/\/[^\s"'<>]+$/.test(String(p.img || '').trim()) ? String(p.img).trim() : '',
+        tags: String(p.tags || '').split(/[\s、,，・#＃]+/).filter(Boolean).filter(function (t, i, a) { return a.indexOf(t) === i; }).slice(0, 8) };
+      var qcur = p.id && db.quotes.find(function (x) { return x.id === p.id; });
+      if (p.id && !qcur) return ng('その額はありません');
+      if (qcur) Object.assign(qcur, qv, { up: now }); else if (!db.quotes.some(function (x) { return x.id === p.rid; })) db.quotes.unshift(Object.assign({ id: p.rid || rid(), at: now }, qv));
+      return ok({ items: db.quotes });
+    }
+    case 'quotedel': { var qn = db.quotes.length; db.quotes = db.quotes.filter(function (x) { return x.id !== p.id; }); return qn === db.quotes.length ? ng('その額はありません') : ok({ items: db.quotes }); }
+    case 'verses': return ok({ items: db.verses });
+    case 'versesave': {
+      var vb = String(p.body || '').replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/^\n+|\s+$/g, '');
+      if (!vb) return ng('便箋が白紙です');
+      var vv = { title: String(p.title || '').trim().slice(0, 80), body: vb, dir: p.dir === 'h' ? 'h' : 'v', ink: p.ink === 'b' ? 'b' : '', from: String(p.from || '').slice(0, 120) };
+      var vcur = p.id && db.verses.find(function (x) { return x.id === p.id; });
+      if (p.id && !vcur) return ng('その詩はありません');
+      var vid = p.id || p.rid || rid();
+      if (vcur) Object.assign(vcur, vv, { up: now }); else if (!db.verses.some(function (x) { return x.id === vid; })) db.verses.unshift(Object.assign({ id: vid, at: now }, vv));
+      return ok({ items: db.verses, id: vid });
+    }
+    case 'versedel': { var vn = db.verses.length; db.verses = db.verses.filter(function (x) { return x.id !== p.id; }); return vn === db.verses.length ? ng('その詩はありません') : ok({ items: db.verses }); }
     case 'tastings': return ok({ items: db.tastings });
     case 'tastingsave': {
       if (!String(p.name || '').trim()) return ng('名前を入れてください');
