@@ -206,6 +206,8 @@ body.idle[data-house="private"] .pv-quiet { opacity: 0; }
 .am-go span.go { flex: 1; color: var(--muted); }
 .am-go small { flex: none; color: var(--muted); }
 .am-go small a { color: var(--muted); }
+.am-mine { display: flex; gap: 8px; align-items: baseline; margin: 4px 0 6px; font-size: 13px; }
+.am-mine small { color: var(--muted); }
 .am-det h3 { margin: 0 0 4px; font-size: 17px; }
 @media (prefers-reduced-motion: reduce) {
   .am-n.new circle, .am-n.new rect { animation: none; filter: drop-shadow(0 0 6px var(--amber)); }
@@ -1247,6 +1249,11 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
     <div class="w-tab" id="tab-map" role="tabpanel" hidden>
       <div class="am-bar"><span id="amNote"></span><button type="button" class="link" id="amRe">読み直す</button><button type="button" class="link" id="amSeen" hidden>更新を見た</button><a id="amOpen" class="link" target="_blank" rel="noopener" hidden>元の画面を開く ↗</a></div>
       <ul class="am-go" id="amGo" aria-label="アプリを開く"></ul>
+      <!-- 自分用のアプリ（2026-11-11）：千石蔵アクセスマップ（シート）には載せないもの。ここは手で書く -->
+      <div class="am-mine"><b>自分用のアプリ</b><small>千石蔵アクセスマップには載せないもの</small></div>
+      <ul class="am-go" id="myApps" aria-label="自分用のアプリを開く">
+        <li><i style="background:#b07a3c"></i><a class="go" href="https://script.google.com/macros/s/AKfycbyGmPJo2BWigkT-SGG9ZcgJM_juVacUNuEHvdsBiUoQ0yIA67EHX1CfHGsuFFwnF6TGsw/exec" target="_blank" rel="noopener">🥃 蒸留所管理アプリ v3 ↗</a><small>v3・<a href="https://script.google.com/home/projects/1rgRMDGeBjz7024v5Fcl-CmhmCZNJZAXXfRES1lOosclwkeV2zhevuBBO/edit" target="_blank" rel="noopener">GAS ↗</a></small></li>
+      </ul>
       <div class="am-box"><svg id="amSvg" viewBox="-800 -770 1600 1400" role="img" aria-label="アプリとマスターの関係図"></svg></div>
       <div class="am-det" id="amDet"></div>
     </div>
@@ -1497,7 +1504,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-08 v5.6';
+var BUILD = '2026-11-11 v5.7';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
