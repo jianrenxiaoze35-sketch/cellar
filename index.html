@@ -758,6 +758,119 @@ a.ev:hover .ttl { text-decoration: underline; }
     background: linear-gradient(var(--win-edge), var(--win-frame) 28% 72%, var(--win-edge)); }
 }
 @media (max-width: 760px) { #canvas.board { border-width: 9px; } .cv-win::after { left: -6px; right: -6px; } }
+
+/* v5.9（2026-11-14・本人の指示）：窓の外の季節と小鳥。遠くの山・丘・木立を季節の色で描き（春＝桜・夏＝緑・秋＝紅葉・冬＝雪）、
+   花びら・木の葉・雪・夏の夜の蛍がゆっくり舞う。朝夕と夜は景色を暗く。昼はときどき鳥が窓の外を横切り（夏はツバメ）、
+   窓台に小鳥が来る（春＝メジロ・夏秋＝スズメ・冬＝シマエナガ）。押すと飛んでいく */
+.cv-season { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.cv-season .land { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 44%; opacity: .62; transition: filter 60s ease, opacity 60s ease; }
+.cv-season.tod-dawn .land { filter: brightness(.62) saturate(.7) hue-rotate(-8deg); }
+.cv-season.tod-eve .land { filter: brightness(.6) sepia(.25) saturate(.9); }
+.cv-season.tod-night .land { filter: brightness(.3) saturate(.45); opacity: .7; }
+.cv-season .fall i { position: absolute; top: -4%; display: block; animation: ssFall linear infinite; will-change: transform; }
+.cv-season .fall i b { display: block; animation: ssSway ease-in-out infinite alternate; }
+.cv-season .fall .petal b { width: 7px; height: 5px; border-radius: 60% 10% 60% 10%; background: linear-gradient(135deg, #FFE3EA, #F2A9BC); opacity: .9; }
+.cv-season .fall .leaf b { width: 9px; height: 6px; border-radius: 10% 70% 10% 70%; opacity: .9; }
+.cv-season .fall .flake b { width: 5px; height: 5px; border-radius: 50%; background: #fff; opacity: .85; filter: blur(.4px); }
+.cv-season .fall .fly { top: auto; bottom: 8%; animation: ssFloat ease-in-out infinite alternate; }
+.cv-season .fall .fly b { width: 4px; height: 4px; border-radius: 50%; background: #E9FF8A; box-shadow: 0 0 6px 2px rgba(200, 255, 90, .65); animation: ssBlink 2.6s ease-in-out infinite; }
+@keyframes ssFall { from { transform: translateY(0); } to { transform: translateY(var(--fall, 560px)); } }
+@keyframes ssSway { from { transform: translateX(-14px) rotate(-40deg); } to { transform: translateX(14px) rotate(50deg); } }
+@keyframes ssFloat { from { transform: translate(0, 0); } to { transform: translate(var(--fx, 30px), var(--fy, -40px)); } }
+@keyframes ssBlink { 0%, 100% { opacity: .05; } 45%, 60% { opacity: 1; } }
+.cv-season .drift { position: absolute; left: -2%; right: -2%; bottom: -6px; height: 20px; display: none;
+  background: radial-gradient(40px 14px at 8% 100%, #fff 60%, transparent 62%), radial-gradient(60px 16px at 30% 100%, #F4F8FB 60%, transparent 62%),
+    radial-gradient(50px 13px at 55% 100%, #fff 60%, transparent 62%), radial-gradient(70px 17px at 80% 100%, #F2F6FA 60%, transparent 62%), radial-gradient(40px 12px at 97% 100%, #fff 60%, transparent 62%); opacity: .9; }
+.cv-season .frost { position: absolute; inset: 0; display: none; background: radial-gradient(120px 90px at 0 0, rgba(255, 255, 255, .45), transparent 70%),
+  radial-gradient(130px 90px at 100% 0, rgba(255, 255, 255, .35), transparent 70%), radial-gradient(150px 70px at 0 100%, rgba(255, 255, 255, .4), transparent 70%),
+  radial-gradient(150px 70px at 100% 100%, rgba(255, 255, 255, .4), transparent 70%); }
+.cv-season.s-winter .drift, .cv-season.s-winter .frost { display: block; }
+.cv-season.tod-night .drift { opacity: .55; }
+/* 窓の外を横切る鳥 */
+.cv-season .flyer { position: absolute; left: 0; animation: ssCross linear forwards; }
+.cv-season .flyer.rtl { animation-name: ssCrossR; }
+.cv-season .flyer svg { display: block; width: 18px; height: 10px; overflow: visible; animation: ssBob 1.6s ease-in-out infinite alternate; }
+.cv-season .flyer.rtl svg { transform: scaleX(-1); }
+.cv-season .flyer .w { transform-box: fill-box; transform-origin: 50% 100%; animation: ssFlap .26s ease-in-out infinite alternate; }
+@keyframes ssCross { from { transform: translateX(-40px); } to { transform: translateX(var(--to, 1200px)); } }
+@keyframes ssCrossR { from { transform: translateX(var(--to, 1200px)); } to { transform: translateX(-40px); } }
+@keyframes ssBob { from { margin-top: -6px; } to { margin-top: 6px; } }
+@keyframes ssFlap { from { transform: scaleY(1); } to { transform: scaleY(-.7); } }
+/* 窓台に来る小鳥 */
+.sbird { position: absolute; bottom: -1px; width: 36px; height: 31px; margin-left: -18px; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transform: translate(-70px, -110px); opacity: 0; transition: transform 1.8s cubic-bezier(.2, .7, .3, 1), opacity .6s ease; }
+.sbird.here { transform: translate(0, 0); opacity: 1; }
+.sbird.away { transform: translate(90px, -140px); opacity: 0; transition: transform 1.6s cubic-bezier(.5, 0, .8, .6), opacity 1.2s ease .4s; }
+.sbird svg { display: block; width: 36px; height: 31px; overflow: visible; filter: drop-shadow(0 1px 1px rgba(30, 20, 10, .3)); transition: transform .25s ease; }
+.sbird.turn svg { transform: scaleX(-1); }
+.sbird .wing { transform-box: fill-box; transform-origin: 85% 15%; transition: transform .2s ease; }
+.sbird.flap .wing { animation: sbFlap .14s ease-in-out infinite alternate; }
+.sbird.flap .legs { opacity: 0; }
+.sbird .head { transform-box: fill-box; transform-origin: 20% 80%; transition: transform .22s ease; }
+.sbird.peck .head { transform: rotate(32deg) translate(1px, 2px); }
+.sbird.look .head { transform: rotate(-12deg); }
+.sbird.hop svg { animation: sbHop .38s ease-out; }
+.sbird.turn.hop svg { animation-name: sbHopL; }
+@keyframes sbFlap { from { transform: rotate(-70deg); } to { transform: rotate(15deg); } }
+@keyframes sbHop { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-7px); } }
+@keyframes sbHopL { 0%, 100% { transform: scaleX(-1) translateY(0); } 45% { transform: scaleX(-1) translateY(-7px); } }
+@media (prefers-reduced-motion: reduce) { .cv-season .fall, .cv-season .flyer { display: none; } .sbird, .sbird svg, .sbird .head { transition: none; animation: none !important; } }
+/* v5.8（2026-11-14・本人の指示）：窓台の小物。スポーツカーのおもちゃ・杯（ウイスキー）・湯気の立つコーヒー。
+   左右に引いて置き場所を変えられる（この端末に覚える）。車はときどき自分で走る。押すと、車は走り・カップは湯気が立ち・杯は氷が鳴る */
+.sill { position: absolute; left: 0; right: 0; bottom: 12px; height: 0; z-index: 5; pointer-events: none; }
+.toy { position: absolute; bottom: 0; transform: translateX(-50%); pointer-events: auto; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent; transition: left 2.6s cubic-bezier(.45, .05, .3, 1); filter: drop-shadow(0 1px 1.5px rgba(40, 28, 12, .16)); }
+.toy.drag { cursor: grabbing; transition: none; }
+.toy svg { display: block; overflow: visible; }
+.toy.car svg { transition: transform .35s ease; }
+.toy[data-k="car"] svg { width: 124px; height: 46px; }
+.toy[data-k="car2"] svg { width: 112px; height: 41.5px; }
+.toy.car.left svg { transform: scaleX(-1); }
+.toy[data-k="cup"] svg { width: 62px; height: 78px; }
+.toy[data-k="glass"] svg { width: 40px; height: 53px; }
+.toy .wh { transform-box: fill-box; transform-origin: center; }
+.toy.run .wh { animation: tyWheel .45s linear infinite; }
+.toy.run svg { animation: tyBump .22s ease-in-out infinite alternate; }
+.toy.left.run .wh { animation-direction: reverse; }
+.toy .steam path { fill: none; stroke: var(--toy-steam); stroke-width: 3.6; stroke-linecap: round; opacity: 0;
+  animation: tySteam 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.toy .steam path:nth-child(2) { animation-delay: 1.4s; }
+.toy .steam path:nth-child(3) { animation-delay: 2.8s; }
+.toy.puff .steam path { animation-duration: 1.6s; stroke-width: 5; }
+.toy .ice { transform-box: fill-box; transform-origin: center; animation: tyIce 6s ease-in-out infinite; }
+.toy.clink svg { animation: tyClink .5s ease-out; transform-origin: 50% 100%; }
+.toy.clink .ice { animation: tyIceHit .5s ease-out; }
+/* 時刻で移ろう（v5.8b）：コーヒーは朝いっぱい→昼に減って冷める→15時に2杯目→夕方から冷めたまま。杯は17時に注がれ、夜じゅう少しずつ減って氷が溶ける。
+   車は朝に出かけ、昼はときどきゆっくり行き来し、夕方ライトを点けて帰ってきて止まる。変わり目はどれも数十秒かけてゆっくり */
+.toy .steam { transition: opacity 40s ease; }
+.toy .coffee, .toy .whisky, .toy .surf, .toy .icebox { transform-box: fill-box; transition: transform 45s ease, opacity 30s ease; }
+.toy .coffee { transform-origin: 50% 50%; }
+.toy .whisky { transform-origin: 50% 100%; }
+.toy .icebox { transform-origin: 50% 50%; }
+.toy .beam { opacity: 0; transition: opacity 3s ease; }
+.toy .hl, .toy .tl { transition: filter 3s ease; }
+.toy.lit .beam { opacity: 1; }
+.toy.lit .hl { filter: drop-shadow(0 0 3px #FFE7A3); }
+.toy.lit .tl { filter: drop-shadow(0 0 2px #FF5A4A); }
+.toy.slow .wh { animation-duration: 1.6s; }
+.toy.slow.run svg { animation-duration: .6s; }
+.sill.now * { transition-duration: 0s !important; }
+:root { --toy-steam: rgba(255, 255, 255, .78); --toy-car: #24539E; --toy-car-hi: #5C8BD6; --toy-car2: #B5121B; --toy-car2-hi: #F0606A; --toy-cup: #FBF8F2; --toy-cup-edge: #C9BFAE; --toy-cup-in: #D8CFC0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --toy-steam: rgba(255, 255, 255, .55); --toy-car: #2E5FAE; --toy-car-hi: #6E98DB; --toy-cup: #E9E3D8; --toy-cup-edge: #8F8677; --toy-cup-in: #B9B0A2; } }
+:root[data-theme="dark"] { --toy-steam: rgba(255, 255, 255, .55); --toy-car: #2E5FAE; --toy-car-hi: #6E98DB; --toy-cup: #E9E3D8; --toy-cup-edge: #8F8677; --toy-cup-in: #B9B0A2; }
+@keyframes tyWheel { to { transform: rotate(360deg); } }
+@keyframes tyBump { from { transform: translateY(0); } to { transform: translateY(-.8px); } }
+.toy.left.run svg { animation-name: tyBumpL; }
+@keyframes tyBumpL { from { transform: scaleX(-1) translateY(0); } to { transform: scaleX(-1) translateY(-.8px); } }
+@keyframes tySteam { 0% { opacity: 0; transform: translateY(4px) scaleX(.8); } 25% { opacity: .9; } 70% { opacity: .35; } 100% { opacity: 0; transform: translateY(-14px) scaleX(1.25); } }
+@keyframes tyIce { 0%, 100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(1.2px) rotate(-3deg); } }
+@keyframes tyIceHit { 0% { transform: rotate(-8deg); } 30% { transform: translate(2px, -2px) rotate(10deg); } 70% { transform: translate(-1px, 0) rotate(-12deg); } 100% { transform: rotate(-8deg); } }
+@keyframes tyClink { 0% { transform: rotate(0); } 25% { transform: rotate(-5deg); } 60% { transform: rotate(3deg); } 100% { transform: rotate(0); } }
+@media (max-width: 760px) { .toy[data-k="car"] svg { width: 84px; height: 31px; } .toy[data-k="car2"] svg { width: 76px; height: 28px; } .toy[data-k="cup"] svg { width: 46px; height: 58px; } .toy[data-k="glass"] svg { width: 30px; height: 40px; } .sill { bottom: 11px; } }
+@media (prefers-reduced-motion: reduce) {
+  .toy, .toy * { transition: none !important; } .toy.run .wh, .toy.run svg, .toy .ice, .toy.clink svg, .toy.clink .ice { animation: none; }
+  .toy .steam path { animation: none; opacity: .45; }
+}
 #canvas.board:not(.full) .cv { padding: 22px clamp(18px, 3vw, 40px) 16px; gap: 10px 32px; }
 #canvas.board:not(.full) .cv-hm { font-size: clamp(54px, 8.4vw, 116px); }
 #canvas.board:not(.full) .cv-date { font-size: 14px; margin-top: 8px; }
@@ -1212,6 +1325,7 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
     <div class="cv-win">
     <section id="canvas" class="board" aria-label="キャンバス">
       <canvas id="cvScene" aria-hidden="true"></canvas>
+      <div class="cv-season" id="cvSeason" aria-hidden="true"><svg class="land" id="cvLand" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice"></svg><div class="fall" id="cvFall"></div><div class="frost"></div><div class="drift"></div><div id="cvFlyers"></div></div>
       <div class="cv-sos" id="cvSos" role="status" aria-live="assertive" hidden><span id="cvSosWho"></span><span class="el" id="cvSosEl"></span></div>
       <div class="cv" id="cv">
         <div class="cv-time"><div class="cv-hm" id="cvHm"></div><div class="cv-date" id="cvDate"></div></div>
@@ -1227,6 +1341,118 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
         <button type="button" id="cvFull" aria-pressed="false">全画面</button>
       </div>
     </section>
+    <div class="sill" id="sill" aria-hidden="true">
+      <div class="toy" data-k="cup"><svg viewBox="0 0 64 80">
+        <defs>
+          <filter id="tyBlur" x="-30%" y="-200%" width="160%" height="500%"><feGaussianBlur stdDeviation="1.4"/></filter>
+          <filter id="tySteamBlur" x="-100%" y="-30%" width="300%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter>
+          <linearGradient id="tyCupBody" x1="0" x2="1"><stop offset="0" stop-color="#CFC6B7"/><stop offset=".16" stop-color="#F4EFE7"/><stop offset=".4" stop-color="#FFFFFF"/><stop offset=".72" stop-color="#EEE8DE"/><stop offset="1" stop-color="#B9AF9F"/></linearGradient>
+          <linearGradient id="tySaucer" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#ECE6DC"/><stop offset="1" stop-color="#BDB3A3"/></linearGradient>
+          <linearGradient id="tyCupIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFB5A6"/><stop offset="1" stop-color="#EFE9DF"/></linearGradient>
+          <radialGradient id="tyCoffee" cx=".42" cy=".4" r=".7"><stop offset="0" stop-color="#7A4B2C"/><stop offset=".55" stop-color="#4A2B17"/><stop offset="1" stop-color="#26140A"/></radialGradient>
+        </defs>
+        <g class="steam" filter="url(#tySteamBlur)"><path d="M25 38 C21 31 29 27 25 19 C22 13 27 9 25 3"/><path d="M32 38 C28 30 36 26 32 18 C29 12 34 8 32 2"/><path d="M39 38 C35 31 43 27 39 19 C36 13 41 9 39 3"/></g>
+        <ellipse cx="32" cy="77.2" rx="28" ry="2.6" fill="rgba(30,20,10,.38)" filter="url(#tyBlur)"/>
+        <ellipse cx="32" cy="74.2" rx="27.5" ry="5" fill="url(#tySaucer)"/>
+        <ellipse cx="32" cy="73.4" rx="17.5" ry="2.8" fill="#DCD4C7"/>
+        <path d="M6 73.6 C10 77.6 54 77.6 58 73.6" fill="none" stroke="#A89E8E" stroke-width=".6" opacity=".7"/>
+        <path d="M48 48.5 C60.5 47 61.5 63.5 46.8 64.2" fill="none" stroke="#B5AB9B" stroke-width="5" stroke-linecap="round"/>
+        <path d="M48 48.5 C60.5 47 61.5 63.5 46.8 64.2" fill="none" stroke="url(#tyCupBody)" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M50 51 C55.5 51 55.8 60.5 49 61.4" fill="none" stroke="#9E9483" stroke-width="1" opacity=".55"/>
+        <path d="M12.6 44 C13.4 55 15.2 63.5 18.4 67.8 C20.6 70.7 24.4 71.8 32 71.8 C39.6 71.8 43.4 70.7 45.6 67.8 C48.8 63.5 50.6 55 51.4 44 Z" fill="url(#tyCupBody)"/>
+        <ellipse cx="32" cy="71.4" rx="10.5" ry="1.4" fill="#C8BFB0"/>
+        <ellipse cx="32" cy="44" rx="19.4" ry="3.7" fill="#FBF8F3" stroke="#D3CABC" stroke-width=".5"/>
+        <ellipse cx="32" cy="44.3" rx="17.8" ry="3" fill="url(#tyCupIn)"/>
+        <g class="coffee"><ellipse cx="32" cy="44.7" rx="17" ry="2.6" fill="url(#tyCoffee)"/>
+          <ellipse cx="32" cy="44.7" rx="15.6" ry="2.2" fill="none" stroke="#B9844F" stroke-width=".7" opacity=".55"/>
+          <ellipse cx="26.5" cy="44.1" rx="4.2" ry=".7" fill="#FFF3E0" opacity=".45"/></g>
+        <path d="M18.6 48.5 C19.2 56.5 20.6 62.4 22.8 66.4" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+        <path d="M45.5 49 C45 56 43.8 61.5 42 65.5" fill="none" stroke="#9C9283" stroke-width="1.6" stroke-linecap="round" opacity=".35"/>
+        <path d="M15 42.6 C20 40.9 26 40.6 30 40.6" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" opacity=".9"/>
+      </svg></div>
+      <div class="toy" data-k="glass"><svg viewBox="0 0 44 58">
+        <defs>
+          <clipPath id="tyGlassIn"><path d="M6.7 9 L37.3 9 L35.9 47.4 L8.1 47.4 Z"/></clipPath>
+          <linearGradient id="tyWhisky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0B25E"/><stop offset=".35" stop-color="#C9781F"/><stop offset="1" stop-color="#7E4210"/></linearGradient>
+          <linearGradient id="tyGlassWall" x1="0" x2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".62"/><stop offset=".09" stop-color="#FFFFFF" stop-opacity=".14"/><stop offset=".22" stop-color="#FFFFFF" stop-opacity=".02"/><stop offset=".78" stop-color="#FFFFFF" stop-opacity=".02"/><stop offset=".91" stop-color="#FFFFFF" stop-opacity=".16"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".55"/></linearGradient>
+          <linearGradient id="tyGlassBase" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".4" stop-color="#E9F1F7" stop-opacity=".35"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".6"/></linearGradient>
+          <linearGradient id="tyIce" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".9"/><stop offset=".5" stop-color="#E8F2FA" stop-opacity=".45"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".7"/></linearGradient>
+        </defs>
+        <ellipse cx="22" cy="56.6" rx="19" ry="2" fill="rgba(30,20,10,.3)" filter="url(#tyBlur)"/>
+        <ellipse cx="22" cy="56.4" rx="12" ry="1.3" fill="rgba(215,140,50,.35)" filter="url(#tyBlur)"/>
+        <path d="M5 8 L39 8 L36.2 52.6 C36 54.8 34.4 56 32.2 56 L11.8 56 C9.6 56 8 54.8 7.8 52.6 Z" fill="rgba(255,255,255,.07)"/>
+        <ellipse cx="22" cy="8.4" rx="16.6" ry="1.9" fill="none" stroke="rgba(255,255,255,.45)" stroke-width=".7"/>
+        <g clip-path="url(#tyGlassIn)"><rect class="whisky" x="4" y="14" width="36" height="40" fill="url(#tyWhisky)" opacity=".92"/></g>
+        <g class="surf"><ellipse cx="22" cy="0" rx="15.5" ry="2" fill="#F3BE6C" opacity=".95"/>
+          <path d="M8 0.4 C14 2.4 30 2.4 36 0.4" fill="none" stroke="#FFE3AE" stroke-width=".6" opacity=".9"/>
+          <g class="icebox"><g class="ice">
+            <path d="M13.2 -9 L24.6 -10.6 L27.4 -1.4 L16 1.4 Z" fill="url(#tyIce)" stroke="rgba(255,255,255,.95)" stroke-width=".6" stroke-linejoin="round"/>
+            <path d="M13.2 -9 L24.6 -10.6 L26 -12.4 L15 -11 Z" fill="rgba(255,255,255,.85)"/>
+            <path d="M24.6 -10.6 L26 -12.4 L28.6 -3 L27.4 -1.4 Z" fill="rgba(220,235,248,.6)"/>
+            <path d="M15.4 -7 L22 -8" stroke="#FFFFFF" stroke-width=".7" opacity=".9"/><circle cx="20" cy="-4" r=".6" fill="#FFFFFF" opacity=".8"/></g></g></g>
+        <path d="M5 8 L39 8 L36.2 52.6 C36 54.8 34.4 56 32.2 56 L11.8 56 C9.6 56 8 54.8 7.8 52.6 Z" fill="url(#tyGlassWall)" stroke="rgba(255,255,255,.75)" stroke-width=".8"/>
+        <path d="M8.1 47.4 L35.9 47.4 L35.7 52.6 C35.5 54.4 34.2 55.3 32.2 55.3 L11.8 55.3 C9.8 55.3 8.5 54.4 8.3 52.6 Z" fill="url(#tyGlassBase)"/>
+        <path d="M8.1 47.4 L35.9 47.4" stroke="rgba(255,255,255,.8)" stroke-width=".6"/>
+        <path d="M5.2 8.6 C10 10.4 34 10.4 38.8 8.6" fill="none" stroke="rgba(255,255,255,.9)" stroke-width=".9"/>
+        <path d="M9.4 12 L11.2 45" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity=".65"/>
+        <path d="M12.6 14 L13.6 30" stroke="#FFFFFF" stroke-width=".7" stroke-linecap="round" opacity=".5"/>
+        <path d="M34.4 14 L33.2 44" stroke="#FFFFFF" stroke-width=".8" stroke-linecap="round" opacity=".35"/>
+      </svg></div>
+      <div class="toy car" data-k="car"><svg viewBox="0 0 124 46">
+        <defs>
+          <linearGradient id="tyCarBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--toy-car-hi)"/><stop offset=".32" style="stop-color:var(--toy-car)"/><stop offset=".72" stop-color="#1A3E7E"/><stop offset="1" stop-color="#0D2149"/></linearGradient>
+          <linearGradient id="tyCarWin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C6E8A"/><stop offset=".45" stop-color="#1F2A3C"/><stop offset="1" stop-color="#0A0F18"/></linearGradient>
+          <radialGradient id="tyRim" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#F4F6F8"/><stop offset=".6" stop-color="#B7BDC5"/><stop offset="1" stop-color="#6D747D"/></radialGradient>
+          <radialGradient id="tyTire" cx=".5" cy=".5" r=".5"><stop offset=".62" stop-color="#2B2B2B"/><stop offset="1" stop-color="#090909"/></radialGradient>
+          <linearGradient id="tyBeam"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".75"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></linearGradient>
+        </defs>
+        <ellipse cx="63" cy="38.2" rx="58" ry="2.6" fill="rgba(20,14,8,.45)" filter="url(#tyBlur)"/>
+        <path class="beam" d="M119.6 26.4 L152 18 L152 36 Z" fill="url(#tyBeam)"/>
+        <path d="M20 36.5 C20 28.5 25 24.6 31 24.6 C37 24.6 42 28.5 42 36.5 Z M84 36.5 C84 28.5 89 24.6 95 24.6 C101 24.6 106 28.5 106 36.5 Z" fill="#070B14"/>
+        <path d="M5 33 C4.6 28.6 5 24 6.8 19.8 L9.6 16.4 C10.2 15.1 11.4 14.5 13 14.4 L58 12.3 C66.5 12.2 72.5 13.6 78.6 16.6 L90.4 22.2 L110 24 C116 24.6 120 26.8 120.6 30 L120.8 33.4 C120.8 35 119.6 36 117.8 36 L106.4 36 C106 29.4 101.2 25 95 25 C88.8 25 84 29.4 83.6 36 L42.4 36 C42 29.4 37.2 25 31 25 C24.8 25 20 29.4 19.6 36 L7 36 C5.8 36 5 35 5 33 Z" fill="url(#tyCarBody)"/>
+        <path d="M13 13.6 L60 11.5" stroke="#0E1A30" stroke-width="1.5" stroke-linecap="round"/><path d="M15 13.1 L15 14.4 M58 11.2 L58 12.4" stroke="#0E1A30" stroke-width="1.2"/>
+        <path d="M13 21 L15.4 16.6 L58 14.6 C65.5 14.6 71 16 76.2 18.6 L84.6 22.4 L13.4 22.8 Z" fill="url(#tyCarWin)"/>
+        <path d="M33.6 15.2 L33 22.7 M56.6 14.7 L56 22.5" stroke="url(#tyCarBody)" stroke-width="2.4"/>
+        <path d="M19 15.8 L14.2 22.8" stroke="url(#tyCarBody)" stroke-width="2"/>
+        <path d="M61 21 L66.5 16.2 L69.5 16.6 L64.6 21 Z" fill="#FFFFFF" opacity=".2"/><path d="M38 21.4 L42 15.6 L44.6 15.5 L40.8 21.4 Z" fill="#FFFFFF" opacity=".14"/>
+        <path d="M8 26.4 C30 24 72 23.2 114 25" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".4" stroke-linecap="round"/>
+        <path d="M44 31.6 L83 31.6" stroke="#0B1B3A" stroke-width="1.2" opacity=".55"/>
+        <path d="M33.4 23.4 C34 27 34.2 31 33.8 35 M57.2 23 C57.8 27 58 31 57.6 35.4" fill="none" stroke="#0B1B3A" stroke-width=".7" opacity=".6"/>
+        <path d="M80.4 22.6 L84.4 21.6 L85.4 23.8 L81.2 24.4 Z" fill="#163569"/>
+        <path d="M97.6 22.6 L106.6 23.4 L105.6 21.4 L99.4 21 Z" fill="#14336A"/><path d="M99.6 21.3 L105.3 21.6" stroke="#05080F" stroke-width=".8"/>
+        <path class="hl" d="M109.4 25 L119.4 26.2 C120.1 26.4 120.3 27 119.9 27.4 L110.4 27 Z" fill="#FFF3C4"/>
+        <path d="M112 31.6 L119.8 31.4 L119.4 34.2 L112.6 34.4 Z" fill="#0A1430" opacity=".8"/>
+        <path class="tl" d="M5.4 21.6 L8.6 21.8 L8.2 27.8 L5 27.6 Z" fill="#C3271B"/>
+        <g class="wh"><circle cx="31" cy="36" r="8.6" fill="url(#tyTire)"/><circle cx="31" cy="36" r="5.6" fill="url(#tyRim)" stroke="#5E656E" stroke-width=".5"/>
+          <path d="M31 30.8 V33.6 M35.9 34.4 L33.3 35.2 M34 40.2 L32.4 38 M28 40.2 L29.6 38 M26.1 34.4 L28.7 35.2" stroke="#5E656E" stroke-width="1.5" stroke-linecap="round"/><circle cx="31" cy="36" r="1.3" fill="#3A3F46"/></g>
+        <g class="wh"><circle cx="95" cy="36" r="8.6" fill="url(#tyTire)"/><circle cx="95" cy="36" r="5.6" fill="url(#tyRim)" stroke="#5E656E" stroke-width=".5"/>
+          <path d="M95 30.8 V33.6 M99.9 34.4 L97.3 35.2 M98 40.2 L96.4 38 M92 40.2 L93.6 38 M90.1 34.4 L92.7 35.2" stroke="#5E656E" stroke-width="1.5" stroke-linecap="round"/><circle cx="95" cy="36" r="1.3" fill="#3A3F46"/></g>
+      </svg></div>
+      <div class="toy car" data-k="car2"><svg viewBox="0 0 124 46">
+        <defs>
+          <linearGradient id="tyCar2Body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--toy-car2-hi)"/><stop offset=".34" style="stop-color:var(--toy-car2)"/><stop offset=".75" stop-color="#7A0B12"/><stop offset="1" stop-color="#3E0509"/></linearGradient>
+        </defs>
+        <ellipse cx="63" cy="38.2" rx="56" ry="2.6" fill="rgba(20,14,8,.45)" filter="url(#tyBlur)"/>
+        <path class="beam" d="M116 25.6 L150 17 L150 35 Z" fill="url(#tyBeam)"/>
+        <path d="M17 36.5 C17 28.5 22 24.6 28 24.6 C34 24.6 39 28.5 39 36.5 Z M83 36.5 C83 28.5 88 24.6 94 24.6 C100 24.6 105 28.5 105 36.5 Z" fill="#0B0607"/>
+        <path d="M7 34 C5.8 30.6 6.6 27.6 9.6 25.8 C13 23.6 17 22 21 19.8 C28 15.4 38 12.3 50 11.8 C58 11.5 64 12.5 69 14.6 C74 16.6 79 19.8 83.5 22.4 C88 23 94 23.6 100 24.2 C104 24.6 107 23.4 110.4 23.2 C113.6 23 116.4 24.4 118 26.6 C119.6 28.6 120.2 31 120 33.4 C119.9 35 118.8 36 117 36 L105.4 36 C105 29.4 100.2 25 94 25 C87.8 25 83 29.4 82.6 36 L39.4 36 C39 29.4 34.2 25 28 25 C21.8 25 17 29.4 16.6 36 L8.8 36 C7.8 36 7.2 35.2 7 34 Z" fill="url(#tyCar2Body)"/>
+        <path d="M12 25.6 C18 23.2 30 22.6 42 23.8" fill="none" stroke="#FFFFFF" stroke-width="1.1" opacity=".38" stroke-linecap="round"/>
+        <path d="M46 25.4 C64 24.6 84 24.8 101 25.6 C105 25.2 108 24.6 111 24.4" fill="none" stroke="#FFFFFF" stroke-width="1" opacity=".35" stroke-linecap="round"/>
+        <path d="M27 21.2 C34 16.6 42 14 51 13.6 C58 13.3 63.6 14.2 68 16.4 L77.2 21.4 L29.4 22.2 Z" fill="url(#tyCarWin)"/>
+        <path d="M56.4 13.6 L56 22" stroke="url(#tyCar2Body)" stroke-width="2.2"/>
+        <path d="M60.6 20.8 L65 16 L67.4 16.6 L63.4 20.8 Z" fill="#FFFFFF" opacity=".2"/><path d="M38 21.2 C40.4 18.4 43.4 16.4 47 15.4 L45.8 21 Z" fill="#FFFFFF" opacity=".1"/>
+        <path d="M57 23 C57.6 27 57.8 31 57.4 35.4" fill="none" stroke="#3A0408" stroke-width=".7" opacity=".6"/>
+        <path d="M74.4 21.4 L78 20.6 L78.8 22.6 L75.2 23.2 Z" fill="#6E0A10"/>
+        <path d="M12.6 22.2 L19.6 19.4 M13.4 23.4 L20.4 20.8 M14.4 24.5 L21 22.2" stroke="#3A0408" stroke-width=".6" opacity=".7"/>
+        <ellipse class="hl" cx="112.8" cy="25.2" rx="2.5" ry="2.2" fill="#FFF3C4" stroke="#8C0E16" stroke-width=".5"/>
+        <path d="M108 32 L120 31.8 L119.7 34.2 L108.6 34.4 Z" fill="#2A0306" opacity=".75"/>
+        <path class="tl" d="M6.6 27 L12.4 25.4 L12.2 27 L6.4 28.6 Z" fill="#E0301F"/>
+        <g class="wh"><circle cx="28" cy="36" r="8.6" fill="url(#tyTire)"/><circle cx="28" cy="36" r="5.6" fill="url(#tyRim)" stroke="#5E656E" stroke-width=".5"/>
+          <path d="M28 30.8 V33.6 M32.9 34.4 L30.3 35.2 M31 40.2 L29.4 38 M25 40.2 L26.6 38 M23.1 34.4 L25.7 35.2" stroke="#5E656E" stroke-width="1.5" stroke-linecap="round"/><circle cx="28" cy="36" r="1.3" fill="#3A3F46"/></g>
+        <g class="wh"><circle cx="94" cy="36" r="8.6" fill="url(#tyTire)"/><circle cx="94" cy="36" r="5.6" fill="url(#tyRim)" stroke="#5E656E" stroke-width=".5"/>
+          <path d="M94 30.8 V33.6 M98.9 34.4 L96.3 35.2 M97 40.2 L95.4 38 M91 40.2 L92.6 38 M89.1 34.4 L91.7 35.2" stroke="#5E656E" stroke-width="1.5" stroke-linecap="round"/><circle cx="94" cy="36" r="1.3" fill="#3A3F46"/></g>
+      </svg></div>
+    </div>
     </div>
     <!-- カミーユの設計と提案（2026-10-26・Claude API）。毎朝 6:30 と 12:30 に GAS が作った案を読むだけ。押したときだけ書き込む -->
     <section class="ai" id="ai" aria-label="今日の設計と気になること" hidden>
@@ -1504,7 +1730,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-11 v5.7';
+var BUILD = '2026-11-14 v5.9b';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -6147,6 +6373,333 @@ $('#cvFull').addEventListener('click', function () { cvSetFull(!CV.full); });
   }, { passive: true });
 });
 
+/* ───────── 窓台の小物（v5.8・2026-11-14）：引いて置き場所を変える・押すと動く・時刻で移ろう ─────────
+   v5.8d：車は2台（car＝レヴォーグの形の青いワゴン・car2＝911の形の赤いクーペ）。夕方は右端から car・car2 の順に並んで止まる */
+var SILL = { pos: { cup: .06, glass: .14, car2: .66, car: .86 }, tick: null, userT: {}, nextT: {}, mode: '', night: false };
+var SILL_CARS = ['car', 'car2'], SILL_KEYS = ['cup', 'glass', 'car2', 'car'];
+// 窓台が画面に見えているときだけ車を動かす（見えていない間に動いても誰も見ないので）
+SILL.seen = !('IntersectionObserver' in window);
+if (!SILL.seen) new IntersectionObserver(function (es) { var was = SILL.seen; SILL.seen = es[0].isIntersecting; if (SILL.seen && !was && SILL.tick) { sillTime(false); seasonTick(); } }).observe($('.cv-win'));
+(function () {
+  try { var p = JSON.parse(load('sill') || 'null'); if (p) SILL_KEYS.forEach(function (k) { if (typeof p[k] === 'number') SILL.pos[k] = Math.min(.96, Math.max(.04, p[k])); }); } catch (e) {}
+})();
+function sillEl(k) { return document.querySelector('#sill .toy[data-k="' + k + '"]'); }
+function sillPlace(k) { var el = sillEl(k); if (el) el.style.left = (SILL.pos[k] * 100).toFixed(2) + '%'; }
+function sillSave() { save('sill', JSON.stringify(SILL.pos)); }
+function sillW() { var b = $('#sill'); return Math.max(1, b ? b.getBoundingClientRect().width : 1); }
+function sillHalf(k) { var el = sillEl(k); return el ? el.getBoundingClientRect().width / 2 / sillW() : .05; }
+// 夕方に止まる場所：右端に car、その左に car2
+function sillHome(k) {
+  var gap = 10 / sillW(), a = 1 - sillHalf('car') - gap * 1.6;
+  return k === 'car' ? a : a - sillHalf('car') - sillHalf('car2') - gap;
+}
+function sillFree(k, to) {
+  var gap = 6 / sillW();
+  return SILL_KEYS.every(function (o) { return o === k || Math.abs(to - SILL.pos[o]) > sillHalf(k) + sillHalf(o) + gap; });
+}
+function sillDrive(k, to, slow) {
+  var el = sillEl(k); if (!el || el.classList.contains('drag')) return;
+  var from = SILL.pos[k];
+  if (to == null) {   // ほかの小物に重ならないところへ
+    var lo = .04 + sillHalf(k), hi = .96 - sillHalf(k);
+    for (var i = 0; i < 20; i++) { to = lo + Math.random() * (hi - lo); if (Math.abs(to - from) > .1 && sillFree(k, to)) break; }
+  }
+  el.classList.toggle('left', to < from);
+  var ms = ugReduced() ? 0 : Math.round(slow ? 5000 + Math.abs(to - from) * 24000 : 900 + Math.abs(to - from) * 3200);
+  el.style.transitionDuration = ms + 'ms';
+  el.classList.toggle('slow', !!slow); el.classList.toggle('lit', SILL.night);
+  el.classList.add('run'); SILL.pos[k] = to; sillPlace(k); sillSave();
+  clearTimeout(el._runT); el._runT = setTimeout(function () { el.classList.remove('run'); }, ms + 60);
+}
+// 時刻ごとの場面（h は JST の時。0〜24）。c＝コーヒーの残り・s＝湯気・g＝杯の残り・ice＝氷の大きさ（0〜1）
+function sillLerp(h, a, b, x, y) { return x + (y - x) * Math.min(1, Math.max(0, (h - a) / (b - a))); }
+function sillScene(h) {
+  var c, st, g, ice, car;
+  if (h >= 5 && h < 8) { c = 1; st = 1; }
+  else if (h >= 8 && h < 15) { c = sillLerp(h, 8, 14, 1, .25); st = sillLerp(h, 8, 11.5, 1, 0); }
+  else if (h >= 15 && h < 17) { c = sillLerp(h, 15, 17, 1, .55); st = sillLerp(h, 15, 16.5, .85, .1); }
+  else { c = .2; st = 0; }
+  if (h >= 17) { g = sillLerp(h, 17, 17.25, 0, .85) - sillLerp(h, 19, 24, 0, .35); ice = sillLerp(h, 17.2, 24, 1, .7); }
+  else if (h < 5) { g = sillLerp(h, 0, 3, .5, .3); ice = sillLerp(h, 0, 3, .7, .5); }
+  else { g = 0; ice = 0; }
+  car = (h >= 6.5 && h < 17.5) ? 'out' : 'home';
+  return { c: c, st: st, g: g, ice: ice, car: car, night: h >= 17.5 || h < 6.5 };
+}
+function sillTime(now) {
+  var h = hourOf(jstNow()), sc = sillScene(h), box = $('#sill'); if (!box) return;
+  if (now) box.classList.add('now');
+  var cup = sillEl('cup'), gl = sillEl('glass');
+  cup.querySelector('.steam').style.opacity = sc.st.toFixed(2);
+  // カップは浅い角度で見ているので、減ると液面の楕円が小さく・少し下がる
+  cup.querySelector('.coffee').style.transform = 'translateY(' + ((1 - sc.c) * 1.6).toFixed(2) + 'px) scale(' + (.62 + .38 * sc.c).toFixed(3) + ')';
+  var top = 50 - 36 * sc.g;   // 杯の液面（底 50・満杯 14）
+  gl.querySelector('.whisky').style.transform = 'scaleY(' + ((4 + 36 * sc.g) / 40).toFixed(4) + ')';
+  gl.querySelector('.whisky').style.opacity = sc.g > .01 ? '' : '0';
+  gl.querySelector('.surf').style.transform = 'translateY(' + top.toFixed(2) + 'px)';
+  gl.querySelector('.surf').style.opacity = sc.g > .01 ? '1' : '0';
+  gl.querySelector('.icebox').style.transform = 'scale(' + Math.max(.0001, sc.ice).toFixed(3) + ')';
+  SILL.night = sc.night;
+  if (now) { void box.offsetWidth; box.classList.remove('now'); }
+  var t = Date.now(), live = !document.hidden && SILL.seen && !CV.full && !ugReduced();
+  SILL_CARS.forEach(function (k, i) {
+    var el = sillEl(k); if (!el) return;
+    if (!el.classList.contains('run')) el.classList.remove('lit');
+    // 本人がさっき置いた車は30分は動かさない
+    if (!live || t - (SILL.userT[k] || 0) < 30 * 60e3 || el.classList.contains('run')) return;
+    if (sc.car === 'home') {
+      var hm = sillHome(k);
+      if (Math.abs(SILL.pos[k] - hm) > .01) setTimeout(function () { sillDrive(k, hm, true); }, i * 9000);   // 2台目は少し遅れて帰る
+    } else if (SILL.mode === 'home') {
+      setTimeout(function () { sillDrive(k, null, true); }, i * 12000);
+      SILL.nextT[k] = t + (4 + Math.random() * 5) * 60e3;
+    } else if (t >= (SILL.nextT[k] || 0)) {
+      if (SILL.nextT[k]) sillDrive(k, null, true);
+      SILL.nextT[k] = t + (4 + Math.random() * 5) * 60e3;
+    }
+  });
+  SILL.mode = sc.car;
+}
+function sillAuto() {
+  clearInterval(SILL.tick);
+  sillTime(true);
+  SILL.tick = setInterval(function () { sillTime(false); seasonTick(); }, 30e3);
+}
+function sillTap(k, el) {
+  if (SILL_CARS.indexOf(k) >= 0) { SILL.userT[k] = Date.now(); return sillDrive(k); }
+  var c = k === 'cup' ? 'puff' : 'clink';
+  el.classList.remove(c); void el.offsetWidth; el.classList.add(c);
+  clearTimeout(el._tapT); el._tapT = setTimeout(function () { el.classList.remove(c); }, k === 'cup' ? 3200 : 600);
+}
+SILL_KEYS.forEach(function (k) {
+  var el = sillEl(k); if (!el) return;
+  var isCar = SILL_CARS.indexOf(k) >= 0;
+  sillPlace(k);
+  var st = null;
+  el.addEventListener('pointerdown', function (e) {
+    if (e.button) return;
+    st = { x: e.clientX, w: $('#sill').getBoundingClientRect(), moved: false };
+    try { el.setPointerCapture(e.pointerId); } catch (er) {}
+  });
+  el.addEventListener('pointermove', function (e) {
+    if (!st) return;
+    if (!st.moved && Math.abs(e.clientX - st.x) < 5) return;
+    if (!st.moved) { st.moved = true; el.classList.add('drag'); el.classList.remove('run'); }
+    if (isCar) el.classList.toggle('left', e.clientX < st.x);
+    var f = (e.clientX - st.w.left) / Math.max(1, st.w.width);
+    SILL.pos[k] = Math.min(.96, Math.max(.04, f)); sillPlace(k);
+  });
+  function end() {
+    if (!st) return;
+    var moved = st.moved; st = null;
+    el.classList.remove('drag'); el.style.transitionDuration = '';
+    if (moved) { sillSave(); if (isCar) SILL.userT[k] = Date.now(); } else sillTap(k, el);
+  }
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+});
+sillAuto();
+
+/* ───────── 窓の外の季節と小鳥（v5.9・2026-11-14） ───────── */
+var SEASON = { cur: '', tod: '', flyAt: 0, visitAt: 0, bird: null };
+var fakeSeason = MOCK && /^(spring|summer|autumn|winter)$/.test(params.get('season') || '') ? params.get('season') : null;
+function seasonNow() { if (fakeSeason) return fakeSeason; var m = jstNow().getUTCMonth() + 1; return m >= 3 && m <= 5 ? 'spring' : m <= 8 && m >= 6 ? 'summer' : m >= 9 && m <= 11 ? 'autumn' : 'winter'; }
+function todOf(h) { return h >= 4.5 && h < 6.5 ? 'dawn' : h >= 6.5 && h < 16.5 ? 'day' : h >= 16.5 && h < 18.5 ? 'eve' : 'night'; }
+function ssRng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+var SS_PAL = {
+  spring: { far: '#A9BCC8', mid: '#8DB08C', near: '#7BA36E', trees: ['#F6CAD6', '#EFB2C4', '#F9DCE4'], green: '#6E9A62' },
+  summer: { far: '#8FAFC2', mid: '#4E8C59', near: '#3D7A48', trees: ['#2E6B3B', '#3C8250', '#2A5E35'], green: '#2E6B3B' },
+  autumn: { far: '#A6A0A6', mid: '#B57C3E', near: '#8F5E30', trees: ['#D9612B', '#E9A23B', '#B9352A', '#C98A2E'], green: '#6F7B3A' },
+  winter: { far: '#DCE3EA', mid: '#E6ECF1', near: '#F3F6F9', trees: ['#2F4A3E', '#38554A'], green: '#2F4A3E' }
+};
+function ssRidge(r, base, amp, n) {
+  var pts = [], i, d;
+  for (i = 0; i <= n; i++) pts.push([i * 1200 / n, base - amp * (.45 + .55 * Math.sin(i * 1.7 + r() * 2.4)) * (.6 + r() * .4)]);
+  d = 'M0 300 L0 ' + pts[0][1].toFixed(1);
+  for (i = 1; i < pts.length; i++) { var mx = (pts[i - 1][0] + pts[i][0]) / 2, my = (pts[i - 1][1] + pts[i][1]) / 2; d += ' Q' + pts[i - 1][0].toFixed(1) + ' ' + pts[i - 1][1].toFixed(1) + ' ' + mx.toFixed(1) + ' ' + my.toFixed(1); }
+  return { d: d + ' L1200 ' + pts[n][1].toFixed(1) + ' L1200 300 Z', y: function (x) { var k = Math.min(n - 1, Math.floor(x / (1200 / n))), f = x / (1200 / n) - k; return pts[k][1] + (pts[k + 1][1] - pts[k][1]) * f; } };
+}
+// 遠くの山並みは八ヶ岳（茅野・諏訪の側から見た形。左＝北の蓼科山 → 右＝南の編笠山と長い裾野）。
+// [x, 標高m, とがり]。とがり 1 は岩稜（直線でつなぐ）、0 はなだらか（丸める）。縦は強調し、2500m より上はさらに強めて南八ヶ岳の岩峰を立たせる
+var SS_YATSU = [
+  [0, 1640, 0], [40, 1760, 0], [88, 2160, 0], [114, 2470, 0], [126, 2531, 0], [140, 2528, 0], [158, 2440, 0], [190, 2180, 0],   // 蓼科山
+  [222, 2093, 0], [262, 2330, 0], [292, 2480, 0], [318, 2430, 0], [346, 2403, 0], [370, 2370, 0], [390, 2384, 0],              // 北横岳・縞枯山・茶臼山
+  [420, 2127, 0], [452, 2330, 0], [478, 2496, 0], [504, 2560, 0],                                                              // 麦草峠・中山
+  [522, 2640, 1], [532, 2604, 1], [544, 2646, 1], [566, 2590, 0], [584, 2603, 0], [606, 2440, 0],                              // 天狗岳（ふたこぶ）・根石岳・夏沢峠
+  [628, 2690, 0], [648, 2752, 0], [672, 2760, 0], [690, 2738, 0],                                                              // 硫黄岳（平たい頭）
+  [704, 2706, 1], [714, 2772, 1], [722, 2738, 1], [732, 2812, 1], [740, 2770, 1], [750, 2829, 1], [760, 2784, 1], [772, 2806, 1], // 横岳（のこぎり）
+  [786, 2780, 1], [802, 2899, 1], [814, 2836, 1], [826, 2760, 1],                                                              // 赤岳
+  [848, 2805, 1], [866, 2690, 1], [884, 2620, 1], [902, 2700, 1], [910, 2715, 1], [920, 2668, 1],                              // 阿弥陀岳・権現岳
+  [940, 2540, 0], [962, 2524, 0], [990, 2400, 0], [1030, 2190, 0], [1090, 1960, 0], [1150, 1780, 0], [1200, 1700, 0]          // 編笠山と裾野
+];
+function ssYatsu() {
+  var pts = SS_YATSU.map(function (q) { return [q[0], 196 - (q[1] - 1600) * .09 - Math.max(0, q[1] - 2500) * .12, q[2]]; }), d = 'M0 300 L0 ' + pts[0][1].toFixed(1), i;
+  for (i = 1; i < pts.length; i++) {
+    var a = pts[i - 1], b = pts[i];
+    if (a[2] || b[2]) d += ' L' + b[0] + ' ' + b[1].toFixed(1);
+    else { var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2; d += ' Q' + a[0] + ' ' + a[1].toFixed(1) + ' ' + mx + ' ' + my.toFixed(1); }
+  }
+  return { d: d + ' L1200 ' + pts[pts.length - 1][1].toFixed(1) + ' L1200 300 Z' };
+}
+// 雪線（これより上が白い）。少し波打たせる
+function ssSnowLine(r, y) {
+  var d = 'M0 0 L1200 0 L1200 ' + y, x;
+  for (x = 1200; x >= 0; x -= 24) d += ' L' + x + ' ' + (y + (r() - .5) * 12).toFixed(1);
+  return d + ' Z';
+}
+function ssTree(se, r, x, y, sc) {
+  var p = SS_PAL[se], col = p.trees[Math.floor(r() * p.trees.length)], o = '', h = 26 * sc;
+  if (se === 'winter') {
+    if (r() < .62) {   // 雪をかぶった針葉樹
+      for (var k = 0; k < 3; k++) {
+        var w = (16 - k * 4) * sc, top = y - h * (.35 + k * .28), bot = y - h * (k * .26);
+        o += '<path d="M' + (x - w).toFixed(1) + ' ' + bot.toFixed(1) + ' L' + x.toFixed(1) + ' ' + (top - 8 * sc).toFixed(1) + ' L' + (x + w).toFixed(1) + ' ' + bot.toFixed(1) + ' Z" fill="' + col + '"/>';
+        o += '<path d="M' + (x - w * .55).toFixed(1) + ' ' + (top + 2 * sc).toFixed(1) + ' L' + x.toFixed(1) + ' ' + (top - 8 * sc).toFixed(1) + ' L' + (x + w * .55).toFixed(1) + ' ' + (top + 2 * sc).toFixed(1) + ' Q' + x.toFixed(1) + ' ' + (top - 1 * sc).toFixed(1) + ' ' + (x - w * .55).toFixed(1) + ' ' + (top + 2 * sc).toFixed(1) + ' Z" fill="#FFFFFF"/>';
+      }
+      return o;
+    }
+    // 葉の落ちた木
+    o += '<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + ' L' + x.toFixed(1) + ' ' + (y - h).toFixed(1) + ' M' + x.toFixed(1) + ' ' + (y - h * .55).toFixed(1) + ' L' + (x - 9 * sc).toFixed(1) + ' ' + (y - h * .95).toFixed(1) +
+      ' M' + x.toFixed(1) + ' ' + (y - h * .7).toFixed(1) + ' L' + (x + 8 * sc).toFixed(1) + ' ' + (y - h * 1.05).toFixed(1) + '" stroke="#6B5B4E" stroke-width="' + (1.6 * sc).toFixed(1) + '" fill="none" stroke-linecap="round"/>';
+    return o + '<ellipse cx="' + x.toFixed(1) + '" cy="' + (y - h * .98).toFixed(1) + '" rx="' + (9 * sc).toFixed(1) + '" ry="' + (2.2 * sc).toFixed(1) + '" fill="#FFFFFF" opacity=".85"/>';
+  }
+  if (se === 'summer' && r() < .3) {   // 夏は針葉樹も混ぜる
+    return '<path d="M' + (x - 9 * sc).toFixed(1) + ' ' + y.toFixed(1) + ' L' + x.toFixed(1) + ' ' + (y - h * 1.3).toFixed(1) + ' L' + (x + 9 * sc).toFixed(1) + ' ' + y.toFixed(1) + ' Z" fill="#24543A"/>';
+  }
+  o += '<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + ' L' + x.toFixed(1) + ' ' + (y - h * .55).toFixed(1) + '" stroke="#5A4636" stroke-width="' + (2.2 * sc).toFixed(1) + '"/>';
+  [[0, -.75, .5], [-.38, -.55, .38], [.38, -.58, .4], [0, -1, .36]].forEach(function (c) {
+    var cc = r() < .5 ? col : p.trees[Math.floor(r() * p.trees.length)];
+    o += '<circle cx="' + (x + c[0] * h).toFixed(1) + '" cy="' + (y + c[1] * h).toFixed(1) + '" r="' + (c[2] * h).toFixed(1) + '" fill="' + cc + '"/>';
+  });
+  return o + '<circle cx="' + (x - .12 * h).toFixed(1) + '" cy="' + (y - .9 * h).toFixed(1) + '" r="' + (.16 * h).toFixed(1) + '" fill="#FFFFFF" opacity=".18"/>';
+}
+function ssLand(se) {
+  var r = ssRng({ spring: 11, summer: 23, autumn: 37, winter: 41 }[se]), p = SS_PAL[se], o = '';
+  var far = ssYatsu(), mid = ssRidge(r, 214, 34, 10), near = ssRidge(r, 268, 16, 6);
+  o += '<path d="' + far.d + '" fill="' + p.far + '"/>';
+  if (se !== 'winter') o += '<path d="' + far.d + '" fill="#FFFFFF" opacity=".12"/>';
+  else o += '<path d="' + far.d + '" fill="#FFFFFF" opacity=".35"/>';
+  // 冠雪：冬は2200m あたりから上、春は残雪で高いところだけ、秋（11月）は初冠雪で頂だけ
+  var snowY = { winter: 132, spring: 88, autumn: jstNow().getUTCMonth() === 10 ? 74 : 0 }[se];
+  if (snowY) o += '<clipPath id="ssSnowClip"><path d="' + ssSnowLine(r, snowY) + '"/></clipPath><path d="' + far.d + '" fill="#FFFFFF" opacity="' + (se === 'winter' ? .9 : .75) + '" clip-path="url(#ssSnowClip)"/>';
+  o += '<path d="' + mid.d + '" fill="' + p.mid + '"/>';
+  for (var i = 0; i < 26; i++) { var x = 20 + i * 45 + r() * 20; o += ssTree(se, r, x, mid.y(x) + 3, .55 + r() * .25); }
+  o += '<path d="' + near.d + '" fill="' + p.near + '"/>';
+  [[60, 1.7], [170, 1.3], [1050, 1.5], [1150, 1.9]].forEach(function (t) { o += ssTree(se, r, t[0], near.y(t[0]) + 6, t[1]); });
+  return o;
+}
+function ssFall(se, tod) {
+  var box = $('#cvFall'), kind = se === 'spring' ? 'petal' : se === 'autumn' ? 'leaf' : se === 'winter' ? 'flake' : (tod === 'night' ? 'fly' : '');
+  box.innerHTML = '';
+  if (!kind || ugReduced()) return;
+  var n = kind === 'fly' ? 9 : kind === 'flake' ? 16 : 11, H = Math.max(200, $('#canvas').clientHeight + 40), leafs = ['#D9612B', '#E9A23B', '#B9352A'];
+  for (var i = 0; i < n; i++) {
+    var el = document.createElement('i'), b = document.createElement('b');
+    el.className = kind; el.style.left = (Math.random() * 100).toFixed(1) + '%';
+    if (kind === 'fly') {
+      el.style.left = (5 + Math.random() * 90).toFixed(1) + '%'; el.style.bottom = (4 + Math.random() * 30).toFixed(1) + '%';
+      el.style.setProperty('--fx', (Math.random() * 80 - 40).toFixed(0) + 'px'); el.style.setProperty('--fy', (-20 - Math.random() * 50).toFixed(0) + 'px');
+      el.style.animationDuration = (6 + Math.random() * 6).toFixed(1) + 's'; b.style.animationDelay = (-Math.random() * 3).toFixed(1) + 's';
+    } else {
+      el.style.setProperty('--fall', H + 'px');
+      el.style.animationDuration = (kind === 'flake' ? 12 + Math.random() * 10 : 14 + Math.random() * 12).toFixed(1) + 's';
+      el.style.animationDelay = (-Math.random() * 24).toFixed(1) + 's';
+      b.style.animationDuration = (2.2 + Math.random() * 2).toFixed(1) + 's';
+      if (kind === 'leaf') b.style.background = leafs[i % 3];
+      if (kind === 'flake') { var z = 3 + Math.random() * 4; b.style.width = b.style.height = z.toFixed(1) + 'px'; }
+    }
+    el.appendChild(b); box.appendChild(el);
+  }
+}
+function seasonTick() {
+  var se = seasonNow(), h = hourOf(jstNow()), tod = todOf(h), box = $('#cvSeason'); if (!box) return;
+  if (se !== SEASON.cur) { $('#cvLand').innerHTML = ssLand(se); box.className = 'cv-season s-' + se + ' tod-' + tod; SEASON.cur = ''; }
+  if (se !== SEASON.cur || tod !== SEASON.tod) {
+    var first = !SEASON.tod, land = $('#cvLand');
+    if (first) land.style.transition = 'none';   // 開いた直後はいまの明るさから始める（移ろうのは時刻が変わったときだけ）
+    box.className = 'cv-season s-' + se + ' tod-' + tod; ssFall(se, tod);
+    if (first) { void land.offsetWidth; land.style.transition = ''; }
+  }
+  SEASON.cur = se; SEASON.tod = tod;
+  var live = !document.hidden && SILL.seen && !ugReduced(), t = Date.now();
+  if (!live || h < 6 || h >= 17.5) return;
+  // 窓の外を横切る鳥（1〜3分に一度）
+  if (!SEASON.flyAt) SEASON.flyAt = t + 8e3 + Math.random() * 20e3;
+  if (t >= SEASON.flyAt) { ssFlyers(se); SEASON.flyAt = t + 60e3 + Math.random() * 120e3; }
+  // 窓台に来る小鳥（4〜10分に一度。最初は開いて少ししてから）
+  if (!SEASON.visitAt) SEASON.visitAt = t + 15e3 + Math.random() * 25e3;
+  if (t >= SEASON.visitAt && !SEASON.bird) { sbVisit(se); SEASON.visitAt = t + 240e3 + Math.random() * 360e3; }
+}
+function ssFlyers(se) {
+  var box = $('#cvFlyers'), W = $('#canvas').clientWidth + 80, n = 1 + Math.floor(Math.random() * 3), rtl = Math.random() < .5, swallow = se === 'summer';
+  var top = 8 + Math.random() * 34, dur = (swallow ? 6 : 10) + Math.random() * 5;
+  for (var i = 0; i < n; i++) {
+    var el = document.createElement('div');
+    el.className = 'flyer' + (rtl ? ' rtl' : '');
+    el.style.top = 'calc(' + (top + i * 3.5).toFixed(1) + '% + ' + (i * 4) + 'px)';
+    el.style.setProperty('--to', W + 'px');
+    el.style.animationDuration = (dur + i * .6).toFixed(1) + 's'; el.style.animationDelay = (i * .5).toFixed(2) + 's';
+    el.innerHTML = swallow
+      ? '<svg viewBox="0 0 18 10"><path class="w" d="M1 6 C5 1 8 2 9 5 C10 2 13 1 17 6 C13 4 11 5 9 7 C7 5 5 4 1 6 Z" fill="#1E2430"/><path d="M8 6 L5 9.6 M10 6 L7.6 9.8" stroke="#1E2430" stroke-width=".9"/></svg>'
+      : '<svg viewBox="0 0 18 10"><path class="w" d="M1 5 C4 1.5 7 2 9 5 C11 2 14 1.5 17 5 C14 3.8 11.5 4.5 9 7 C6.5 4.5 4 3.8 1 5 Z" fill="#2A2522"/></svg>';
+    box.appendChild(el);
+    (function (e, ms) { setTimeout(function () { e.remove(); }, ms); })(el, (dur + i * .6 + i * .5 + 1) * 1000);
+  }
+}
+var SB_ART = {
+  suzume: '<defs><linearGradient id="sbSz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8A5A34"/><stop offset=".55" stop-color="#A57A55"/><stop offset=".62" stop-color="#DCCDB5"/><stop offset="1" stop-color="#C9B79C"/></linearGradient></defs>' +
+    '<path d="M3 20 L13 16.6 L13.6 21.4 Z" fill="#5B3A22"/><ellipse cx="19" cy="20" rx="10.4" ry="7.6" fill="url(#sbSz)"/>' +
+    '<g class="wing"><path d="M11.4 16.8 C15.6 12.6 24.4 12.8 27.6 17 C23.4 21.4 15.6 22 11.4 18.8 Z" fill="#76482A"/><path d="M14 16.4 L22 15.8 M14.6 18.4 L23 17.6 M16 20 L22.6 19.4" stroke="#3B2414" stroke-width=".8"/><path d="M15 15.2 L25 15" stroke="#EADFCB" stroke-width=".7"/></g>' +
+    '<g class="head"><circle cx="28" cy="13.2" r="6.2" fill="#ECE2CF"/><path d="M22 12.6 C22.6 6.6 33.4 5.8 34.4 11 C30.4 9.8 26 10.4 22 12.6 Z" fill="#7A3E1D"/><circle cx="29.8" cy="11.8" r="1.1" fill="#111"/><circle cx="29.4" cy="11.5" r=".35" fill="#fff"/>' +
+    '<circle cx="26.6" cy="15.2" r="1.5" fill="#242424"/><path d="M33.8 12.2 L37.6 13.4 L34 14.6 Z" fill="#2B2B2B"/><path d="M31.4 16.2 C32.4 18.4 31 20.2 28.8 20.4 C30 18.8 30.2 17.4 31.4 16.2 Z" fill="#222"/></g>' +
+    '<path class="legs" d="M17 27 L16.2 31 M21 27 L21.6 31 M14.6 31 L18 31 M20 31 L23.4 31" stroke="#8C6A4C" stroke-width="1" stroke-linecap="round"/>',
+  mejiro: '<defs><linearGradient id="sbMj" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7E9B2E"/><stop offset=".5" stop-color="#93AE3C"/><stop offset=".6" stop-color="#E4E0CF"/><stop offset="1" stop-color="#CFCAB8"/></linearGradient></defs>' +
+    '<path d="M3 19.6 L13 16.4 L13.6 21 Z" fill="#5D7425"/><ellipse cx="19" cy="20" rx="10" ry="7.2" fill="url(#sbMj)"/>' +
+    '<g class="wing"><path d="M11.6 16.8 C15.6 12.8 24 13 27.2 17 C23.2 21 15.6 21.6 11.6 18.8 Z" fill="#6B8526"/><path d="M14.4 17.4 L23 16.8 M15 19.2 L22.4 18.6" stroke="#4E631B" stroke-width=".7"/></g>' +
+    '<g class="head"><circle cx="28" cy="13.4" r="6" fill="#86A332"/><path d="M28.6 16.4 C31.6 16.8 33 18.4 32 20.6 C29.6 20.4 27.6 19 27 17.4 Z" fill="#D9CB3E"/><circle cx="30" cy="12.4" r="2.2" fill="#FFFFFF"/><circle cx="30" cy="12.4" r="1.15" fill="#111"/>' +
+    '<path d="M33.6 12.8 L38.4 13.6 L33.8 14.6 Z" fill="#3A3A3A"/></g>' +
+    '<path class="legs" d="M17 26.6 L16.2 31 M21 26.6 L21.6 31 M14.6 31 L18 31 M20 31 L23.4 31" stroke="#6C6A70" stroke-width="1" stroke-linecap="round"/>',
+  shimaenaga: '<defs><radialGradient id="sbSe" cx=".55" cy=".4" r=".7"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".75" stop-color="#F1F1EE"/><stop offset="1" stop-color="#D6D3CC"/></radialGradient></defs>' +
+    '<path d="M1 21.4 L14 17.4 L14.4 20.4 Z" fill="#1E1E1E"/><path d="M1.6 21.8 L13.6 20.4" stroke="#FFFFFF" stroke-width=".8"/>' +
+    '<ellipse cx="22" cy="18.4" rx="10.6" ry="9.6" fill="url(#sbSe)"/><path d="M14 22 C18 26.6 26 27 30 22.6" fill="#F3E3DF" opacity=".55"/>' +
+    '<g class="wing"><path d="M12.6 17 C16 13.4 23 13.6 25.6 17.2 C22.4 21 16.4 21.6 12.6 19 Z" fill="#2A2A2A"/><path d="M15 17.4 L23.4 17" stroke="#C9A9A6" stroke-width="1"/><path d="M15.6 19 L22 18.6" stroke="#FFFFFF" stroke-width=".8"/></g>' +
+    '<g class="head"><circle cx="27.6" cy="13" r="5.4" fill="#FFFFFF" opacity=".01"/><circle cx="29.6" cy="13.2" r="1.15" fill="#111"/><circle cx="29.25" cy="12.9" r=".35" fill="#fff"/><path d="M32.4 14.4 L34.6 14.9 L32.4 15.6 Z" fill="#1A1A1A"/></g>' +
+    '<path class="legs" d="M20 27.6 L19.4 31 M24 27.6 L24.6 31 M17.8 31 L21 31 M23 31 L26.4 31" stroke="#3A3A3A" stroke-width="1" stroke-linecap="round"/>'
+};
+function sbVisit(se) {
+  var kind = se === 'spring' ? 'mejiro' : se === 'winter' ? 'shimaenaga' : 'suzume', box = $('#sill'); if (!box) return;
+  var half = 20 / sillW(), to = .5, ok = false;
+  for (var i = 0; i < 24 && !ok; i++) {
+    to = .08 + Math.random() * .84;
+    ok = SILL_KEYS.every(function (o) { return Math.abs(to - SILL.pos[o]) > half + sillHalf(o); });
+  }
+  if (!ok) return;
+  var el = document.createElement('div'), turn = Math.random() < .5;
+  el.className = 'sbird flap' + (turn ? ' turn' : ''); el.style.left = (to * 100).toFixed(2) + '%';
+  el.innerHTML = '<svg viewBox="0 0 40 34">' + SB_ART[kind] + '</svg>';
+  if (turn) el.style.transform = 'translate(70px, -110px)';
+  box.appendChild(el); SEASON.bird = el;
+  void el.offsetWidth; el.style.transform = ''; el.classList.add('here');
+  setTimeout(function () { el.classList.remove('flap'); }, 1700);
+  var stay = 25e3 + Math.random() * 30e3, t0 = Date.now();
+  function act() {
+    if (SEASON.bird !== el) return;
+    if (Date.now() - t0 > stay) return sbLeave(el);
+    var r = Math.random(), c = r < .45 ? 'peck' : r < .7 ? 'look' : r < .88 ? 'hop' : 'turn';
+    if (c === 'turn') el.classList.toggle('turn');
+    else { el.classList.add(c); setTimeout(function () { el.classList.remove(c); }, c === 'hop' ? 400 : 650); }
+    el._actT = setTimeout(act, 1400 + Math.random() * 2600);
+  }
+  el._actT = setTimeout(act, 2200);
+  el.addEventListener('pointerdown', function (e) { e.stopPropagation(); sbLeave(el); });
+}
+function sbLeave(el) {
+  if (!el || el._gone) return;
+  el._gone = true; clearTimeout(el._actT);
+  el.classList.remove('turn', 'peck', 'look', 'hop'); el.classList.add('flap', 'away');
+  setTimeout(function () { el.remove(); if (SEASON.bird === el) SEASON.bird = null; }, 2200);
+}
+seasonTick();
+
 /* ───────── モック（?mock=1。Notion にも Drive にも触れず、サーバと同じ形で返す） ───────── */
 // 公開ページに載るので、人名・社名は架空。部屋の中身（姿の絵・夜の話）はモックにも置かない（見本の文だけ）
 var mockDB = null;
@@ -6561,7 +7114,7 @@ function mockPanel() {
       h('p', { style: 'margin:8px 0 0;color:#5F6C66' }, ['合図：時計を3回押す／camille と打つ → 欄に mock と入れて Enter'])])]);
   document.body.appendChild(box);
   function sync() { var hh = hourOf(jstNow()); $('#hh').value = hh; $('#hhLabel').textContent = fmtH(hh); $('#mClosed').checked = isClosedDay(todayJst()); }
-  $('#hh').addEventListener('input', function () { fakeH = +this.value; $('#hhLabel').textContent = fmtH(fakeH); lastSlot = ''; tick(); });
+  $('#hh').addEventListener('input', function () { fakeH = +this.value; $('#hhLabel').textContent = fmtH(fakeH); lastSlot = ''; tick(); SILL.userT = {}; sillTime(true); seasonTick(); });
   $('#mClosed').addEventListener('change', function () { fakeClosed = this.checked; lastSlot = ''; tick(); });
 }
 
