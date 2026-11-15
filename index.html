@@ -744,7 +744,7 @@ a.ev:hover .ttl { text-decoration: underline; }
 :root { --win-frame: #ECE6DA; --win-edge: #C8BEAD; --win-sill: #DED5C4; --win-shadow: rgba(48, 36, 18, .32); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --win-frame: #35312C; --win-edge: #1D1B18; --win-sill: #2C2925; --win-shadow: rgba(0, 0, 0, .55); } }
 :root[data-theme="dark"] { --win-frame: #35312C; --win-edge: #1D1B18; --win-sill: #2C2925; --win-shadow: rgba(0, 0, 0, .55); }
-.cv-win { position: relative; margin: 4px 0 30px; padding-bottom: 13px; }
+.cv-win { position: relative; margin: 4px 0 50px; padding-bottom: 13px; }
 .cv-win::after { content: ""; position: absolute; left: -12px; right: -12px; bottom: 0; height: 15px; border-radius: 3px;
   background: linear-gradient(var(--win-sill), color-mix(in srgb, var(--win-sill) 78%, #000)); box-shadow: 0 0 0 1px var(--win-edge), 0 12px 18px -12px var(--win-shadow); }
 #canvas.board:not(.full)::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
@@ -757,7 +757,7 @@ a.ev:hover .ttl { text-decoration: underline; }
   #canvas.board:not(.full) .cv::after { grid-column: 1 / -1; grid-row: 4; align-self: start; height: 9px; margin: -10px -60px 0;
     background: linear-gradient(var(--win-edge), var(--win-frame) 28% 72%, var(--win-edge)); }
 }
-@media (max-width: 760px) { #canvas.board { border-width: 9px; } .cv-win::after { left: -6px; right: -6px; } }
+@media (max-width: 760px) { #canvas.board { border-width: 9px; } .cv-win::after { left: -6px; right: -6px; } .cv-win { margin-bottom: 42px; } }
 
 /* v5.9（2026-11-14・本人の指示）：窓の外の季節と小鳥。遠くの山・丘・木立を季節の色で描き（春＝桜・夏＝緑・秋＝紅葉・冬＝雪）、
    花びら・木の葉・雪・夏の夜の蛍がゆっくり舞う。朝夕と夜は景色を暗く。昼はときどき鳥が窓の外を横切り（夏はツバメ）、
@@ -815,6 +815,70 @@ a.ev:hover .ttl { text-decoration: underline; }
 @keyframes sbHop { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-7px); } }
 @keyframes sbHopL { 0%, 100% { transform: scaleX(-1) translateY(0); } 45% { transform: scaleX(-1) translateY(-7px); } }
 @media (prefers-reduced-motion: reduce) { .cv-season .fall, .cv-season .flyer { display: none; } .sbird, .sbird svg, .sbird .head { transition: none; animation: none !important; } }
+/* v5.10（2026-11-15・本人の指示）：窓の外を動物が歩く（犬・猫・タヌキ・シカ。時間帯で出る顔ぶれが変わる）。
+   窓台には巣と餌皿。小鳥は、どんぐりや木の実を置いていく／巣材を運んで巣を少しずつ作る（1日2段まで）／餌を食べにくる。
+   車は窓台から下ろして、窓の下の2車線のコースで横並びのレースをする */
+.cv-season .beast { position: absolute; left: 0; bottom: 5%; will-change: transform; }
+.cv-season .beast svg { display: block; overflow: visible; }
+.cv-season .beast.rtl svg { transform: scaleX(-1); }
+.cv-season .beast .bd { animation: bsBob var(--st, .4s) ease-in-out infinite alternate; }
+.cv-season .beast .la, .cv-season .beast .lb { transform-box: fill-box; transform-origin: 50% 0; animation: bsLeg var(--st, .4s) ease-in-out infinite alternate; }
+.cv-season .beast .lb { animation-direction: alternate-reverse; }
+.cv-season .beast.stop .la, .cv-season .beast.stop .lb, .cv-season .beast.stop .bd { animation: none; }
+.cv-season .beast .tl { transform-box: fill-box; transform-origin: 100% 100%; }
+.cv-season .beast.stop .tl { animation: bsWag var(--wag, .26s) ease-in-out infinite alternate; }
+.cv-season .beast .hd { transform-box: fill-box; transform-origin: 15% 90%; transition: transform .7s ease; }
+.cv-season .b-dog.stop .hd { transform: rotate(20deg) translateY(2px); }
+.cv-season .b-cat.stop .hd { transform: rotate(-10deg); }
+.cv-season .b-tanuki.stop .hd { transform: rotate(12deg); }
+.cv-season .b-deer.stop .hd { transform: rotate(-12deg); }
+.cv-season.tod-dawn .beast, .cv-season.tod-eve .beast { filter: brightness(.72) saturate(.8); }
+.cv-season.tod-night .beast { filter: brightness(.42) saturate(.55); }
+@keyframes bsLeg { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+@keyframes bsBob { from { transform: translateY(0); } to { transform: translateY(-.8px); } }
+@keyframes bsWag { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+/* 窓台の巣・餌皿・小鳥が置いていったもの */
+.nest, .feeder, .gift { position: absolute; bottom: -1px; transform: translateX(-50%); }
+.nest { width: 58px; height: 32px; pointer-events: none; }
+.nest svg, .feeder svg, .gift svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.nest .nw { animation: nsGrow 1.4s ease-out; transform-box: fill-box; transform-origin: 50% 100%; }
+.feeder { width: 46px; height: 19px; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; filter: drop-shadow(0 1px 1px rgba(40, 28, 12, .18)); }
+.feeder .seeds { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 1.2s ease, opacity 1.2s ease; }
+.feeder.fill svg { animation: tyClink .5s ease-out; transform-origin: 50% 100%; }
+.gift { width: 13px; height: 13px; pointer-events: auto; cursor: pointer; transition: opacity 1.2s ease; filter: drop-shadow(0 1px .6px rgba(40, 28, 12, .25)); }
+.gift svg { transform: rotate(var(--r, 0deg)); }
+.gift.drop { animation: gfDrop .45s ease-in; }
+.gift.gone { opacity: 0; }
+.sbird .carry { position: absolute; left: 30px; top: 8px; width: 12px; height: 12px; pointer-events: none; }
+.sbird.turn .carry { left: -6px; transform: scaleX(-1); }
+.sbird .carry svg { display: block; width: 100%; height: 100%; overflow: visible; }
+@keyframes nsGrow { from { opacity: 0; transform: translateY(-6px) scale(.8); } to { opacity: 1; transform: none; } }
+@keyframes gfDrop { from { transform: translate(-50%, -12px); } to { transform: translate(-50%, 0); } }
+/* 窓の下のコース（2車線）。奥の車線＝青のワゴン、手前＝赤のクーペ。左の信号が赤・赤・青でスタート、右の白黒の線がゴール */
+.track { position: absolute; left: 1%; right: 1%; top: calc(100% + 8px); height: 22px; z-index: 6; pointer-events: none; border-radius: 4px;
+  background: linear-gradient(#4C4F54, #34373B); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 6px 10px -6px rgba(0, 0, 0, .45); }
+.track::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; height: 1.5px; margin-top: -1px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .7) 0 10px, transparent 10px 20px); }
+.track::after { content: ""; position: absolute; inset: 2px 4px; border-top: 1px solid rgba(255, 255, 255, .3); border-bottom: 1px solid rgba(255, 255, 255, .3); }
+.track .line { position: absolute; top: 2px; bottom: 2px; width: 6px; margin-left: -3px; background: repeating-conic-gradient(#F4F4F4 0 25%, #222 0 50%) 0 0 / 6px 6px; opacity: .85; }
+.track .sig { position: absolute; left: -13px; bottom: 1px; width: 9px; padding: 2px 0; border-radius: 3px; background: #222427; display: flex; flex-direction: column; gap: 2px; align-items: center; box-shadow: 0 0 0 1px rgba(0, 0, 0, .3); }
+.track .sig i { width: 5px; height: 5px; border-radius: 50%; background: #4A4A4A; }
+.track .sig.s1 i:nth-child(1), .track .sig.s2 i:nth-child(1), .track .sig.s2 i:nth-child(2) { background: #FF3B2F; box-shadow: 0 0 4px #FF3B2F; }
+.track .sig.go i:nth-child(3) { background: #3BE36A; box-shadow: 0 0 5px #3BE36A; }
+.track .toy { cursor: pointer; }
+.track .toy[data-k="car"] { bottom: 10px; z-index: 1; }
+.track .toy[data-k="car2"] { bottom: 0; z-index: 2; }
+.track .toy[data-k="car"] svg { width: 100px; height: 37px; }
+.track .toy[data-k="car2"] svg { width: 92px; height: 34px; }
+.track .toy .tag { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, 4px); padding: 2px 5px; border-radius: 3px; pointer-events: none;
+  font: 700 10px/1 system-ui, sans-serif; letter-spacing: .1em; color: #3A2A00; background: linear-gradient(#FFE07A, #E6B422); opacity: 0; transition: opacity .4s ease, transform .4s ease; }
+.track .toy.won .tag { opacity: 1; transform: translate(-50%, -2px); }
+@media (max-width: 760px) {
+  .track { height: 18px; } .track .toy[data-k="car"] { bottom: 8px; }
+  .track .toy[data-k="car"] svg { width: 70px; height: 26px; } .track .toy[data-k="car2"] svg { width: 64px; height: 24px; }
+  .nest { width: 46px; height: 25px; } .feeder { width: 38px; height: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .cv-season .beast { display: none; } .nest .nw, .gift.drop { animation: none; } }
 /* v5.8（2026-11-14・本人の指示）：窓台の小物。スポーツカーのおもちゃ・杯（ウイスキー）・湯気の立つコーヒー。
    左右に引いて置き場所を変えられる（この端末に覚える）。車はときどき自分で走る。押すと、車は走り・カップは湯気が立ち・杯は氷が鳴る */
 .sill { position: absolute; left: 0; right: 0; bottom: 12px; height: 0; z-index: 5; pointer-events: none; }
@@ -1325,7 +1389,7 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
     <div class="cv-win">
     <section id="canvas" class="board" aria-label="キャンバス">
       <canvas id="cvScene" aria-hidden="true"></canvas>
-      <div class="cv-season" id="cvSeason" aria-hidden="true"><svg class="land" id="cvLand" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice"></svg><div class="fall" id="cvFall"></div><div class="frost"></div><div class="drift"></div><div id="cvFlyers"></div></div>
+      <div class="cv-season" id="cvSeason" aria-hidden="true"><svg class="land" id="cvLand" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice"></svg><div id="cvBeasts"></div><div class="fall" id="cvFall"></div><div class="frost"></div><div class="drift"></div><div id="cvFlyers"></div></div>
       <div class="cv-sos" id="cvSos" role="status" aria-live="assertive" hidden><span id="cvSosWho"></span><span class="el" id="cvSosEl"></span></div>
       <div class="cv" id="cv">
         <div class="cv-time"><div class="cv-hm" id="cvHm"></div><div class="cv-date" id="cvDate"></div></div>
@@ -1398,7 +1462,21 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
         <path d="M12.6 14 L13.6 30" stroke="#FFFFFF" stroke-width=".7" stroke-linecap="round" opacity=".5"/>
         <path d="M34.4 14 L33.2 44" stroke="#FFFFFF" stroke-width=".8" stroke-linecap="round" opacity=".35"/>
       </svg></div>
-      <div class="toy car" data-k="car"><svg viewBox="0 0 124 46">
+      <div class="nest" id="sillNest"></div>
+      <div class="feeder" id="sillFeeder" title="押すと餌を足す"><svg viewBox="0 0 46 19">
+        <defs><linearGradient id="fdDish" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F1E8"/><stop offset="1" stop-color="#BDB3A2"/></linearGradient></defs>
+        <ellipse cx="23" cy="17.8" rx="16" ry="1.5" fill="rgba(40,28,12,.18)"/>
+        <path d="M4 9.6 Q6 17.2 23 17.2 Q40 17.2 42 9.6 Z" fill="url(#fdDish)"/>
+        <ellipse cx="23" cy="9.6" rx="19" ry="3.3" fill="#EDE6DA" stroke="#C8BEAD" stroke-width=".6"/>
+        <g class="seeds"><path d="M8 10 Q23 2.6 38 10 Q23 12.6 8 10 Z" fill="#D8B85C"/>
+          <g fill="#B8923A"><circle cx="15" cy="8.6" r=".8"/><circle cx="20" cy="7" r=".8"/><circle cx="25" cy="6.8" r=".8"/><circle cx="30" cy="8.2" r=".8"/><circle cx="18" cy="9.6" r=".7"/><circle cx="27" cy="9.6" r=".7"/></g>
+          <g fill="#3A3028"><ellipse cx="22" cy="8" rx="1.3" ry=".7" transform="rotate(-20 22 8)"/><ellipse cx="28" cy="9" rx="1.3" ry=".7" transform="rotate(25 28 9)"/><ellipse cx="17" cy="8.4" rx="1.3" ry=".7" transform="rotate(10 17 8.4)"/></g>
+          <g fill="#F4E6B8"><circle cx="23" cy="8.8" r=".6"/><circle cx="19" cy="8" r=".5"/><circle cx="26.6" cy="7.6" r=".5"/></g></g>
+      </svg></div>
+    </div>
+    <div class="track" id="track" aria-hidden="true">
+      <span class="sig" id="trSig"><i></i><i></i><i></i></span><span class="line" style="left:12%"></span><span class="line" style="left:88%"></span>
+      <div class="toy car" data-k="car" title="押すとレース"><span class="tag">WIN</span><svg viewBox="0 0 124 46">
         <defs>
           <linearGradient id="tyCarBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--toy-car-hi)"/><stop offset=".32" style="stop-color:var(--toy-car)"/><stop offset=".72" stop-color="#1A3E7E"/><stop offset="1" stop-color="#0D2149"/></linearGradient>
           <linearGradient id="tyCarWin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C6E8A"/><stop offset=".45" stop-color="#1F2A3C"/><stop offset="1" stop-color="#0A0F18"/></linearGradient>
@@ -1428,7 +1506,7 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
         <g class="wh"><circle cx="95" cy="36" r="8.6" fill="url(#tyTire)"/><circle cx="95" cy="36" r="5.6" fill="url(#tyRim)" stroke="#5E656E" stroke-width=".5"/>
           <path d="M95 30.8 V33.6 M99.9 34.4 L97.3 35.2 M98 40.2 L96.4 38 M92 40.2 L93.6 38 M90.1 34.4 L92.7 35.2" stroke="#5E656E" stroke-width="1.5" stroke-linecap="round"/><circle cx="95" cy="36" r="1.3" fill="#3A3F46"/></g>
       </svg></div>
-      <div class="toy car" data-k="car2"><svg viewBox="0 0 124 46">
+      <div class="toy car" data-k="car2" title="押すとレース"><span class="tag">WIN</span><svg viewBox="0 0 124 46">
         <defs>
           <linearGradient id="tyCar2Body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--toy-car2-hi)"/><stop offset=".34" style="stop-color:var(--toy-car2)"/><stop offset=".75" stop-color="#7A0B12"/><stop offset="1" stop-color="#3E0509"/></linearGradient>
         </defs>
@@ -1728,7 +1806,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-15 v5.9d';
+var BUILD = '2026-11-15 v5.10';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -6384,8 +6462,8 @@ $('#cvFull').addEventListener('click', function () { cvSetFull(!CV.full); });
 
 /* ───────── 窓台の小物（v5.8・2026-11-14）：引いて置き場所を変える・押すと動く・時刻で移ろう ─────────
    v5.8d：車は2台（car＝レヴォーグの形の青いワゴン・car2＝911の形の赤いクーペ）。夕方は右端から car・car2 の順に並んで止まる */
-var SILL = { pos: { cup: .06, glass: .14, car2: .66, car: .86 }, tick: null, userT: {}, nextT: {}, mode: '', night: false };
-var SILL_CARS = ['car', 'car2'], SILL_KEYS = ['cup', 'glass', 'car2', 'car'];
+var SILL = { pos: { cup: .06, glass: .14 }, tick: null, userT: {}, nextT: {}, mode: '', night: false };
+var SILL_CARS = ['car', 'car2'], SILL_KEYS = ['cup', 'glass'];   // v5.10：車は窓の下のコース（#track）へ
 // 窓台が画面に見えているときだけ車を動かす（見えていない間に動いても誰も見ないので）
 SILL.seen = !('IntersectionObserver' in window);
 if (!SILL.seen) new IntersectionObserver(function (es) { var was = SILL.seen; SILL.seen = es[0].isIntersecting; if (SILL.seen && !was && SILL.tick) { sillTime(false); seasonTick(); } }).observe($('.cv-win'));
@@ -6397,29 +6475,6 @@ function sillPlace(k) { var el = sillEl(k); if (el) el.style.left = (SILL.pos[k]
 function sillSave() { save('sill', JSON.stringify(SILL.pos)); }
 function sillW() { var b = $('#sill'); return Math.max(1, b ? b.getBoundingClientRect().width : 1); }
 function sillHalf(k) { var el = sillEl(k); return el ? el.getBoundingClientRect().width / 2 / sillW() : .05; }
-// 夕方に止まる場所：右端に car、その左に car2
-function sillHome(k) {
-  var gap = 10 / sillW(), a = 1 - sillHalf('car') - gap * 1.6;
-  return k === 'car' ? a : a - sillHalf('car') - sillHalf('car2') - gap;
-}
-function sillFree(k, to) {
-  var gap = 6 / sillW();
-  return SILL_KEYS.every(function (o) { return o === k || Math.abs(to - SILL.pos[o]) > sillHalf(k) + sillHalf(o) + gap; });
-}
-function sillDrive(k, to, slow) {
-  var el = sillEl(k); if (!el || el.classList.contains('drag')) return;
-  var from = SILL.pos[k];
-  if (to == null) {   // ほかの小物に重ならないところへ
-    var lo = .04 + sillHalf(k), hi = .96 - sillHalf(k);
-    for (var i = 0; i < 20; i++) { to = lo + Math.random() * (hi - lo); if (Math.abs(to - from) > .1 && sillFree(k, to)) break; }
-  }
-  el.classList.toggle('left', to < from);
-  var ms = ugReduced() ? 0 : Math.round(slow ? 5000 + Math.abs(to - from) * 24000 : 900 + Math.abs(to - from) * 3200);
-  el.style.transitionDuration = ms + 'ms';
-  el.classList.toggle('slow', !!slow); el.classList.toggle('lit', SILL.night);
-  el.classList.add('run'); SILL.pos[k] = to; sillPlace(k); sillSave();
-  clearTimeout(el._runT); el._runT = setTimeout(function () { el.classList.remove('run'); }, ms + 60);
-}
 // 時刻ごとの場面（h は JST の時。0〜24）。c＝コーヒーの残り・s＝湯気・g＝杯の残り・ice＝氷の大きさ（0〜1）
 function sillLerp(h, a, b, x, y) { return x + (y - x) * Math.min(1, Math.max(0, (h - a) / (b - a))); }
 function sillScene(h) {
@@ -6450,23 +6505,8 @@ function sillTime(now) {
   SILL.night = sc.night;
   if (now) { void box.offsetWidth; box.classList.remove('now'); }
   var t = Date.now(), live = !document.hidden && SILL.seen && !CV.full && !ugReduced();
-  SILL_CARS.forEach(function (k, i) {
-    var el = sillEl(k); if (!el) return;
-    if (!el.classList.contains('run')) el.classList.remove('lit');
-    // 本人がさっき置いた車は30分は動かさない
-    if (!live || t - (SILL.userT[k] || 0) < 30 * 60e3 || el.classList.contains('run')) return;
-    if (sc.car === 'home') {
-      var hm = sillHome(k);
-      if (Math.abs(SILL.pos[k] - hm) > .01) setTimeout(function () { sillDrive(k, hm, true); }, i * 9000);   // 2台目は少し遅れて帰る
-    } else if (SILL.mode === 'home') {
-      setTimeout(function () { sillDrive(k, null, true); }, i * 12000);
-      SILL.nextT[k] = t + (4 + Math.random() * 5) * 60e3;
-    } else if (t >= (SILL.nextT[k] || 0)) {
-      if (SILL.nextT[k]) sillDrive(k, null, true);
-      SILL.nextT[k] = t + (4 + Math.random() * 5) * 60e3;
-    }
-  });
-  SILL.mode = sc.car;
+  raceTime(sc, live, t);
+  feederDaily();
 }
 function sillAuto() {
   clearInterval(SILL.tick);
@@ -6474,7 +6514,6 @@ function sillAuto() {
   SILL.tick = setInterval(function () { sillTime(false); seasonTick(); }, 30e3);
 }
 function sillTap(k, el) {
-  if (SILL_CARS.indexOf(k) >= 0) { SILL.userT[k] = Date.now(); return sillDrive(k); }
   var c = k === 'cup' ? 'puff' : 'clink';
   el.classList.remove(c); void el.offsetWidth; el.classList.add(c);
   clearTimeout(el._tapT); el._tapT = setTimeout(function () { el.classList.remove(c); }, k === 'cup' ? 3200 : 600);
@@ -6506,6 +6545,163 @@ SILL_KEYS.forEach(function (k) {
   el.addEventListener('pointerup', end);
   el.addEventListener('pointercancel', end);
 });
+/* ───────── v5.10（2026-11-15）：窓の下のコースで車がレース ─────────
+   昼（6:30〜17:30）は4〜9分ごと（開いて40〜100秒後に最初の1回）。ゆっくりスタートへ戻り、信号が赤・赤・青で同時に出る。
+   勝ったほうに WIN。夕方からはゴールの先に並んで止まり、動くときはライトを点ける。車を押すといつでもレース */
+var RACE = { busy: false, nextT: 0, mode: '', pos: {} }, TR_START = .12, TR_GOAL = .88;
+function trEl(k) { return document.querySelector('#track .toy[data-k="' + k + '"]'); }
+function trW() { var b = $('#track'); return Math.max(1, b ? b.getBoundingClientRect().width : 1); }
+function trHalf(k) { var el = trEl(k), sv = el && el.querySelector('svg'); return sv ? sv.getBoundingClientRect().width / 2 / trW() : .05; }
+function trPark(k) { return Math.min(.985 - trHalf(k), TR_GOAL + trHalf(k) + .02); }
+function trSet(k, to, ms, ease, slow) {
+  var el = trEl(k); if (!el) return;
+  var from = RACE.pos[k] == null ? to : RACE.pos[k], moving = ms > 0 && Math.abs(to - from) > .002;
+  if (moving) el.classList.toggle('left', to < from);
+  el.style.transitionDuration = (ugReduced() ? 0 : ms) + 'ms';
+  el.style.transitionTimingFunction = ease || '';
+  el.classList.toggle('slow', !!slow);
+  if (moving) {
+    el.classList.toggle('lit', SILL.night); el.classList.add('run');
+    clearTimeout(el._runT); el._runT = setTimeout(function () { el.classList.remove('run', 'lit'); }, ms + 60);
+  }
+  RACE.pos[k] = to; el.style.left = (to * 100).toFixed(2) + '%';
+}
+function trSig(c) { var g = $('#trSig'); if (g) g.className = 'sig' + (c ? ' ' + c : ''); }
+function race() {
+  if (RACE.busy) return;
+  RACE.busy = true;
+  var later = function (ms, f) { setTimeout(f, ugReduced() ? 10 : ms); };
+  SILL_CARS.forEach(function (k, i) { var el = trEl(k); if (el) el.classList.remove('won'); trSet(k, TR_START - trHalf(k) - .006, 3600 + i * 500, 'cubic-bezier(.45,.05,.3,1)', true); });
+  later(4500, function () {
+    SILL_CARS.forEach(function (k) { var el = trEl(k); if (el) el.classList.remove('left'); });
+    later(500, function () { trSig('s1'); });
+    later(1300, function () { trSig('s2'); });
+    later(2100, function () {
+      trSig('go');
+      var d = {}; SILL_CARS.forEach(function (k) { d[k] = 2500 + Math.random() * 1600; });
+      var win = d.car <= d.car2 ? 'car' : 'car2';
+      SILL_CARS.forEach(function (k) { trSet(k, trPark(k), d[k], 'cubic-bezier(.6,0,.3,1)'); });
+      later(Math.max(d.car, d.car2) + 250, function () {
+        trSig(''); var w = trEl(win); if (w) w.classList.add('won');
+        later(5000, function () { if (w) w.classList.remove('won'); RACE.busy = false; });
+      });
+    });
+  });
+}
+function raceTime(sc, live, t) {
+  if (!live || RACE.busy) { RACE.mode = sc.car; return; }
+  if (sc.car === 'home') {
+    SILL_CARS.forEach(function (k, i) { var p = trPark(k); if (Math.abs((RACE.pos[k] || 0) - p) > .01) setTimeout(function () { if (!RACE.busy) trSet(k, p, 6000, '', true); }, i * 4000); });
+  } else if (!RACE.nextT || RACE.mode === 'home') RACE.nextT = t + 40e3 + Math.random() * 60e3;
+  else if (t >= RACE.nextT) { race(); RACE.nextT = t + (4 + Math.random() * 5) * 60e3; }
+  RACE.mode = sc.car;
+}
+SILL_CARS.forEach(function (k) {
+  var el = trEl(k); if (!el) return;
+  trSet(k, trPark(k), 0);
+  el.addEventListener('click', function () { if (RACE.busy) return; race(); RACE.nextT = Date.now() + (4 + Math.random() * 5) * 60e3; });
+});
+addEventListener('resize', function () { if (!RACE.busy) SILL_CARS.forEach(function (k) { if (RACE.pos[k] > TR_GOAL) trSet(k, trPark(k), 0); }); });
+
+/* ───────── v5.10：窓台の巣・餌皿・小鳥の贈りもの（この端末に覚える：cellar.nest） ───────── */
+var NEST_X = .9, FEED_X = .58;
+var NEST = { n: 0, day: '', today: 0, gifts: [], seed: 1, seedDay: '' };
+try { var nst0 = JSON.parse(load('nest') || 'null'); if (nst0) for (var nk in NEST) if (nst0[nk] != null) NEST[nk] = nst0[nk]; } catch (e) {}
+if (MOCK && /^[0-6]$/.test(params.get('nest') || '')) NEST.n = +params.get('nest');
+if (MOCK && /^(0|1|0?\.\d+)$/.test(params.get('seed') || '')) { NEST.seed = +params.get('seed'); NEST.seedDay = jstNow().toISOString().slice(0, 10); }
+function nestSave() { save('nest', JSON.stringify(NEST)); }
+function jstDay() { return jstNow().toISOString().slice(0, 10); }
+// 巣：1〜2段は小枝が散らばるだけ、3段から椀の形が立ち上がり、6段で内側に苔と羽が敷かれて完成。春と夏はそこに卵が3つ
+function nestSvg(n, se, fresh) {
+  if (!n) return '';
+  var o = '', cols = ['#6B4A2E', '#8A6440', '#A07C52', '#5A3C22', '#7A5A3A', '#94744E'], r, i, k, twig = function (x1, y1, x2, y2, c, w, cls) {
+    var mx = (x1 + x2) / 2 + (r() - .5) * 3, my = (y1 + y2) / 2 + (r() - .5) * 2;
+    return '<path' + (cls ? ' class="' + cls + '"' : '') + ' d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke="' + c + '" stroke-width="' + w.toFixed(2) + '" fill="none" stroke-linecap="round"/>';
+  };
+  o += '<ellipse cx="30" cy="30.6" rx="' + (10 + Math.min(n, 6) * 2.6) + '" ry="1.6" fill="rgba(40,28,12,.2)"/>';
+  if (n <= 2) {   // 小枝を運んできたところ
+    for (k = 1; k <= n; k++) {
+      r = ssRng(100 + k);
+      for (i = 0; i < 7; i++) { var x = 14 + r() * 32, y = 29 - r() * (k * 2.2), l = 7 + r() * 9, a = (r() - .5) * .9; o += twig(x - l / 2, y + a * l / 2, x + l / 2, y - a * l / 2, cols[Math.floor(r() * cols.length)], 1 + r() * .6, k === n && fresh ? 'nw' : ''); }
+    }
+    return o;
+  }
+  var s6 = Math.min(n, 6), H = 4 + s6 * 2.1, W = 26 + s6 * 3, top = 30 - H, L = 30 - W / 2, R = 30 + W / 2;
+  o += '<path d="M' + L + ' ' + top + ' Q' + (L + 2) + ' 30 30 30 Q' + (R - 2) + ' 30 ' + R + ' ' + top + ' Z" fill="#7A5A3A"/>';
+  o += '<ellipse cx="30" cy="' + top + '" rx="' + (W / 2) + '" ry="3.4" fill="#3B2716"/>';
+  if (n >= 6) {
+    o += '<ellipse cx="30" cy="' + (top + .5) + '" rx="' + (W / 2 - 3.4) + '" ry="2.2" fill="#9EA46A"/><path d="M' + (L + 6) + ' ' + (top - .2) + ' q3 -1.4 5 .4 M' + (R - 9) + ' ' + (top + .4) + ' q2.6 -1.6 4.6 .2" stroke="#F1EEE6" stroke-width="1.2" fill="none" stroke-linecap="round"/>';
+    if (se === 'spring' || se === 'summer') {
+      [[-5, .4], [0, -.3], [5, .5]].forEach(function (e) { o += '<ellipse cx="' + (30 + e[0]) + '" cy="' + (top - .6 + e[1]) + '" rx="2.6" ry="3.1" fill="#BCD8DE"/><ellipse cx="' + (29.2 + e[0]) + '" cy="' + (top - 1.6 + e[1]) + '" rx=".8" ry="1" fill="#fff" opacity=".7"/>'; });
+    }
+  }
+  for (k = 1; k <= s6; k++) {   // 椀の外側に、段ごとに小枝を巻きつける
+    r = ssRng(200 + k);
+    var cls = k === s6 && fresh ? 'nw' : '';
+    for (i = 0; i < 6; i++) {
+      var yy = top + 1.5 + r() * (H - 2), f = (yy - top) / H, half = (W / 2) * (1 - f * f * .55), dx = (r() - .5) * 6;
+      o += twig(30 - half - 1.5 + dx, yy + (r() - .5) * 2, 30 + half + 1.5 + dx, yy + (r() - .5) * 2.4, cols[Math.floor(r() * cols.length)], .9 + r() * .6, cls);
+    }
+    o += twig(L - 1 - r() * 2, top + r() * 1.5, L + 6 + r() * 6, top + 2.6 + r() * 1.4, cols[Math.floor(r() * cols.length)], 1.1, cls);
+    o += twig(R + 1 + r() * 2, top + r() * 1.5, R - 6 - r() * 6, top + 2.6 + r() * 1.4, cols[Math.floor(r() * cols.length)], 1.1, cls);
+  }
+  return o;
+}
+function nestDraw(fresh) {
+  var el = $('#sillNest'); if (!el) return;
+  el.style.left = (NEST_X * 100) + '%';
+  el.innerHTML = NEST.n ? '<svg viewBox="0 0 60 32">' + nestSvg(NEST.n, seasonNow(), fresh) + '</svg>' : '';
+}
+function nestQuota() { var d = jstDay(); if (NEST.day !== d) { NEST.day = d; NEST.today = 0; } return NEST.n < 6 && NEST.today < 2; }
+function nestGrow() { if (!nestQuota()) return false; NEST.n++; NEST.today++; nestSave(); nestDraw(true); return true; }
+// 餌皿：朝6時を過ぎたら毎日いっぱいに戻る。押せばいつでも足せる
+function feederDraw() {
+  var el = $('#sillFeeder'); if (!el) return;
+  el.style.left = (FEED_X * 100) + '%';
+  var g = el.querySelector('.seeds'); if (!g) return;
+  g.style.transform = 'scaleY(' + Math.max(.0001, NEST.seed).toFixed(3) + ')'; g.style.opacity = NEST.seed > .03 ? '1' : '0';
+}
+function feederDaily() { var d = jstDay(); if (NEST.seedDay !== d && hourOf(jstNow()) >= 6) { NEST.seed = 1; NEST.seedDay = d; nestSave(); } feederDraw(); }
+$('#sillFeeder').addEventListener('click', function () {
+  var el = this; NEST.seed = 1; NEST.seedDay = jstDay(); nestSave(); feederDraw();
+  el.classList.remove('fill'); void el.offsetWidth; el.classList.add('fill');
+});
+// 小鳥が置いていったもの（いちばん新しい7つまで。押すと片づく）
+var GIFT_ART = {
+  acorn: '<svg viewBox="0 0 12 14"><ellipse cx="6" cy="9" rx="3.6" ry="4.2" fill="#9A6B34"/><ellipse cx="5" cy="8.4" rx="1" ry="2" fill="#C99A5E" opacity=".7"/><path d="M1.8 6.4 Q6 1.8 10.2 6.4 Q6 7.8 1.8 6.4 Z" fill="#6B4A2A"/><path d="M6 3.4 L6.6 1.2" stroke="#5A3C22" stroke-width="1" stroke-linecap="round"/></svg>',
+  berry: '<svg viewBox="0 0 14 12"><path d="M7 1 Q6 4 4 6 M7 1 Q8 4 10 6.5 M7 1 Q7 5 7.2 7" stroke="#5B4A2A" stroke-width=".7" fill="none"/><circle cx="4" cy="7.6" r="2.3" fill="#C8202A"/><circle cx="10" cy="8" r="2.3" fill="#B71C25"/><circle cx="7.2" cy="9.4" r="2.3" fill="#D52A33"/><circle cx="6.5" cy="8.7" r=".6" fill="#fff" opacity=".7"/></svg>',
+  cone: '<svg viewBox="0 0 12 14"><ellipse cx="6" cy="8" rx="4" ry="5.4" fill="#7A5432"/><path d="M2.4 6 Q6 8 9.6 6 M2.2 8.6 Q6 10.6 9.8 8.6 M3 11 Q6 12.6 9 11 M3.4 3.8 Q6 5.4 8.6 3.8" stroke="#4E331C" stroke-width=".8" fill="none"/></svg>',
+  petal: '<svg viewBox="0 0 12 10"><path d="M2 6 Q4 1 9 2.4 Q8.6 4.6 10.6 6 Q6 9.6 2 6 Z" fill="#F7C6D3"/><path d="M3.2 6 Q6 4.6 9.4 4" stroke="#E79AB0" stroke-width=".5" fill="none"/></svg>',
+  feather: '<svg viewBox="0 0 16 8"><path d="M1 6.4 Q8 -1 15 2.4 Q9 6.6 1 6.4 Z" fill="#E9E6E0"/><path d="M1 6.4 Q8 3.6 15 2.4" stroke="#A9A39A" stroke-width=".6" fill="none"/></svg>',
+  leaf: '<svg viewBox="0 0 14 10"><path d="M1 7 Q5 0 13 2 Q10 9 1 7 Z" fill="#6E9A3E"/><path d="M1 7 Q7 4.4 13 2" stroke="#4F7428" stroke-width=".6" fill="none"/></svg>',
+  momiji: '<svg viewBox="0 0 12 12"><path d="M6 1 L7 4.4 L10.6 3 L8.6 6 L11 8 L7.6 7.8 L6 11 L4.4 7.8 L1 8 L3.4 6 L1.4 3 L5 4.4 Z" fill="#D2412A"/></svg>',
+  pebble: '<svg viewBox="0 0 12 8"><ellipse cx="6" cy="4.6" rx="4.6" ry="3" fill="#8F969C"/><ellipse cx="4.6" cy="3.6" rx="1.6" ry=".8" fill="#fff" opacity=".45"/></svg>',
+  twig: '<svg viewBox="0 0 16 8"><path d="M1 5.4 Q7 2.4 15 3.4 M8 3.2 L10.4 .8 M5 4.4 L4 2" stroke="#6B4A2E" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>'
+};
+var GIFT_BY = { spring: ['petal', 'petal', 'feather', 'leaf'], summer: ['leaf', 'feather', 'pebble'], autumn: ['acorn', 'acorn', 'momiji', 'cone'], winter: ['berry', 'berry', 'cone', 'feather'] };
+function giftEl(g, drop) {
+  var el = document.createElement('div');
+  el.className = 'gift' + (drop ? ' drop' : ''); el.style.left = (g.x * 100).toFixed(2) + '%'; el.style.setProperty('--r', (g.r || 0) + 'deg');
+  el.innerHTML = GIFT_ART[g.k] || ''; el._g = g;
+  el.addEventListener('click', function () {
+    NEST.gifts = NEST.gifts.filter(function (x) { return x !== g; }); nestSave();
+    el.classList.add('gone'); setTimeout(function () { el.remove(); }, 1300);
+  });
+  $('#sill').appendChild(el);
+  return el;
+}
+function giftsDraw() { [].forEach.call(document.querySelectorAll('#sill .gift'), function (e) { e.remove(); }); NEST.gifts.forEach(function (g) { giftEl(g); }); }
+function giftAdd(k, x) {
+  var g = { k: k, x: Math.min(.97, Math.max(.03, x)), r: Math.round((Math.random() - .5) * 50) };
+  NEST.gifts.push(g); giftEl(g, true);
+  while (NEST.gifts.length > 7) {
+    var old = NEST.gifts.shift();
+    [].forEach.call(document.querySelectorAll('#sill .gift'), function (e) { if (e._g === old) { e.classList.add('gone'); setTimeout(function () { e.remove(); }, 1300); } });
+  }
+  nestSave();
+}
+nestDraw(false); feederDaily(); giftsDraw();
+
 sillAuto();
 
 /* ───────── 窓の外の季節と小鳥（v5.9・2026-11-14） ───────── */
@@ -6630,6 +6826,12 @@ function seasonTick() {
   }
   SEASON.cur = se; SEASON.tod = tod;
   var live = !document.hidden && SILL.seen && !ugReduced(), t = Date.now();
+  if (se !== NEST.drawnSe) { NEST.drawnSe = se; nestDraw(false); }   // 季節が変わると巣の卵が出たり消えたりする
+  // 窓の外を歩く動物（3〜7分に一度。最初は開いて20〜60秒後）
+  if (live && !BEAST.cur) {
+    if (!BEAST.at) BEAST.at = t + 20e3 + Math.random() * 40e3;
+    if (t >= BEAST.at) { var bk = beastPick(h, se); if (bk) beastWalk(bk); BEAST.at = t + 180e3 + Math.random() * 240e3; }
+  }
   if (!live || h < 6 || h >= 17.5) return;
   // 窓の外を横切る鳥（1〜3分に一度）
   if (!SEASON.flyAt) SEASON.flyAt = t + 8e3 + Math.random() * 20e3;
@@ -6674,32 +6876,143 @@ var SB_ART = {
     '<g class="head"><circle cx="27.6" cy="13" r="5.4" fill="#FFFFFF" opacity=".01"/><circle cx="29.6" cy="13.2" r="1.15" fill="#111"/><circle cx="29.25" cy="12.9" r=".35" fill="#fff"/><path d="M32.4 14.4 L34.6 14.9 L32.4 15.6 Z" fill="#1A1A1A"/></g>' +
     '<path class="legs" d="M20 27.6 L19.4 31 M24 27.6 L24.6 31 M17.8 31 L21 31 M23 31 L26.4 31" stroke="#3A3A3A" stroke-width="1" stroke-linecap="round"/>'
 };
-function sbVisit(se) {
-  var kind = se === 'spring' ? 'mejiro' : se === 'winter' ? 'shimaenaga' : 'suzume', box = $('#sill'); if (!box) return;
-  var half = 20 / sillW(), to = .5, ok = false;
-  for (var i = 0; i < 24 && !ok; i++) {
-    to = .08 + Math.random() * .84;
-    ok = SILL_KEYS.every(function (o) { return Math.abs(to - SILL.pos[o]) > half + sillHalf(o); });
-  }
-  if (!ok) return;
-  var el = document.createElement('div'), turn = Math.random() < .5;
+// 窓台のもの（杯・カップ・巣・餌皿）を避けて小鳥が降りられる場所
+function sbObst() {
+  var o = SILL_KEYS.map(function (k) { return { x: SILL.pos[k], h: sillHalf(k) }; });
+  [['#sillNest', NEST_X], ['#sillFeeder', FEED_X]].forEach(function (q) { var el = $(q[0]); if (el && el.offsetWidth) o.push({ x: q[1], h: el.offsetWidth / 2 / sillW() }); });
+  return o;
+}
+function sbFreeX(half) {
+  var obs = sbObst();
+  for (var i = 0; i < 30; i++) { var x = .08 + Math.random() * .84; if (obs.every(function (o) { return Math.abs(x - o.x) > half + o.h; })) return x; }
+  return null;
+}
+// 来た目的：eat＝餌を食べる・nest＝巣材を運ぶ（1日2段まで）・gift＝何か置いていく・rest＝ひと休み
+function sbPlan() {
+  var w = [['eat', NEST.seed > .05 ? 3 : 0], ['nest', nestQuota() ? 3 : 0], ['gift', 3], ['rest', 1]], sum = 0, i;
+  for (i = 0; i < w.length; i++) sum += w[i][1];
+  var r = Math.random() * sum;
+  for (i = 0; i < w.length; i++) { if (r < w[i][1]) return w[i][0]; r -= w[i][1]; }
+  return 'rest';
+}
+function sbVisit(se, plan) {
+  var kind = se === 'spring' ? 'mejiro' : se === 'winter' ? 'shimaenaga' : 'suzume', box = $('#sill'); if (!box || SEASON.bird) return;
+  plan = plan || sbPlan();
+  if (plan === 'eat' && NEST.seed <= .05) plan = 'gift';
+  if (plan === 'nest' && !nestQuota()) plan = 'gift';
+  var half = 20 / sillW(), to = null, turn = Math.random() < .5;
+  if (plan === 'eat') {
+    var fh = $('#sillFeeder').offsetWidth / 2 / sillW(), side = Math.random() < .5 ? -1 : 1;
+    to = FEED_X + side * (fh + half * .55); turn = side > 0;   // 皿の右にいるなら左を向く
+  } else if (plan === 'nest') {
+    var nh = Math.max(.03, ($('#sillNest').offsetWidth || 50) / 2 / sillW());
+    to = NEST_X - nh * .75 - half * .5; turn = false;
+  } else to = sbFreeX(half);
+  if (to == null) return;
+  var el = document.createElement('div'), carry = plan === 'nest' ? 'twig' : plan === 'gift' ? GIFT_BY[se][Math.floor(Math.random() * GIFT_BY[se].length)] : '';
   el.className = 'sbird flap' + (turn ? ' turn' : ''); el.style.left = (to * 100).toFixed(2) + '%';
-  el.innerHTML = '<svg viewBox="0 0 40 34">' + SB_ART[kind] + '</svg>';
+  el.innerHTML = '<svg viewBox="0 0 40 34">' + SB_ART[kind] + '</svg>' + (carry ? '<span class="carry">' + GIFT_ART[carry] + '</span>' : '');
   if (turn) el.style.transform = 'translate(70px, -110px)';
-  box.appendChild(el); SEASON.bird = el;
+  box.appendChild(el); SEASON.bird = el; el._plan = plan;
   void el.offsetWidth; el.style.transform = ''; el.classList.add('here');
   setTimeout(function () { el.classList.remove('flap'); }, 1700);
-  var stay = 25e3 + Math.random() * 30e3, t0 = Date.now();
+  var stay = plan === 'eat' ? 22e3 + Math.random() * 20e3 : plan === 'nest' ? 14e3 + Math.random() * 14e3 : plan === 'gift' ? 12e3 + Math.random() * 14e3 : 25e3 + Math.random() * 30e3, t0 = Date.now();
+  function pose(c, ms) { el.classList.add(c); setTimeout(function () { el.classList.remove(c); }, ms); }
+  // 着いて少ししたら、くわえてきたものを置く
+  setTimeout(function () {
+    if (SEASON.bird !== el || el._gone) return;
+    var cy = el.querySelector('.carry'); if (cy) cy.remove();
+    if (plan === 'gift') giftAdd(carry, to + (el.classList.contains('turn') ? -1 : 1) * 15 / sillW());
+    if (plan === 'nest') nestGrow();
+    pose('peck', 650);
+  }, 2600);
   function act() {
     if (SEASON.bird !== el) return;
     if (Date.now() - t0 > stay) return sbLeave(el);
-    var r = Math.random(), c = r < .45 ? 'peck' : r < .7 ? 'look' : r < .88 ? 'hop' : 'turn';
+    var r = Math.random(), c;
+    if (plan === 'eat') {   // 皿のほうを向いたまま、何度もついばむ。ついばむたびに少し減る
+      c = r < .72 ? 'peck' : r < .88 ? 'look' : 'hop';
+      if (c === 'peck') { NEST.seed = Math.max(0, NEST.seed - .012); nestSave(); feederDraw(); }
+    } else if (plan === 'nest') c = r < .55 ? 'peck' : r < .85 ? 'look' : 'hop';
+    else c = r < .45 ? 'peck' : r < .7 ? 'look' : r < .88 ? 'hop' : 'turn';
     if (c === 'turn') el.classList.toggle('turn');
-    else { el.classList.add(c); setTimeout(function () { el.classList.remove(c); }, c === 'hop' ? 400 : 650); }
-    el._actT = setTimeout(act, 1400 + Math.random() * 2600);
+    else pose(c, c === 'hop' ? 400 : 650);
+    el._actT = setTimeout(act, (plan === 'eat' ? 900 : 1400) + Math.random() * (plan === 'eat' ? 1500 : 2600));
   }
-  el._actT = setTimeout(act, 2200);
+  el._actT = setTimeout(act, 3600);
   el.addEventListener('pointerdown', function (e) { e.stopPropagation(); sbLeave(el); });
+}
+/* ───────── v5.10：窓の外を歩く動物。昼は犬と猫、夕方から夜明けはタヌキ、朝夕（冬は昼も）はシカ。途中で立ち止まる ───────── */
+var BEAST = { at: 0, cur: null };
+function bsLegs(cls, xs, y1, y2, col, w) { return '<g class="' + cls + '">' + xs.map(function (x) { return '<path d="M' + x[0] + ' ' + y1 + ' L' + x[1] + ' ' + y2 + '" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round"/>'; }).join('') + '</g>'; }
+var BEAST_ART = {
+  dog: { vb: '0 0 50 34', w: 44, h: 30, v: 40, st: '.3s', wag: '.16s', stop: [3, 7], y: 14, svg: function () {
+    return bsLegs('lb', [[14, 13], [33, 34]], 20, 31, '#A8642C', 3) +
+      '<g class="bd"><g class="tl"><path d="M10 14 C4 12 4.6 4.6 9.4 5 C12.4 5.4 12 9.4 9.6 9.8" stroke="#C97C3A" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M8.6 6.6 C10.6 6.4 11 8.6 9.8 9.4" stroke="#F3E6D2" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>' +
+      '<ellipse cx="22" cy="16" rx="13" ry="6.6" fill="#C97C3A"/><path d="M13 18.6 Q22 23.6 33 19.4 Q26 22.4 13 18.6 Z" fill="#F3E6D2"/>' +
+      '<path d="M30 11 Q33.6 6.4 37.4 8 L37.6 13.6 Q33.6 15.6 30.6 17 Z" fill="#C97C3A"/>' +
+      '<g class="hd"><circle cx="38.4" cy="9.4" r="5.6" fill="#C97C3A"/><path d="M34.4 5.6 L35.4 .6 L38.8 4.2 Z M38.8 4.2 L41 .4 L42.2 5.4 Z" fill="#B86A2C"/>' +
+      '<ellipse cx="43.6" cy="11.4" rx="3.8" ry="2.5" fill="#F3E6D2"/><ellipse cx="39.6" cy="12" rx="2.6" ry="1.8" fill="#F3E6D2"/><circle cx="46.8" cy="10.8" r="1.05" fill="#222"/><circle cx="40.4" cy="7.8" r=".85" fill="#222"/></g></g>' +
+      bsLegs('la', [[16, 15], [31, 32]], 20, 31, '#C97C3A', 3.2) + '<path d="M13.4 31 h3 M30.6 31 h3" stroke="#F3E6D2" stroke-width="1.6" stroke-linecap="round"/>';
+  } },
+  cat: { vb: '0 0 44 28', w: 36, h: 23, v: 24, st: '.42s', wag: '.9s', stop: [4, 9], y: 14.5, svg: function () {
+    return bsLegs('lb', [[13, 12.4], [30, 30.6]], 16, 26, '#5E5A57', 2.2) +
+      '<g class="bd"><g class="tl"><path d="M8.6 13 C3 12 1.4 5.6 3.6 2" stroke="#77726D" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>' +
+      '<ellipse cx="20" cy="14" rx="12" ry="4.8" fill="#837D77"/><path d="M14 9.8 L15 13 M18 9.3 L18.6 12.6 M22 9.3 L22.2 12.6 M26 9.8 L25.8 13" stroke="#5C5752" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<g class="hd"><circle cx="34" cy="9.4" r="4.6" fill="#837D77"/><path d="M30.6 6.4 L31.2 1.4 L34 4.8 Z M34.4 4.6 L37.4 1.6 L37.8 6.4 Z" fill="#837D77"/><path d="M31.4 5 L31.6 2.8 L33 4.6 Z" fill="#D9A6A0"/>' +
+      '<ellipse cx="37.6" cy="11" rx="1.9" ry="1.3" fill="#ECE6DE"/><circle cx="36.2" cy="8.6" r=".95" fill="#C9D46A"/><circle cx="36.3" cy="8.6" r=".42" fill="#222"/><circle cx="39" cy="10.4" r=".5" fill="#D88A8A"/>' +
+      '<path d="M38 11.4 L42.4 10.6 M38 11.8 L42.2 12.4" stroke="#F4F1EC" stroke-width=".35"/></g></g>' +
+      bsLegs('la', [[15, 14.6], [28, 28.6]], 16, 26, '#837D77', 2.4);
+  } },
+  tanuki: { vb: '0 0 48 30', w: 40, h: 25, v: 30, st: '.26s', wag: '.5s', stop: [3, 6], y: 14, svg: function () {
+    return bsLegs('lb', [[15, 14.6], [30, 30.4]], 19, 28, '#241C16', 3) +
+      '<g class="bd"><g class="tl"><ellipse cx="8" cy="18.4" rx="6" ry="3.4" fill="#6E5A46" transform="rotate(28 8 18.4)"/><ellipse cx="4.4" cy="21" rx="2.4" ry="2" fill="#2A221C"/></g>' +
+      '<ellipse cx="22" cy="16" rx="13" ry="7.4" fill="#7C6650"/><path d="M14 10 Q22 7.6 31 10.4 Q30 13 27 13.6 Q22 11.6 15 13 Z" fill="#4A3B2E" opacity=".75"/><path d="M28 17 Q33 22 34 23 L30 23 Z" fill="#2E2620"/>' +
+      '<g class="hd"><circle cx="37.6" cy="12" r="6" fill="#A28C72"/><circle cx="34" cy="6.8" r="2.1" fill="#2A221C"/><circle cx="39" cy="6.3" r="2.1" fill="#2A221C"/>' +
+      '<path d="M33 11.4 Q37.4 8.6 41 11.6 Q39.6 15.6 34.6 14.6 Z" fill="#2A221C"/><circle cx="38.6" cy="11.6" r=".55" fill="#F2EDE2"/>' +
+      '<ellipse cx="42.4" cy="13.6" rx="2.8" ry="2" fill="#E2D7C2"/><circle cx="44.8" cy="13.2" r=".95" fill="#1A1410"/></g></g>' +
+      bsLegs('la', [[18, 17.6], [33, 33.4]], 19, 28, '#2A221C', 3.2);
+  } },
+  deer: { vb: '0 0 58 52', w: 48, h: 43, v: 32, st: '.5s', wag: '.3s', stop: [4, 9], y: 13, svg: function (se) {
+    var c = se === 'summer' ? '#A8683A' : se === 'winter' ? '#6E5A4A' : '#8E6040', stag = se !== 'spring' && Math.random() < .5, o = '';
+    o += bsLegs('lb', [[17, 16], [38, 39]], 30, 50, '#5A3A22', 2.2);
+    o += '<g class="bd"><g class="tl"><path d="M12 21.6 L10.4 24.6" stroke="#2A2018" stroke-width="1.6" stroke-linecap="round"/></g>' +
+      '<ellipse cx="27" cy="26" rx="15" ry="7.4" fill="' + c + '"/><ellipse cx="13.4" cy="25.4" rx="3.2" ry="4.4" fill="#F2EEE6"/><path d="M17 30 Q27 34 38 30 Q28 32.4 17 30 Z" fill="#EFE6D8" opacity=".8"/>';
+    if (se === 'summer') [[18, 22], [22, 21], [26, 21.2], [30, 21], [34, 22], [20, 25], [25, 24.6], [30, 24.4], [35, 25]].forEach(function (p) { o += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1" fill="#F7F1E4" opacity=".9"/>'; });
+    o += '<path d="M36 23 Q39.6 14 43 9.6 L47.4 11.6 Q45 20 42 27.6 Z" fill="' + c + '"/>';
+    o += '<g class="hd"><ellipse cx="47" cy="11" rx="4.8" ry="3.4" fill="' + c + '"/><ellipse cx="51.6" cy="12.6" rx="2.8" ry="1.9" fill="' + c + '"/><circle cx="53.8" cy="12.2" r=".85" fill="#1A1410"/><circle cx="47.8" cy="9.8" r=".8" fill="#111"/>' +
+      '<path d="M44.4 8.4 L40 5 L45 6.6 Z" fill="' + c + '"/>' +
+      (stag ? '<path d="M45.6 7.4 L44.6 .6 M45 3.4 L42 1 M44.6 .6 L47 -1.8 M47.6 7.4 L47.6 1 M47.6 3.6 L50.2 1.4" stroke="#DCCDAA" stroke-width="1.1" fill="none" stroke-linecap="round"/>' : '') + '</g></g>';
+    o += bsLegs('la', [[20, 19.4], [35, 36]], 30, 50, c, 2.6);
+    return o;
+  } }
+};
+function beastPick(h, se) {
+  var c = [];
+  if (h >= 7 && h < 17) c.push('dog', 'dog');
+  if (h >= 6 && h < 21) c.push('cat');
+  if (h >= 16.5 || h < 5) c.push('tanuki', 'tanuki');
+  if ((h >= 5 && h < 8.5) || (h >= 15.5 && h < 19) || (se === 'winter' && h >= 8 && h < 15.5)) c.push('deer', 'deer');
+  return c.length ? c[Math.floor(Math.random() * c.length)] : null;
+}
+function beastWalk(kind) {
+  var box = $('#cvBeasts'), A = BEAST_ART[kind]; if (!box || !A || BEAST.cur || !box.animate) return;
+  var el = document.createElement('div'), rtl = Math.random() < .5, W = $('#canvas').clientWidth;
+  el.className = 'beast b-' + kind + (rtl ? ' rtl' : '');
+  el.style.bottom = (A.y + Math.random() * 3).toFixed(1) + '%';
+  el.style.setProperty('--st', A.st); el.style.setProperty('--wag', A.wag);
+  el.innerHTML = '<svg viewBox="' + A.vb + '" style="width:' + A.w + 'px;height:' + A.h + 'px">' + A.svg(seasonNow()) + '</svg>';
+  box.appendChild(el); BEAST.cur = el;
+  var x0 = rtl ? W + 20 : -A.w - 20, x1 = rtl ? -A.w - 20 : W + 20, dur = Math.abs(x1 - x0) / A.v * 1000;
+  var p = .3 + Math.random() * .35, pause = (A.stop[0] + Math.random() * (A.stop[1] - A.stop[0])) * 1000, total = dur + pause, xm = x0 + (x1 - x0) * p;
+  var an = el.animate([
+    { transform: 'translateX(' + x0 + 'px)', easing: 'cubic-bezier(.3,.1,.55,1)' },
+    { transform: 'translateX(' + xm + 'px)', offset: p * dur / total },
+    { transform: 'translateX(' + xm + 'px)', offset: (p * dur + pause) / total, easing: 'cubic-bezier(.45,0,.7,.9)' },
+    { transform: 'translateX(' + x1 + 'px)' }], { duration: total, fill: 'forwards' });
+  setTimeout(function () { el.classList.add('stop'); }, p * dur);
+  setTimeout(function () { el.classList.remove('stop'); }, p * dur + pause);
+  an.onfinish = function () { el.remove(); if (BEAST.cur === el) BEAST.cur = null; };
 }
 function sbLeave(el) {
   if (!el || el._gone) return;
@@ -6708,6 +7021,11 @@ function sbLeave(el) {
   setTimeout(function () { el.remove(); if (SEASON.bird === el) SEASON.bird = null; }, 2200);
 }
 seasonTick();
+if (MOCK) setTimeout(function () {
+  var b = params.get('beast'); if (b && BEAST_ART[b]) beastWalk(b);
+  var v = params.get('visit'); if (/^(eat|nest|gift|rest)$/.test(v || '')) sbVisit(seasonNow(), v);
+  if (params.get('race')) race();
+}, 900);
 
 /* ───────── モック（?mock=1。Notion にも Drive にも触れず、サーバと同じ形で返す） ───────── */
 // 公開ページに載るので、人名・社名は架空。部屋の中身（姿の絵・夜の話）はモックにも置かない（見本の文だけ）
