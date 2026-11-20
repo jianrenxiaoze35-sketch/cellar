@@ -1260,6 +1260,162 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
 .mock input[type=range] { width: 100%; }
 .mock .btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .mock .btns button { border: 1px solid #9AA6A0; background: #fff; border-radius: 6px; padding: 3px 8px; cursor: pointer; color: #1D2622; }
+/* ───────── つながり帳（v6・2026-11-20）。表と鍵の一覧・A 需要予測・E 製造のグラフ。色は銘柄の3色（色覚の型でも差 14.7 以上）と、たまり具合の3段 ───────── */
+:root { --tg-s1: #B87A0A; --tg-s2: #2F5D8C; --tg-s4: #7A3B2E; --tg-ok: #2E7D4F; --tg-ok-bg: #E1F0E6; --tg-thin: #8A5A0B; --tg-thin-bg: #FAEED3;
+  --tg-none: #5F6D77; --tg-none-bg: #E6EAEB; --tg-bad: #A33A4A; --tg-bad-bg: #F6E1E4; --tg-soft: #E2EAF3; --tg-acc: #2F5D8C; --tg-acc-ink: #FFFFFF; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --tg-s1: #E8AC3C; --tg-s2: #6E9BD1; --tg-s4: #C77A62; --tg-ok: #6CC08F; --tg-ok-bg: #1C3326;
+  --tg-thin: #E8AC3C; --tg-thin-bg: #3A2E16; --tg-none: #9C9A94; --tg-none-bg: #26292E; --tg-bad: #E58A97; --tg-bad-bg: #3D2329; --tg-soft: #22344A; --tg-acc: #8CB4EA; --tg-acc-ink: #0E151A; } }
+:root[data-theme="dark"] { --tg-s1: #E8AC3C; --tg-s2: #6E9BD1; --tg-s4: #C77A62; --tg-ok: #6CC08F; --tg-ok-bg: #1C3326;
+  --tg-thin: #E8AC3C; --tg-thin-bg: #3A2E16; --tg-none: #9C9A94; --tg-none-bg: #26292E; --tg-bad: #E58A97; --tg-bad-bg: #3D2329; --tg-soft: #22344A; --tg-acc: #8CB4EA; --tg-acc-ink: #0E151A; }
+#tab-links { font-variant-numeric: tabular-nums; }
+.tg-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 14px; }
+.tg-sub { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--sheet); }
+.tg-sub button { border: 0; background: none; padding: 6px 14px; font-size: 13.5px; cursor: pointer; color: var(--muted); border-right: 1px solid var(--rule); }
+.tg-sub button:last-child { border-right: 0; }
+.tg-sub button[aria-pressed="true"] { background: var(--tg-acc); color: var(--tg-acc-ink); font-weight: 600; }
+.tg-at { font-size: 12.5px; color: var(--muted); }
+.tg-lede { color: var(--muted); margin: 0 0 12px; font-size: 13.5px; max-width: 62em; }
+.tg-panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; }
+.tg-empty { color: var(--muted); font-size: 13.5px; padding: 12px 0; }
+.tg-err { color: var(--tg-bad); font-size: 13px; }
+.tg-rd { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; border-radius: 4px; padding: 0 6px; font-weight: 600; white-space: nowrap; line-height: 1.7; }
+.tg-rd.ok { color: var(--tg-ok); background: var(--tg-ok-bg); } .tg-rd.thin { color: var(--tg-thin); background: var(--tg-thin-bg); } .tg-rd.none { color: var(--tg-none); background: var(--tg-none-bg); }
+.tg-lenses { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tg-lens { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 4px 12px 4px 10px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--ink); }
+.tg-lens[aria-pressed="true"] { background: var(--tg-acc); border-color: var(--tg-acc); color: var(--tg-acc-ink); }
+.tg-lens[aria-pressed="true"] .tg-rd { background: rgba(255, 255, 255, .9); }
+.tg-strip { font-size: 13.5px; color: var(--muted); margin: 2px 0 12px; min-height: 1.6em; }
+.tg-strip b { color: var(--ink); }
+.tg-mxw { overflow-x: auto; border-radius: 10px; }
+table.tg-mx { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; font-size: 13px; }
+.tg-mx th, .tg-mx td { border-bottom: 1px solid var(--grid); padding: 0; }
+.tg-mx thead th { position: sticky; top: 0; background: var(--sheet); font-weight: 600; color: var(--muted); vertical-align: bottom; }
+.tg-mx th.k { width: 58px; text-align: center; padding: 10px 2px 8px; line-height: 1.25; }
+.tg-mx th.k button { border: 0; background: none; padding: 2px 4px; border-radius: 6px; font-weight: 600; color: inherit; font-size: 12px; line-height: 1.3; cursor: pointer; }
+.tg-mx th.k button:hover { background: var(--paper); }
+.tg-mx th.k.sel button { background: var(--tg-acc); color: var(--tg-acc-ink); }
+.tg-mx th.dsh { text-align: left; padding: 10px 12px 8px; min-width: 220px; }
+.tg-mx td.ds { position: sticky; left: 0; background: var(--sheet); padding: 7px 12px; min-width: 220px; z-index: 1; }
+.tg-mx td.ds button { border: 0; background: none; padding: 0; text-align: left; font-weight: 600; color: var(--ink); cursor: pointer; }
+.tg-mx td.ds .g { display: block; font-size: 12px; color: var(--muted); font-weight: 400; line-height: 1.4; }
+.tg-mx td.c { text-align: center; width: 58px; }
+.tg-mx td.r { padding: 7px 12px; white-space: nowrap; }
+.tg-mx tr.grp td { background: var(--paper); color: var(--muted); font-weight: 600; font-size: 12px; padding: 5px 12px; }
+.tg-mx tr.grp td:first-child { position: sticky; left: 0; }
+.tg-gl { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; }
+.tg-gl.ok { background: var(--tg-acc); }
+.tg-gl.part { background: linear-gradient(90deg, var(--tg-acc) 50%, transparent 50%); box-shadow: inset 0 0 0 2px var(--tg-acc); }
+.tg-gl.bad { width: auto; height: auto; border-radius: 0; color: var(--tg-bad); font-weight: 700; font-size: 14px; line-height: 1; }
+.tg-live { display: inline-block; font-size: 10.5px; color: var(--tg-ok); border: 1px solid currentColor; border-radius: 3px; padding: 0 3px; margin-left: 4px; vertical-align: 1px; font-weight: 600; }
+.tg-mx .colhl { background: var(--tg-soft); }
+.tg-mx tr.rowhl td.ds, .tg-mx tr.rowsel td { background: var(--tg-soft); }
+.tg-mx .dim { opacity: .22; }
+.tg-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); padding: 10px 12px; border-top: 1px solid var(--grid); }
+.tg-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tg-det { padding: 16px 18px; position: fixed; right: 16px; top: 72px; width: 360px; max-height: calc(100vh - 88px); overflow: auto; z-index: 45; box-shadow: 0 8px 28px rgba(10, 20, 30, .22); }
+.tg-det[hidden] { display: none; }
+.tg-det .x { position: absolute; right: 10px; top: 10px; }
+@media (max-width: 700px) { .tg-det { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 62vh; } }
+.tg-det h3 { font-size: 16px; margin: 0 0 2px; line-height: 1.4; padding-right: 64px; }
+.tg-det h4 { font-size: 12.5px; color: var(--muted); margin: 12px 0 4px; font-weight: 600; }
+.tg-det .meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.tg-det dl { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 4px 10px; margin: 0 0 12px; font-size: 13.5px; }
+.tg-det dt { color: var(--muted); } .tg-det dd { margin: 0; }
+.tg-det ul { margin: 0 0 10px; padding: 0; list-style: none; font-size: 13.5px; }
+.tg-det li { display: flex; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--grid); }
+.tg-note { font-size: 13px; background: var(--paper); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+.tg-note.warn { background: var(--tg-thin-bg); color: var(--tg-thin); }
+.tg-chip { display: inline-block; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 1px 8px; font-size: 12.5px; margin: 0 4px 4px 0; color: var(--ink); }
+button.tg-chip { cursor: pointer; } button.tg-chip:hover { border-color: var(--tg-acc); }
+.tg-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.tg-tools input[type=search] { border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 8px; padding: 6px 10px; width: 220px; max-width: 100%; font: inherit; font-size: 13.5px; }
+.tg-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--sheet); flex-wrap: wrap; }
+.tg-seg button { border: 0; background: none; padding: 5px 10px; font-size: 13px; border-right: 1px solid var(--grid); cursor: pointer; color: var(--ink); }
+.tg-seg button:last-child { border-right: 0; }
+.tg-seg button[aria-pressed="true"] { background: var(--tg-acc); color: var(--tg-acc-ink); }
+.tg-cat { display: grid; gap: 8px; }
+.tg-cat .it { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 1.6fr) auto; gap: 10px; align-items: center; padding: 10px 14px;
+  background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; text-align: left; width: 100%; cursor: pointer; color: var(--ink); font: inherit; }
+.tg-cat .it:hover { border-color: var(--tg-acc); }
+.tg-cat .nm { font-weight: 600; } .tg-cat .nm small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.tg-cat .sm { font-size: 13px; color: var(--muted); }
+.tg-cat .keys { display: flex; flex-wrap: wrap; gap: 3px; }
+.tg-cat .keys span { font-size: 11.5px; border-radius: 4px; padding: 0 5px; background: var(--paper); color: var(--muted); }
+.tg-cat .keys span.part { background: transparent; box-shadow: inset 0 0 0 1px var(--rule); }
+.tg-cat .keys span.bad { color: var(--tg-bad); background: var(--tg-bad-bg); }
+@media (max-width: 760px) { .tg-cat .it { grid-template-columns: minmax(0, 1fr) auto; } .tg-cat .it .sm, .tg-cat .it .keys { grid-column: 1 / -1; } }
+.tg-card { padding: 18px 20px; margin-bottom: 16px; }
+.tg-card > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; margin-bottom: 10px; }
+.tg-card h3 { font-size: 17px; margin: 0; line-height: 1.35; }
+.tg-card .q { color: var(--muted); font-size: 13.5px; flex-basis: 100%; }
+.tg-body { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 860px) { .tg-body { grid-template-columns: minmax(0, 1fr); } }
+.tg-chart { width: 100%; margin-bottom: 14px; }
+.tg-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.tg-chart h4 { font-size: 13px; margin: 0 0 4px; font-weight: 600; }
+.tg-chart .cap { font-size: 12px; color: var(--muted); margin-top: 4px; }
+@media (max-width: 600px) { .tg-chart .sc { overflow-x: auto; -webkit-overflow-scrolling: touch; } .tg-chart .sc svg { min-width: 540px; } }
+.tg-key { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+.tg-key i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: 3px; margin-right: 5px; }
+.tg-key i.sq { width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; }
+.tg-find { font-size: 14px; }
+.tg-find h4 { font-size: 12.5px; color: var(--muted); margin: 12px 0 4px; font-weight: 600; }
+.tg-find p { margin: 0 0 8px; }
+.tg-find ul { margin: 0 0 8px; padding-left: 1.2em; }
+.tg-big { font-size: 22px; font-weight: 600; line-height: 1.3; }
+.tg-big small { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.tg-cam { border-left: 3px solid var(--tg-acc); padding: 6px 12px; margin: 10px 0; background: var(--paper); border-radius: 0 8px 8px 0; font-size: 13.5px; }
+.tg-cam b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+.tg-acc { font-size: 12.5px; color: var(--muted); margin: 6px 0; }
+.tg-next { border: 1px solid var(--rule); border-radius: 8px; padding: 9px 12px; margin: 8px 0; }
+.tg-next .t { font-size: 13.5px; }
+.tg-next .w { font-size: 12px; color: var(--muted); }
+.tg-next .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+.tg-btn { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 5px 12px; font-weight: 600; font-size: 13px; cursor: pointer; color: var(--ink); font-family: inherit; }
+.tg-btn.pri { background: var(--tg-acc); border-color: var(--tg-acc); color: var(--tg-acc-ink); }
+.tg-btn:disabled { opacity: .5; cursor: default; }
+.tg-st { font-size: 12.5px; font-weight: 600; border-radius: 6px; padding: 2px 8px; }
+.tg-st.adopt { color: var(--tg-ok); background: var(--tg-ok-bg); } .tg-st.skip { color: var(--tg-none); background: var(--tg-none-bg); }
+.tg-bars { display: grid; gap: 6px; font-size: 13px; margin: 8px 0; }
+.tg-bars .b { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 6.5em; gap: 8px; align-items: center; }
+.tg-bars .t { height: 12px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.tg-bars .v { text-align: right; font-weight: 600; white-space: nowrap; }
+.tg-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.tg-stat { background: var(--paper); border-radius: 8px; padding: 8px 12px; min-width: 120px; }
+.tg-stat b { display: block; font-size: 19px; line-height: 1.3; font-weight: 600; }
+.tg-stat span { font-size: 12px; color: var(--muted); }
+.tg-mini { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 20px; }
+@media (max-width: 860px) { .tg-mini { grid-template-columns: minmax(0, 1fr); } }
+.tg-ax { stroke: var(--rule); stroke-width: 1; } .tg-gr { stroke: var(--grid); stroke-width: 1; }
+.tg-tx { fill: var(--muted); font-size: 11px; font-family: inherit; } .tg-tx2 { fill: var(--ink); font-size: 11.5px; font-family: inherit; }
+.tg-act { fill: var(--steel); } .tg-act.part { fill: var(--steel); opacity: .45; }
+.tg-fc { fill: none; stroke: var(--tg-acc); stroke-width: 2; stroke-dasharray: 4 3; }
+.tg-fcf { fill: var(--tg-acc); opacity: .16; }
+.tg-whisk { stroke: var(--tg-acc); stroke-width: 2; }
+.tg-warnln { stroke: var(--tg-bad); stroke-width: 1.5; stroke-dasharray: 4 3; } .tg-warntx { fill: var(--tg-bad); font-size: 11px; font-weight: 600; font-family: inherit; }
+.tg-closed { fill: var(--muted); opacity: .1; }
+.tg-hit { fill: transparent; }
+.tg-hit:hover + .tg-hl, .tg-hl.on { opacity: 1; }
+.tg-hl { opacity: 0; pointer-events: none; }
+#tgTip { position: fixed; pointer-events: none; background: var(--ink); color: var(--paper); font-size: 12.5px; line-height: 1.5; padding: 6px 9px; border-radius: 6px; display: none; z-index: 70; max-width: 260px; white-space: pre-line; }
+table.tg-tb { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+.tg-tb th, .tg-tb td { padding: 7px 10px; border-bottom: 1px solid var(--grid); text-align: left; vertical-align: middle; }
+.tg-tb th { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.tg-tb td.n { text-align: right; white-space: nowrap; }
+.tg-tbw { overflow-x: auto; }
+.tg-h { font-size: 15px; margin: 22px 0 8px; font-weight: 600; }
+.tg-ok { color: var(--tg-ok); font-weight: 600; } .tg-ng { color: var(--tg-bad); font-weight: 600; }
+.tg-mbg { position: fixed; inset: 0; background: rgba(10, 15, 20, .45); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 80; }
+.tg-modal { background: var(--sheet); color: var(--ink); border-radius: 12px; padding: 18px 20px; max-width: 440px; width: 100%; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.tg-modal h3 { margin: 0 0 8px; font-size: 16px; }
+.tg-modal p { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+.tg-modal textarea, .tg-modal input { width: 100%; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 8px; font: inherit; font-size: 14px; }
+.tg-modal textarea { min-height: 72px; }
+.tg-modal .row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.tg-modal .err { color: var(--tg-bad); font-size: 13px; min-height: 1.4em; }
+.tg-credit { font-size: 12px; color: var(--muted); margin: 18px 0 4px; }
+@media (max-width: 520px) { .tg-card { padding: 14px; } .tg-det { padding: 14px; } .tg-sub button { padding: 6px 10px; } }
+@media (prefers-reduced-motion: no-preference) { .tg-mx td, .tg-mx th { transition: opacity .15s, background-color .15s; } }
 </style>
 </head>
 <body data-house="work">
@@ -1546,6 +1702,7 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
     <div class="w-nav" role="tablist" aria-label="仕事のページ">
       <button type="button" role="tab" data-tab="rounds" aria-selected="true">見回り</button>
       <button type="button" role="tab" data-tab="map" aria-selected="false">マップ</button>
+      <button type="button" role="tab" data-tab="links" aria-selected="false">つながり</button>
     </div>
 
     <!-- 見回り（v4・2026-10-29）：4アプリとシフト・収支計画表を読むだけ。書けるのは迷子の行の日付と担当者だけ
@@ -1558,6 +1715,16 @@ body.in-work[data-house="private"] .id-tab { transform: translate(0, -50%); }
       <ul class="am-go" id="myApps" aria-label="自分用のアプリを開く" hidden></ul>
       <div class="am-box"><svg id="amSvg" viewBox="-800 -770 1600 1400" role="img" aria-label="アプリとマスターの関係図"></svg></div>
       <div class="am-det" id="amDet"></div>
+    </div>
+
+    <!-- つながり帳（v6・2026-11-20・Links.gs）：各アプリと気象庁のデータを読むだけ。表の名前・数・取引先はサーバから届く（公開されるこのファイルには書かない） -->
+    <div class="w-tab" id="tab-links" role="tabpanel" hidden>
+      <div class="tg-top">
+        <div class="tg-sub" role="group" aria-label="つながり帳の画面"><button type="button" data-tgv="link" aria-pressed="true">つながり</button><button type="button" data-tgv="list" aria-pressed="false">一覧</button><button type="button" data-tgv="prop" aria-pressed="false">提案</button><button type="button" data-tgv="ingest" aria-pressed="false">取り込み</button></div>
+        <span class="tg-at" id="tgAt"></span><button type="button" class="link" id="tgRe">読み直す</button>
+      </div>
+      <div id="tgMain"></div>
+      <aside class="tg-panel tg-det" id="tgDet" aria-live="polite" hidden></aside>
     </div>
 
     <div class="w-tab" id="tab-rounds" role="tabpanel">
@@ -1806,7 +1973,7 @@ var MOCK = params.get('mock') === '1';
 var IS_GAS = (typeof google !== 'undefined') && google.script && google.script.run;
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbzIsya9odvbyb8x_-zzXwTf-wA_7BBQGEUab4dk7Jc-nL3UcfDzkH26P2Wt_z4tetJC/exec';
 // 画面の版。別の PC で同時に直したときに、どちらが載っているか見分けるための印
-var BUILD = '2026-11-15 v5.10';
+var BUILD = '2026-11-20 v6.0';
 var WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 function load(k) { try { return localStorage.getItem('cellar.' + k); } catch (e) { return null; } }
@@ -2601,7 +2768,9 @@ function showTab(tab) {
   document.querySelectorAll('.w-nav [role=tab]').forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-tab') === tab)); });
   $('#tab-rounds').hidden = tab !== 'rounds';
   $('#tab-map').hidden = tab !== 'map';
+  $('#tab-links').hidden = tab !== 'links';
   if (tab === 'map') amFresh();
+  if (tab === 'links') tgOpen(); else { TG.sel = null; tgDetail(); tgTipHide(); }
   // スマホ幅ではタブの帯が横に流れるので、選んだタブを見えるところへ送る
   var nav = document.querySelector('.w-nav'), sb = nav.querySelector('[data-tab="' + tab + '"]');
   if (sb) { var nr = nav.getBoundingClientRect(), br = sb.getBoundingClientRect(); if (br.right > nr.right || br.left < nr.left) nav.scrollLeft += br.left - nr.left - 8; }
@@ -2801,6 +2970,494 @@ $('#amSvg').addEventListener('click', function (e) { amPick(e.target.closest('.a
 $('#amSvg').addEventListener('keydown', function (e) { var g = e.target.closest('.am-n'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); amPick(g); } });
 $('#amRe').addEventListener('click', amLoad);
 $('#amSeen').addEventListener('click', function () { Object.keys(AM.seen).forEach(function (k) { AM.seen[k].n = false; }); amSave(); amRender(); });
+
+/* ───────── つながり帳（v6・2026-11-20・Links.gs）─────────
+   各アプリと気象庁のデータを、GAS が毎晩 23:30 に読むだけで写したもの。ここは置いた写しを読んで描くだけ。
+   書くのは「採用」（自分のスケジュールにタスク）と「見送り」（理由を Cellar の Drive に）だけ。
+   表の名前・鍵・取引先はサーバから届く。公開されるこのファイルには書かない */
+var TG = { d: null, busy: false, t: 0, view: 'link', lens: '', sel: null, app: '', rdf: '', q: '' };
+var TG_RDT = { ok: 'そろっている', thin: '少ない', none: 'まだ無い' }, TG_RDI = { ok: '✅', thin: '🟡', none: '⬜' };
+var TG_GLT = { ok: 'つながる', part: '名前だけ・一部', bad: 'ずれ・未確認' };
+var TG_BC = { CREAM: '--tg-s1', AIPA: '--tg-s2', DTM: '--tg-s4' };
+function tgEsc(s) { return amEsc(s); }
+function tgMD(d) { return d ? Number(d.slice(5, 7)) + '/' + Number(d.slice(8, 10)) : ''; }
+function tgMan(v) { v = Number(v) || 0; return Math.abs(v) >= 10000 ? (Math.round(v / 1000) / 10) + '万円' : Math.round(v).toLocaleString() + '円'; }
+function tgPct(r) { return r == null ? '―' : Math.round(r * 100) + '%'; }
+function tgBrandName(k) { var b = TG.d && TG.d.catalog.brands.filter(function (x) { return x.k === k; })[0]; return b ? b.n : (k || '銘柄なし'); }
+function tgCol(k) { return 'var(' + (TG_BC[k] || '--muted') + ')'; }
+function tgNice(v) { if (!(v > 0)) return 1; var p = Math.pow(10, Math.floor(Math.log10(v))), m = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].filter(function (x) { return x * p >= v; })[0]; return m * p; }
+function tgTicks(mx, pref) { var c = [pref || 4, 5, 3, 2, 4]; for (var i = 0; i < c.length; i++) { var st = mx / c[i]; if (Math.abs(st * 2 - Math.round(st * 2)) < 1e-9) return c[i]; } return pref || 4; }
+function tgSvg(w, h, inner, label) { return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + tgEsc(label) + '">' + inner + '</svg>'; }
+function tgRdPill(r, t) { return '<span class="tg-rd ' + r + '">' + TG_RDI[r] + ' ' + tgEsc(t || TG_RDT[r]) + '</span>'; }
+function tgGlyph(v) { return v === 'bad' ? '<span class="tg-gl bad" aria-label="' + TG_GLT.bad + '">✕</span>' : v ? '<span class="tg-gl ' + v + '" aria-label="' + TG_GLT[v] + '"></span>' : ''; }
+function tgKey(id) { return TG.d.catalog.keys.filter(function (k) { return k.id === id; })[0] || { id: id, n: id, s: '', note: '' }; }
+function tgTable(id) { return TG.d.catalog.tables.filter(function (t) { return t.id === id; })[0]; }
+function tgProp(id) { return TG.d.catalog.props.filter(function (p) { return p.id === id; })[0]; }
+
+function tgShown() { return !$('#tab-links').hidden && document.visibilityState === 'visible'; }
+function tgOpen() { if (!TG.d || Date.now() - TG.t > 5 * 60e3) tgLoad(); else tgRender(); }
+function tgLoad() {
+  if (TG.busy) return Promise.resolve();
+  TG.busy = true;
+  if (!TG.d) { $('#tgAt').textContent = '読み込み中…'; $('#tgMain').innerHTML = ''; }
+  return call('links').then(function (d) { TG.d = d; TG.t = Date.now(); tgRender(); },
+    function (e) { $('#tgAt').textContent = 'つながり帳を読めませんでした：' + e.message; })
+    .then(function () { TG.busy = false; });
+}
+document.addEventListener('visibilitychange', function () { if (tgShown() && TG.d && Date.now() - TG.t > 5 * 60e3) tgLoad(); });
+
+function tgRender() {
+  var d = TG.d;
+  if (!d) return;
+  document.querySelectorAll('#tab-links [data-tgv]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-tgv') === TG.view)); });
+  $('#tgAt').textContent = d.at ? '写し：' + stampOf(d.at) + (d.ingest.by === 'night' ? '（毎晩 23:30）' : d.ingest.by === 'manual' ? '（手で取り込み）' : '') : (d.note || 'まだ取り込んでいません');
+  tgTipHide();
+  if (TG.view !== 'link') { TG.sel = null; tgDetail(); }
+  var m = $('#tgMain');
+  if (TG.view === 'list') m.innerHTML = tgViewList();
+  else if (TG.view === 'prop') m.innerHTML = tgViewProp();
+  else if (TG.view === 'ingest') m.innerHTML = tgViewIngest();
+  else { m.innerHTML = tgViewLink(); tgDrawMatrix(); tgDrawStrip(); tgDetail(); }
+  if (TG.view === 'list') tgDrawList();
+}
+
+/* ── つながり（表 × 鍵）── */
+function tgViewLink() {
+  var c = TG.d.catalog;
+  return '<p class="tg-lede">表（行）と、表どうしをつなぐ鍵（列）の一覧です。提案の型を選ぶと、その提案に使う表と鍵が光ります。鍵や表を押すと、詳しく出ます。<span class="tg-live">写している</span> の付いた表は、毎晩 23:30 に読んでいます（ほかは設計の見立て）。</p>' +
+    '<div class="tg-lenses" role="group" aria-label="提案の型">' + [''].concat(c.props.map(function (p) { return p.id; })).map(function (id) {
+      var p = id ? tgProp(id) : null;
+      return '<button type="button" class="tg-lens" data-lens="' + id + '" aria-pressed="' + (TG.lens === id) + '">' +
+        (p ? '<b>' + p.id + '</b>' + tgEsc(p.n) + ' ' + tgRdPill(p.rd, p.rd === 'ok' ? 'そろう' : p.rd === 'thin' ? '少ない' : 'まだ') : '全部の表') + '</button>';
+    }).join('') + '</div><div class="tg-strip" id="tgStrip"></div>' +
+    '<div class="tg-panel"><div class="tg-mxw"><table class="tg-mx" id="tgMx"></table></div>' +
+    '<div class="tg-legend"><span>' + tgGlyph('ok') + ' つながる</span><span>' + tgGlyph('part') + ' 名前だけ・一部</span><span>' + tgGlyph('bad') + ' ずれ・未確認</span><span>空欄＝その鍵を持っていない</span></div></div>';
+}
+function tgDrawMatrix() {
+  var c = TG.d.catalog, p = TG.lens ? tgProp(TG.lens) : null;
+  var used = p ? c.tables.filter(function (t) { return t.u.indexOf(p.id) >= 0; }).map(function (t) { return t.id; }) : null, ukeys = p ? p.keys : null;
+  var sk = TG.sel && TG.sel.t === 'key' ? TG.sel.id : null, sd = TG.sel && TG.sel.t === 'ds' ? TG.sel.id : null;
+  var hcell = function (k) {
+    var cls = 'k' + (sk === k.id ? ' sel' : '') + (ukeys && ukeys.indexOf(k.id) < 0 ? ' dim' : '') + (ukeys && ukeys.indexOf(k.id) >= 0 ? ' colhl' : '');
+    return '<th class="' + cls + '" scope="col"><button type="button" data-key="' + k.id + '" aria-label="鍵 ' + tgEsc(k.n) + ' を詳しく">' + tgEsc(k.n) + '</button></th>';
+  };
+  var html = '<thead><tr><th class="dsh" scope="col">表（' + c.tables.length + '）</th>' + c.keys.map(hcell).join('') + '<th class="dsh" scope="col" style="min-width:150px">材料のたまり具合</th></tr></thead><tbody>';
+  c.apps.forEach(function (a) {
+    var rows = c.tables.filter(function (t) { return t.app === a; });
+    if (!rows.length) return;
+    html += '<tr class="grp"><td colspan="' + (c.keys.length + 2) + '">' + tgEsc(a) + '</td></tr>';
+    rows.forEach(function (t) {
+      var off = used && used.indexOf(t.id) < 0, hl = sk && t.k[sk];
+      html += '<tr class="' + (sd === t.id ? 'rowsel' : '') + (hl ? ' rowhl' : '') + '"><td class="ds' + (off ? ' dim' : '') + '"><button type="button" data-ds="' + t.id + '">' + tgEsc(t.n) + '</button>' +
+        (t.live ? '<span class="tg-live">写している</span>' : '') + (t.err ? ' <span class="tg-err">読めない</span>' : '') + '<span class="g">' + tgEsc(t.g) + '</span></td>' +
+        c.keys.map(function (k) {
+          var dim = off || (ukeys && ukeys.indexOf(k.id) < 0), col = (ukeys && ukeys.indexOf(k.id) >= 0 && !off) || sk === k.id;
+          return '<td class="c' + (dim ? ' dim' : '') + (col ? ' colhl' : '') + '" title="' + tgEsc(t.n + ' × ' + k.n + (t.k[k.id] ? '：' + TG_GLT[t.k[k.id]] : '：持っていない')) + '">' + tgGlyph(t.k[k.id]) + '</td>';
+        }).join('') + '<td class="r' + (off ? ' dim' : '') + '">' + tgRdPill(t.rd, t.rdt) + '</td></tr>';
+    });
+  });
+  $('#tgMx').innerHTML = html + '</tbody>';
+}
+function tgDrawStrip() {
+  var c = TG.d.catalog, p = TG.lens ? tgProp(TG.lens) : null, el = $('#tgStrip');
+  if (!p) {
+    var live = c.tables.filter(function (t) { return t.live; }).length;
+    el.innerHTML = '<b>' + c.tables.length + '</b> の表を <b>' + c.keys.length + '</b> の鍵でつないでいます。いま写しているのは <b>' + live + '</b> 表。いちばん多くの表をつなぐ鍵は <b>営業日</b>（' + c.tables.filter(function (t) { return t.k.day; }).length + '表）。';
+    return;
+  }
+  var ts = c.tables.filter(function (t) { return t.u.indexOf(p.id) >= 0; }), n = { ok: 0, thin: 0, none: 0 };
+  ts.forEach(function (t) { n[t.rd]++; });
+  el.innerHTML = '<b>' + p.id + ' ' + tgEsc(p.n) + '</b>：表 <b>' + ts.length + '</b>・鍵 <b>' + p.keys.length + '</b>（' + p.keys.map(function (k) { return tgEsc(tgKey(k).n); }).join('・') + '）。材料は ✅ ' + n.ok + '・🟡 ' + n.thin + '・⬜ ' + n.none + '。' +
+    (p.live ? '<button type="button" class="link" data-gop="' + p.id + '">提案を見る</button>' : '提案は ' + tgEsc(p.when || 'あとで') + '。');
+}
+function tgDetail() {
+  var el = $('#tgDet'), s = TG.sel;
+  if (!s || !TG.d) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  var X = '<button class="act x" type="button" data-close>閉じる</button>', c = TG.d.catalog, html;
+  if (s.t === 'key') {
+    var k = tgKey(s.id), hs = c.tables.filter(function (t) { return t.k[k.id]; }), ps = c.props.filter(function (p) { return p.keys.indexOf(k.id) >= 0; });
+    html = X + '<h3>鍵：' + tgEsc(k.n) + '</h3><div class="meta">持っている表 ' + hs.length + '</div><dl><dt>正</dt><dd>' + tgEsc(k.s) + '</dd></dl>' +
+      (k.note ? '<div class="tg-note' + (hs.some(function (t) { return t.k[k.id] !== 'ok'; }) ? ' warn' : '') + '">' + tgEsc(k.note) + '</div>' : '') +
+      '<h4>持っている表</h4><ul>' + hs.map(function (t) { return '<li>' + tgGlyph(t.k[k.id]) + '<button class="tg-chip" type="button" data-ds="' + t.id + '">' + tgEsc(t.n) + '</button><small style="color:var(--muted)">' + tgEsc(t.app) + '</small></li>'; }).join('') + '</ul>' +
+      '<h4>この鍵を使う提案</h4>' + (ps.map(function (p) { return '<button class="tg-chip" type="button" data-golens="' + p.id + '">' + p.id + ' ' + tgEsc(p.n) + '</button>'; }).join('') || '<span class="tg-empty">なし</span>');
+  } else {
+    var t = tgTable(s.id);
+    if (!t) { TG.sel = null; el.hidden = true; return; }
+    var ps2 = c.props.filter(function (p) { return t.u.indexOf(p.id) >= 0; });
+    html = X + '<h3>' + tgEsc(t.n) + '</h3><div class="meta">' + tgEsc(t.app) + '・元：' + tgEsc(t.src) + '</div><dl><dt>1行は</dt><dd>' + tgEsc(t.g) + '</dd><dt>期間</dt><dd>' + tgEsc(t.p) + '</dd><dt>行数</dt><dd>' + tgEsc(t.rows) + '</dd><dt>最終更新</dt><dd>' + tgEsc(t.fresh) + '</dd><dt>たまり具合</dt><dd>' + tgRdPill(t.rd, t.rdt) + '</dd></dl>' +
+      (t.err ? '<div class="tg-note warn">読めませんでした：' + tgEsc(t.err) + '</div>' : '') + (t.note ? '<div class="tg-note' + (t.rd !== 'ok' ? ' warn' : '') + '">' + tgEsc(t.note) + '</div>' : '') +
+      '<h4>持っている鍵</h4><ul>' + Object.keys(t.k).map(function (id) { return '<li>' + tgGlyph(t.k[id]) + '<button class="tg-chip" type="button" data-key="' + id + '">' + tgEsc(tgKey(id).n) + '</button><small style="color:var(--muted)">' + TG_GLT[t.k[id]] + '</small></li>'; }).join('') + '</ul>' +
+      '<h4>この表を使う提案</h4>' + ps2.map(function (p) { return '<button class="tg-chip" type="button" data-golens="' + p.id + '">' + p.id + ' ' + tgEsc(p.n) + '</button>'; }).join('');
+  }
+  el.innerHTML = html;
+}
+
+/* ── 一覧 ── */
+function tgViewList() {
+  var c = TG.d.catalog;
+  return '<p class="tg-lede">写している表と、これから写す表の一覧です。押すと、つながりの詳しい欄が開きます。</p><div class="tg-tools"><input type="search" id="tgQ" placeholder="表の名前・中身で探す" aria-label="表を探す" value="' + tgEsc(TG.q) + '">' +
+    '<div class="tg-seg" role="group" aria-label="アプリ">' + [''].concat(c.apps).map(function (a) { return '<button type="button" data-app="' + tgEsc(a) + '" aria-pressed="' + (TG.app === a) + '">' + (a ? tgEsc(a) : '全部') + '</button>'; }).join('') + '</div>' +
+    '<div class="tg-seg" role="group" aria-label="たまり具合">' + ['', 'ok', 'thin', 'none'].map(function (r) { return '<button type="button" data-rdf="' + r + '" aria-pressed="' + (TG.rdf === r) + '">' + (r ? TG_RDI[r] + ' ' + TG_RDT[r] : '全部') + '</button>'; }).join('') + '</div></div>' +
+    '<div class="tg-at" id="tgCnt" style="margin-bottom:8px"></div><div class="tg-cat" id="tgCat"></div>';
+}
+function tgDrawList() {
+  var c = TG.d.catalog, q = norm(TG.q.trim());
+  var rows = c.tables.filter(function (t) { return (!TG.app || t.app === TG.app) && (!TG.rdf || t.rd === TG.rdf) && (!q || norm(t.n + t.g + t.note + t.src).indexOf(q) >= 0); });
+  $('#tgCnt').textContent = rows.length + ' / ' + c.tables.length + ' 表';
+  $('#tgCat').innerHTML = rows.map(function (t) {
+    return '<button type="button" class="it" data-open="' + t.id + '"><span class="nm">' + tgEsc(t.n) + (t.live ? '<span class="tg-live">写している</span>' : '') + '<small>' + tgEsc(t.app) + '・' + tgEsc(t.src) + '</small></span><span class="sm">' + tgEsc(t.g) + '</span><span class="sm">' + tgEsc(t.p) + '<br>' + tgEsc(t.rows) + '</span>' +
+      '<span class="keys">' + Object.keys(t.k).map(function (id) { return '<span class="' + t.k[id] + '">' + tgEsc(tgKey(id).n) + (t.k[id] === 'bad' ? ' ✕' : '') + '</span>'; }).join('') + '</span>' + tgRdPill(t.rd, t.rdt) + '</button>';
+  }).join('') || '<p class="tg-empty">当てはまる表がありません。条件をゆるめてください。</p>';
+}
+
+/* ── 提案 ── */
+function tgViewProp() {
+  var d = TG.d, ai = d.ai || null, u = d.usage || {};
+  var head = '<p class="tg-lede">数とグラフは決まった式で出します（同じ材料なら同じ答え）。見立ての文はカミーユが書きます（毎週月曜 12:30。Cellar の Claude API）。' +
+    '「採用」で自分のスケジュールにタスクを作り、「見送り」は理由を残します。</p><div class="tg-top"><button type="button" class="act" id="tgAi">カミーユに読んでもらう</button><span class="tg-at">' +
+    (ai && ai.at ? '見立て：' + stampOf(ai.at) : '見立てはまだありません') + (ai && ai.err ? '（前回は書けませんでした：' + tgEsc(ai.err) + '）' : '') +
+    (u.cap ? '・今月 $' + u.usd + ' / $' + u.cap : '') + '</span></div>';
+  if (!d.ready) return head + '<p class="tg-empty">' + tgEsc(d.note || 'まだ取り込んでいません') + '</p>';
+  return head + tgCardA() + tgCardE() + d.catalog.props.filter(function (p) { return !p.live; }).map(tgCardLater).join('');
+}
+function tgCam(kind) {
+  var ai = TG.d.ai;
+  if (!ai || !ai[kind] || !ai[kind].find) return '';
+  return '<div class="tg-cam"><b>Camille（' + stampOf(ai.at) + '）</b>' + tgEsc(ai[kind].find) + (ai[kind].next ? '<br>' + tgEsc(ai[kind].next) : '') + '</div>';
+}
+function tgNexts(type) {
+  var list = (TG.d.next || []).filter(function (n) { return n.type === type; });
+  if (!list.length) return '<p class="tg-empty">今週の次の一手はありません。</p>';
+  return list.map(function (n) {
+    var rec = TG.d.decide[n.id];
+    return '<div class="tg-next"><div class="t">' + tgEsc(n.title) + '</div><div class="w">' + tgEsc(n.why) + '</div><div class="row">' +
+      (rec ? (rec.kind === 'adopt' ? '<span class="tg-st adopt">採用しました（' + tgEsc(tgMD(rec.date)) + ' のタスク）</span>' : '<span class="tg-st skip">見送りました：' + tgEsc(rec.why) + '</span>')
+        : '<button type="button" class="tg-btn pri" data-adopt="' + tgEsc(n.id) + '">採用してタスクにする</button><button type="button" class="tg-btn" data-skip="' + tgEsc(n.id) + '">見送る</button>') +
+      '</div></div>';
+  }).join('');
+}
+function tgMats(pid) {
+  return '<div style="margin-top:10px">' + TG.d.catalog.tables.filter(function (t) { return t.u.indexOf(pid) >= 0; }).map(function (t) {
+    return '<span class="tg-chip" title="' + tgEsc(TG_RDT[t.rd]) + '">' + TG_RDI[t.rd] + ' ' + tgEsc(t.n) + '</span>';
+  }).join('') + '</div>';
+}
+function tgCardHead(p, extra) {
+  return '<header><h3>' + p.id + ' ' + tgEsc(p.n) + '</h3>' + tgRdPill(p.rd, p.rd === 'ok' ? '材料はそろっている' : p.rd === 'thin' ? '材料が少ない' : '材料がまだ無い') + (extra || '') + '<div class="q">' + tgEsc(p.q) + '</div></header>';
+}
+function tgCardA() {
+  var d = TG.d, p = tgProp('A'), a = d.a;
+  if (!a) return '<section class="tg-panel tg-card" id="tgP-A">' + tgCardHead(p) + '<p class="tg-err">' + tgEsc(d.aErr || '計算できませんでした') + '</p></section>';
+  var nx = a.next, last = a.last, end = addDays(a.target, 6), coef = a.coef;
+  var vs = last && last.sum ? Math.round((nx.sum / last.sum - 1) * 100) : null;
+  var brands = ['CREAM', 'AIPA', 'DTM'], mxL = Math.max.apply(null, brands.map(function (k) { return nx.brand[k]; }).concat([0.1]));
+  var lastW = a.weeks.filter(function (w) { return w.done; }).slice(-1)[0];
+  return '<section class="tg-panel tg-card" id="tgP-A">' + tgCardHead(p) + '<div class="tg-body"><div>' +
+    tgChartWeeks(a) + tgChartDays(a) + tgChartBeer(a) + '</div><div class="tg-find">' +
+    '<h4>来週（' + tgMD(a.target) + '〜' + tgMD(end) + '）の売上の見込み</h4><div class="tg-big">' + tgMan(nx.sum) + '<small>幅 ' + tgMan(Math.max(0, nx.lo)) + '〜' + tgMan(nx.hi) + '</small></div>' +
+    '<p>' + (vs != null ? '締めた先週（' + tgMD(last.m) + '〜）の ' + tgMan(last.sum) + ' より <b>' + (vs >= 0 ? '+' : '') + vs + '%</b>。' : '') +
+    (nx.hol.length ? '祝日 ' + nx.hol.map(function (h) { return tgMD(h.slice(0, 10)) + ' ' + h.slice(11); }).map(tgEsc).join('・') + ' を入れています（×' + coef.h + '）。' : '') + '</p>' +
+    '<h4>ビールの見込み（飲み放題を除く）</h4><div class="tg-big">' + nx.beer + ' L<small>幅 ' + Math.max(0, nx.beerLo) + '〜' + nx.beerHi + ' L</small></div>' +
+    '<div class="tg-bars" role="list">' + brands.map(function (k) {
+      return '<div class="b" role="listitem"><span>' + tgEsc(tgBrandName(k)) + '</span><span class="t" style="width:' + (nx.brand[k] / mxL * 100).toFixed(1) + '%;background:' + tgCol(k) + '"></span><span class="v">' + nx.brand[k] + ' L<small style="color:var(--muted);font-weight:400">・' + Math.round(nx.brand[k] / 0.35) + '杯分</small></span></div>';
+    }).join('') + '</div>' +
+    '<p class="tg-acc">銘柄の割合は直近4週の出方（直近2週に7割の重み）。1杯・缶は 350ml、テイスティングセットは3銘柄×130ml、3本セットは3銘柄×1缶として数えています。' + (lastW && lastW.nomi ? '先週の飲み放題 ' + lastW.nomi + ' 件は銘柄に分けられないので、この量に入っていません。' : '') + '</p>' +
+    tgCam('a') +
+    '<h4>確からしさ</h4><p class="tg-acc">締めた直近' + a.acc.n + '週を、その週の前の日までの材料で当てた外れ：<b>週の合計 ' + tgPct(a.acc.week) + '</b>・日ごと ' + tgPct(a.acc.day) + '・ビール ' + tgPct(a.acc.beer) + '。' +
+    '幅はこの外れの大きさから出しています。秋の観光の終わりで週ごとに落ちていて、基準が追いつきにくい時期です。日ごとの見込みは目安にとどめてください。</p>' +
+    '<p class="tg-acc">式：週の水準（曜日でならした1日あたり）を直近4週で 4・3・2・1 の重み × 曜日の形（直近8週） × 祝日 ×' + coef.h + '（' + coef.hN + '日・上限2倍） × 雨・雪の日 ×' + coef.g + '（' + coef.wetN + '日）を降水確率で掛ける。月の係数は1年たまる 2027-05 まで使いません。材料：売上 ' + tgEsc(tgMD(a.from)) + '〜' + tgEsc(tgMD(a.to)) + '。</p>' +
+    '<h4>次の一手</h4>' + tgNexts('A') + tgMats('A') +
+    '<div class="tg-top" style="margin-top:12px"><button type="button" class="tg-btn" data-golens="A">つながりで見る</button></div></div></div></section>';
+}
+// 週の売上：締めた週（実績）・途中の週・その週の前の日までの材料で当てた見込み（線）・来週の見込み（点線の箱と幅）
+function tgChartWeeks(a) {
+  var ws = a.weeks.slice(-11), back = {}, W = 640, H = 236, L = 44, R = 12, T = 16, B = 34;
+  a.back.forEach(function (b) { back[b.m] = b; });
+  var n = ws.length + 1, bw = (W - L - R) / n, nx = a.next;
+  var mx = tgNice(Math.max.apply(null, ws.map(function (w) { return Math.max(w.sum, back[w.m] ? back[w.m].f : 0); }).concat([nx.hi])));
+  var y = function (v) { return T + (H - T - B) * (1 - Math.max(0, v) / mx); }, g = '';
+  var nt = tgTicks(mx / 10000, 4); for (var i = 0; i <= nt; i++) { var v = mx * i / nt; g += '<line class="tg-gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="tg-tx" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (v ? (Math.round(v / 1000) / 10) + '万' : '0') + '</text>'; }
+  ws.forEach(function (w, i) {
+    var x = L + i * bw + bw * 0.18, bwid = bw * 0.64, bk = back[w.m];
+    var tip = tgMD(w.m) + '〜' + tgMD(addDays(w.m, 6)) + (w.part ? '（途中の週）' : '') + '\n実績 ' + tgMan(w.sum) + '（締めた日 ' + w.days + '）' + (bk ? '\n前の日までの材料で当てた見込み ' + tgMan(bk.f) : '') + (w.hol ? '\n祝日 ' + w.hol + '日' : '');
+    g += '<rect class="tg-act' + (w.part ? ' part' : '') + '" x="' + x + '" y="' + y(w.sum) + '" width="' + bwid + '" height="' + (y(0) - y(w.sum)) + '" rx="2"/>';
+    if (bk) g += '<line class="tg-whisk" x1="' + (x - 3) + '" x2="' + (x + bwid + 3) + '" y1="' + y(bk.f) + '" y2="' + y(bk.f) + '"/>';
+    g += '<rect class="tg-hit" x="' + (L + i * bw) + '" y="' + T + '" width="' + bw + '" height="' + (H - T - B) + '" data-tip="' + tgEsc(tip) + '"/>';
+    if ((ws.length - i) % 2 === 1) g += '<text class="tg-tx" x="' + (x + bwid / 2) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + tgMD(w.m) + '</text>';
+  });
+  var x2 = L + ws.length * bw + bw * 0.18, b2 = bw * 0.64;
+  g += '<rect class="tg-fcf" x="' + x2 + '" y="' + y(nx.sum) + '" width="' + b2 + '" height="' + (y(0) - y(nx.sum)) + '" rx="2"/><rect class="tg-fc" x="' + x2 + '" y="' + y(nx.sum) + '" width="' + b2 + '" height="' + (y(0) - y(nx.sum)) + '" rx="2"/>' +
+    '<line class="tg-whisk" x1="' + (x2 + b2 / 2) + '" x2="' + (x2 + b2 / 2) + '" y1="' + y(nx.hi) + '" y2="' + y(Math.max(0, nx.lo)) + '"/>' +
+    '<text class="tg-tx2" x="' + (x2 + b2 / 2) + '" y="' + (H - B + 15) + '" text-anchor="middle">来週</text>' +
+    '<rect class="tg-hit" x="' + (L + ws.length * bw) + '" y="' + T + '" width="' + bw + '" height="' + (H - T - B) + '" data-tip="' + tgEsc('来週 ' + tgMD(a.target) + '〜 の見込み\n' + tgMan(nx.sum) + '（幅 ' + tgMan(Math.max(0, nx.lo)) + '〜' + tgMan(nx.hi) + '）') + '"/>' +
+    '<line class="tg-ax" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+  return '<div class="tg-chart"><h4>週の売上（レストラン＋Shop・月曜から）</h4><div class="tg-key"><span><i class="sq" style="background:var(--steel)"></i>実績</span><span><i class="sq" style="background:var(--steel);opacity:.45"></i>途中の週</span>' +
+    '<span><i style="background:var(--tg-acc)"></i>前の日までの材料で当てた見込み</span><span><i class="sq" style="background:var(--tg-acc);opacity:.3"></i>来週の見込み（縦の線は幅）</span></div><div class="sc">' + tgSvg(W, H, g, '週の売上の実績と来週の見込み') + '</div></div>';
+}
+// 来週の日ごと：見込みと幅、定休、祝日、降水確率
+function tgChartDays(a) {
+  var ds = a.next.days, W = 640, H = 210, L = 44, R = 12, T = 14, B = 52, n = ds.length, bw = (W - L - R) / n;
+  var mx = tgNice(Math.max.apply(null, ds.map(function (x) { return x.hi; }).concat([1])));
+  var y = function (v) { return T + (H - T - B) * (1 - Math.max(0, v) / mx); }, g = '';
+  var nt = tgTicks(mx / 10000, 3); for (var i = 0; i <= nt; i++) { var v = mx * i / nt; g += '<line class="tg-gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="tg-tx" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (v ? (Math.round(v / 1000) / 10) + '万' : '0') + '</text>'; }
+  ds.forEach(function (x, i) {
+    var cx = L + i * bw, mid = cx + bw / 2, bwid = bw * 0.5;
+    if (!x.open) g += '<rect class="tg-closed" x="' + cx + '" y="' + T + '" width="' + bw + '" height="' + (H - T - B) + '"/><text class="tg-tx" x="' + mid + '" y="' + (y(0) - 8) + '" text-anchor="middle">定休</text>';
+    else {
+      g += '<rect class="tg-fcf" x="' + (mid - bwid / 2) + '" y="' + y(x.f) + '" width="' + bwid + '" height="' + (y(0) - y(x.f)) + '" rx="2"/><rect class="tg-fc" x="' + (mid - bwid / 2) + '" y="' + y(x.f) + '" width="' + bwid + '" height="' + (y(0) - y(x.f)) + '" rx="2"/>' +
+        '<line class="tg-whisk" x1="' + mid + '" x2="' + mid + '" y1="' + y(x.hi) + '" y2="' + y(Math.max(0, x.lo)) + '"/>';
+    }
+    g += '<text class="tg-tx2" x="' + mid + '" y="' + (H - B + 15) + '" text-anchor="middle">' + tgMD(x.d) + '（' + wd(x.d) + '）</text>' +
+      '<text class="tg-tx" x="' + mid + '" y="' + (H - B + 30) + '" text-anchor="middle">' + (x.pop != null ? '降水 ' + x.pop + '%' : '予報なし') + '</text>' +
+      (x.hol ? '<text class="tg-tx" x="' + mid + '" y="' + (H - B + 45) + '" text-anchor="middle">' + tgEsc(x.hol) + '</text>' : '') +
+      '<rect class="tg-hit" x="' + cx + '" y="' + T + '" width="' + bw + '" height="' + (H - T) + '" data-tip="' + tgEsc(fmtDay(x.d) + (x.hol ? ' ' + x.hol : '') + (x.open ? '\n見込み ' + tgMan(x.f) + '（幅 ' + tgMan(Math.max(0, x.lo)) + '〜' + tgMan(x.hi) + '）\nビール ' + x.beer + ' L' : '\n定休') + (x.pop != null ? '\n降水確率 ' + x.pop + '%' : '')) + '"/>';
+  });
+  g += '<line class="tg-ax" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+  return '<div class="tg-chart"><h4>来週の日ごと（目安。幅が広い）</h4><div class="sc">' + tgSvg(W, H, g, '来週の日ごとの見込み') + '</div><div class="cap">降水確率は気象庁の週間予報（上川・留萌地方）。出典：気象庁ホームページ</div></div>';
+}
+// 銘柄ごとの週の量（L）：締めた週の線と、来週の見込みの点
+function tgChartBeer(a) {
+  var ws = a.weeks.filter(function (w) { return w.done; }).slice(-10), W = 640, H = 210, L = 44, R = 96, T = 14, B = 26, brands = ['CREAM', 'AIPA', 'DTM'];
+  if (ws.length < 2) return '';
+  var n = ws.length + 1, step = (W - L - R) / (n - 1), nx = a.next;
+  var mx = tgNice(Math.max.apply(null, [].concat.apply([], ws.map(function (w) { return brands.map(function (k) { return w.brand[k]; }); })).concat(brands.map(function (k) { return nx.brand[k]; }))));
+  var X = function (i) { return L + i * step; }, y = function (v) { return T + (H - T - B) * (1 - v / mx); }, g = '';
+  var nt = tgTicks(mx, 3); for (var i = 0; i <= nt; i++) { var v = mx * i / nt; g += '<line class="tg-gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="tg-tx" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (Math.round(v * 10) / 10) + 'L</text>'; }
+  ws.forEach(function (w, i) { if ((ws.length - i) % 2 === 1) g += '<text class="tg-tx" x="' + X(i) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + tgMD(w.m) + '</text>'; });
+  g += '<text class="tg-tx2" x="' + X(ws.length) + '" y="' + (H - B + 15) + '" text-anchor="middle">来週</text>';
+  var ends = [];
+  brands.forEach(function (k) {
+    var pts = ws.map(function (w, i) { return X(i) + ',' + y(w.brand[k]); }).join(' ');
+    g += '<polyline points="' + pts + '" fill="none" stroke="' + tgCol(k) + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<line x1="' + X(ws.length - 1) + '" y1="' + y(ws[ws.length - 1].brand[k]) + '" x2="' + X(ws.length) + '" y2="' + y(nx.brand[k]) + '" stroke="' + tgCol(k) + '" stroke-width="2" stroke-dasharray="4 3"/>' +
+      '<circle cx="' + X(ws.length) + '" cy="' + y(nx.brand[k]) + '" r="4.5" fill="var(--sheet)" stroke="' + tgCol(k) + '" stroke-width="2"/>';
+    ends.push({ k: k, y: y(nx.brand[k]) });
+  });
+  // 右端の名札（重ならないようにずらす）
+  ends.sort(function (p, q) { return p.y - q.y; });
+  for (var j = 1; j < ends.length; j++) if (ends[j].y - ends[j - 1].y < 13) ends[j].y = ends[j - 1].y + 13;
+  ends.forEach(function (e) { g += '<text class="tg-tx2" x="' + (X(ws.length) + 9) + '" y="' + (e.y + 4) + '">' + tgEsc(tgBrandName(e.k)) + '</text>'; });
+  ws.concat([null]).forEach(function (w, i) {
+    var tip = w ? tgMD(w.m) + '〜 の週\n' + brands.map(function (k) { return tgBrandName(k) + ' ' + w.brand[k] + ' L'; }).join('\n') + (w.nomi ? '\n飲み放題 ' + w.nomi + ' 件（量に入れていない）' : '')
+      : '来週の見込み\n' + brands.map(function (k) { return tgBrandName(k) + ' ' + nx.brand[k] + ' L'; }).join('\n');
+    g += '<rect class="tg-hit" x="' + (X(i) - step / 2) + '" y="' + T + '" width="' + step + '" height="' + (H - T - B) + '" data-tip="' + tgEsc(tip) + '"/>';
+  });
+  g += '<line class="tg-ax" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+  return '<div class="tg-chart"><h4>銘柄ごとの週の量（L）</h4><div class="tg-key">' + brands.map(function (k) { return '<span><i style="background:' + tgCol(k) + '"></i>' + tgEsc(tgBrandName(k)) + '</span>'; }).join('') +
+    '<span>○ 来週の見込み</span></div><div class="sc">' + tgSvg(W, H, g, '銘柄ごとの週の量') + '</div></div>';
+}
+
+function tgCardE() {
+  var d = TG.d, p = tgProp('E'), e = d.e;
+  if (!e) return '<section class="tg-panel tg-card" id="tgP-E">' + tgCardHead(p) + '<p class="tg-err">' + tgEsc(d.eErr || '計算できませんでした') + '</p></section>';
+  var k = e.kegs, c = e.can, stats = '<div class="tg-stats">' +
+    (k ? '<div class="tg-stat"><b>' + k.late + '本</b><span>出荷から' + k.lateDays + '日を超えて戻っていない樽（出荷中 ' + k.out.length + '本）</span></div>' +
+      '<div class="tg-stat"><b>' + (k.backMedian != null ? k.backMedian + '日' : '―') + '</b><span>出荷から戻るまで（中央値・直近180日の ' + k.backN + '本）</span></div>' : '') +
+    (c ? '<div class="tg-stat"><b>' + c.thisM + '本</b><span>缶のロス・破損（今月・先月 ' + c.prevM + '本）</span></div>' : '') + '</div>';
+  return '<section class="tg-panel tg-card" id="tgP-E">' + tgCardHead(p) + '<div class="tg-body"><div>' + tgChartFerm(e) + tgChartKegs(e) + '</div><div class="tg-find">' + stats +
+    tgChartCan(e) + tgCam('e') +
+    '<p class="tg-acc">発酵は台帳の T_発酵測定（ハブの発酵ログが書く）を、タンクと酵母投入日で見出しにしています。台帳のロットは現物とずれがあり（P-69）' + (e.fermWarn ? '、閉じたロットに入った測定が ' + e.fermWarn + ' 件あります' : '') + '。仕込みの効率と詰口は、台帳への移行（P-71）のあとで足します。</p>' +
+    '<h4>次の一手</h4>' + tgNexts('E') + tgMats('E') +
+    '<div class="tg-top" style="margin-top:12px"><button type="button" class="tg-btn" data-golens="E">つながりで見る</button></div></div></div></section>';
+}
+// 発酵の推移：横は酵母投入日からの日数、縦は °P。銘柄の色、右端にタンク
+function tgChartFerm(e) {
+  var lots = (e.ferm || []).filter(function (l) { return l.pts.some(function (p) { return p[1] != null; }); });
+  if (!lots.length) return '<div class="tg-chart"><h4>発酵の推移</h4><p class="tg-empty">直近60日の測定がありません。</p></div>';
+  var W = 640, H = 240, L = 40, R = 70, T = 14, B = 30;
+  var xs = [], ps = [];
+  lots.forEach(function (l) { l.pts.forEach(function (p) { if (p[1] != null) { xs.push(p[0]); ps.push(p[1]); } }); });
+  var x0 = Math.min(0, Math.min.apply(null, xs)), x1 = Math.max(10, Math.max.apply(null, xs)), mx = tgNice(Math.max.apply(null, ps.concat([1])));
+  var X = function (v) { return L + (W - L - R) * (v - x0) / (x1 - x0); }, y = function (v) { return T + (H - T - B) * (1 - v / mx); }, g = '';
+  var nt = tgTicks(mx, 4); for (var i = 0; i <= nt; i++) { var v = mx * i / nt; g += '<line class="tg-gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="tg-tx" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (Math.round(v * 10) / 10) + '</text>'; }
+  var stepX = x1 - x0 > 60 ? 14 : 7;
+  for (var t = Math.ceil(x0 / stepX) * stepX; t <= x1; t += stepX) g += '<text class="tg-tx" x="' + X(t) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + t + '日</text>';
+  var ends = [];
+  lots.forEach(function (l) {
+    var pp = l.pts.filter(function (p) { return p[1] != null; }), col = tgCol(l.brand);
+    g += '<polyline points="' + pp.map(function (p) { return X(p[0]) + ',' + y(p[1]); }).join(' ') + '" fill="none" stroke="' + col + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"' + (l.closed ? ' stroke-dasharray="2 3"' : '') + '/>';
+    pp.forEach(function (p) {
+      var tip = (l.tank || '') + '・' + l.lot + '（' + tgBrandName(l.brand) + '）\n' + fmtDay(p[3]) + '・酵母投入から ' + p[0] + '日\n°P ' + p[1] + (p[2] != null ? '・' + p[2] + '℃' : '') + (l.closed ? '\n閉じたロット（' + tgMD(l.closed) + '）' : '');
+      g += '<circle cx="' + X(p[0]) + '" cy="' + y(p[1]) + '" r="2.5" fill="' + col + '"/><circle class="tg-hit" cx="' + X(p[0]) + '" cy="' + y(p[1]) + '" r="8" data-tip="' + tgEsc(tip) + '"/>';
+    });
+    var last = pp[pp.length - 1];
+    if (l.stall) g += '<circle cx="' + X(last[0]) + '" cy="' + y(last[1]) + '" r="7" fill="none" stroke="var(--tg-bad)" stroke-width="2"/>';
+    ends.push({ y: y(last[1]), x: X(last[0]), t: (l.tank || l.lot) + (l.stall ? ' 止まり気味' : ''), stall: l.stall });
+  });
+  ends.sort(function (p, q) { return p.y - q.y; });
+  for (var j = 1; j < ends.length; j++) if (ends[j].y - ends[j - 1].y < 13) ends[j].y = ends[j - 1].y + 13;
+  ends.forEach(function (en) { g += '<text class="' + (en.stall ? 'tg-warntx' : 'tg-tx2') + '" x="' + (en.x + 8) + '" y="' + (en.y + 4) + '">' + tgEsc(en.t) + '</text>'; });
+  g += '<line class="tg-ax" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+  var bs = ['CREAM', 'AIPA', 'DTM'].filter(function (b) { return lots.some(function (l) { return l.brand === b; }); });
+  return '<div class="tg-chart"><h4>発酵の推移（°P・直近60日に測ったロット）</h4><div class="tg-key">' + bs.map(function (b) { return '<span><i style="background:' + tgCol(b) + '"></i>' + tgEsc(tgBrandName(b)) + '</span>'; }).join('') +
+    '<span>点線＝閉じたロット</span><span style="color:var(--tg-bad)">○ 止まり気味</span></div><div class="sc">' + tgSvg(W, H, g, '発酵の推移') + '</div><div class="cap">横は酵母投入日からの日数（台帳に投入日が無いロットは最初の測定から）</div></div>';
+}
+// 出荷中の樽：出荷からの日数（長い順・12本まで）。30日の線
+function tgChartKegs(e) {
+  var k = e.kegs;
+  if (!k) return '';
+  if (!k.out.length) return '<div class="tg-chart"><h4>出荷中の樽</h4><p class="tg-empty">出荷中の樽はありません。</p></div>';
+  var rows = k.out.slice(0, 12), W = 640, rh = 22, L = 150, R = 50, T = 8, H = T + rows.length * rh + 24;
+  var mx = Math.max(k.lateDays + 10, Math.max.apply(null, rows.map(function (r) { return r.days; })));
+  var X = function (v) { return L + (W - L - R) * v / mx; }, g = '';
+  rows.forEach(function (r, i) {
+    var yy = T + i * rh, late = r.days > k.lateDays;
+    g += '<text class="tg-tx2" x="' + (L - 8) + '" y="' + (yy + 15) + '" text-anchor="end">' + tgEsc(String(r.dest || '（出荷先なし）').slice(0, 12)) + '</text>' +
+      '<rect x="' + L + '" y="' + (yy + 4) + '" width="' + Math.max(2, X(r.days) - L) + '" height="' + (rh - 9) + '" rx="2" fill="' + tgCol(r.brand) + '"/>' +
+      '<text class="' + (late ? 'tg-warntx' : 'tg-tx') + '" x="' + (X(r.days) + 6) + '" y="' + (yy + 15) + '">' + r.days + '日</text>' +
+      '<rect class="tg-hit" x="0" y="' + yy + '" width="' + W + '" height="' + rh + '" data-tip="' + tgEsc((r.dest || '（出荷先なし）') + '\n' + tgBrandName(r.brand) + '\n' + fmtDay(r.ship) + ' に出荷・' + r.days + '日') + '"/>';
+  });
+  g += '<line class="tg-warnln" x1="' + X(k.lateDays) + '" x2="' + X(k.lateDays) + '" y1="' + T + '" y2="' + (H - 18) + '"/><text class="tg-warntx" x="' + X(k.lateDays) + '" y="' + (H - 4) + '" text-anchor="middle">' + k.lateDays + '日</text>' +
+    '<line class="tg-ax" x1="' + L + '" x2="' + L + '" y1="' + T + '" y2="' + (H - 18) + '"/>';
+  return '<div class="tg-chart"><h4>出荷中の樽（出荷からの日数）</h4><div class="tg-key">' + ['CREAM', 'AIPA', 'DTM'].map(function (b) { return '<span><i class="sq" style="background:' + tgCol(b) + '"></i>' + tgEsc(tgBrandName(b)) + '</span>'; }).join('') + '</div>' +
+    '<div class="sc">' + tgSvg(W, H, g, '出荷中の樽の日数') + '</div>' + (k.out.length > rows.length ? '<div class="cap">長い順に ' + rows.length + '本（全部で ' + k.out.length + '本）</div>' : '') + '</div>';
+}
+// 缶のロス・破損：月ごとの本数（理由はツールチップ）
+function tgChartCan(e) {
+  var c = e.can;
+  if (!c) return '';
+  var ms = c.months, W = 320, H = 150, L = 30, R = 8, T = 16, B = 22, bw = (W - L - R) / ms.length;
+  var sum = function (m) { var s = 0; Object.keys(m.c).forEach(function (k) { s += m.c[k]; }); return s; };
+  var mx = Math.ceil(tgNice(Math.max.apply(null, ms.map(sum).concat([1])))), y = function (v) { return T + (H - T - B) * (1 - v / mx); }, g = '';
+  var nt = [2, 3, 4, 5, 1].filter(function (n) { return mx % n === 0; })[0]; for (var i = 0; i <= nt; i++) { var v = mx * i / nt; g += '<line class="tg-gr" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="tg-tx" x="' + (L - 5) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + Math.round(v) + '</text>'; }
+  ms.forEach(function (m, i) {
+    var s = sum(m), x = L + i * bw + bw * 0.2, b = bw * 0.6;
+    g += '<rect class="tg-act" x="' + x + '" y="' + y(s) + '" width="' + b + '" height="' + (y(0) - y(s)) + '" rx="2"/>' +
+      (s ? '<text class="tg-tx2" x="' + (x + b / 2) + '" y="' + (y(s) - 4) + '" text-anchor="middle">' + s + '</text>' : '') +
+      '<text class="tg-tx" x="' + (x + b / 2) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + Number(m.ym.slice(5)) + '月</text>' +
+      '<rect class="tg-hit" x="' + (L + i * bw) + '" y="' + T + '" width="' + bw + '" height="' + (H - T - B) + '" data-tip="' + tgEsc(m.ym.replace('-', '年') + '月 ' + s + '本' + Object.keys(m.c).map(function (k) { return '\n' + k + ' ' + m.c[k] + '本'; }).join('')) + '"/>';
+  });
+  g += '<line class="tg-ax" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+  return '<div class="tg-chart" style="max-width:380px"><h4>缶のロス・破損（月ごとの本数）</h4>' + tgSvg(W, H, g, '缶のロス・破損の月ごとの本数') +
+    (c.reasons.length ? '<div class="cap">多い理由：' + c.reasons.slice(0, 3).map(tgEsc).join('・') + '</div>' : '') + '</div>';
+}
+function tgCardLater(p) {
+  return '<section class="tg-panel tg-card" id="tgP-' + p.id + '">' + tgCardHead(p) + '<p class="tg-acc">まだ出していません。出すのは ' + tgEsc(p.when || 'あとで') + '。</p>' + tgMats(p.id) +
+    '<div class="tg-top" style="margin-top:10px"><button type="button" class="tg-btn" data-golens="' + p.id + '">つながりで見る</button></div></section>';
+}
+
+/* ── 取り込み ── */
+function tgViewIngest() {
+  var g = TG.d.ingest;
+  var log = g.log.length ? '<div class="tg-tbw"><table class="tg-tb"><thead><tr><th>読む先</th><th>結果</th><th class="n">件数</th><th class="n">かかった秒</th><th>気をつけること</th></tr></thead><tbody>' + g.log.map(function (l) {
+    return '<tr><td>' + tgEsc(l.label) + '</td><td>' + (l.ok ? '<span class="tg-ok">読めた</span>' : '<span class="tg-ng">読めない</span>') + '</td><td class="n">' + tgEsc(l.n == null ? '―' : l.n) + '</td><td class="n">' + (Math.round(l.ms / 100) / 10) + '</td><td>' + tgEsc(l.ok ? l.warn : l.err) + '</td></tr>';
+  }).join('') + '</tbody></table></div>' : '<p class="tg-empty">まだ取り込んでいません。</p>';
+  var map = '<div class="tg-tbw"><table class="tg-tb"><thead><tr><th>売上の商品</th><th>区分</th><th>銘柄×量</th><th>メモ</th></tr></thead><tbody>' + g.map.map(function (m) {
+    return '<tr><td>' + tgEsc(m.name) + '</td><td>' + tgEsc(m.src) + '</td><td>' + (m.nomi ? '<span style="color:var(--muted)">分けない</span>' : tgEsc(m.parts.replace(/CREAM|AIPA|DTM/g, function (k) { return tgBrandName(k); }))) + '</td><td>' + tgEsc(m.note) + (m.guess ? ' <span class="tg-rd thin">推しはかり</span>' : '') + '</td></tr>';
+  }).join('') + '</tbody></table></div>';
+  var unm = g.unmapped && g.unmapped.length ? '<ul>' + g.unmapped.map(function (u) { return '<li>' + tgEsc(u.name) + '（' + (u.src === 'shop' ? 'Shop' : 'レストラン') + '・' + u.qty + '件）</li>'; }).join('') + '</ul>' : '<p class="tg-empty">ありません。</p>';
+  return '<p class="tg-lede">毎晩 23:30 に、各アプリと気象庁のデータを読むだけで写します（見回りの控えと一緒）。各アプリには書きません。読めなかった表は前の写しを残し、ここに理由を出します。</p>' +
+    '<div class="tg-top"><button type="button" class="act" id="tgRun">今すぐ取り込む</button><span class="tg-at">' + (g.at ? '前回：' + stampOf(g.at) : 'まだ取り込んでいません') + '（1〜2分かかります）</span></div>' +
+    '<h3 class="tg-h">前回の取り込み</h3>' + log +
+    '<h3 class="tg-h">気象庁の日ごとの値</h3><p class="tg-acc">' + (g.wx ? 'アメダス増毛 ' + g.wx.mashike + '日・留萌（雪）' + g.wx.rumoi + '日（2025年1月から）。毎晩、当月と前月を読み直します。' : 'まだ読んでいません。') + '</p>' +
+    '<h3 class="tg-h">対応表：売上の商品 → 銘柄×量</h3><p class="tg-acc">11/20 に決めた量（1杯・缶 350ml、テイスティングセット 130ml くらい）。「推しはかり」の行は、中身を確かめたら Links.gs の LK_BEER_MAP を直します。</p>' + map +
+    '<h3 class="tg-h">対応表に無いビールらしい商品</h3><p class="tg-acc">ここに出た商品は、銘柄の量に入っていません。</p>' + unm +
+    '<p class="tg-credit">' + tgEsc(g.credit) + '</p>';
+}
+
+/* ── 小窓と吹き出し ── */
+function tgModal(o) {
+  return new Promise(function (res) {
+    var bg = document.createElement('div');
+    bg.className = 'tg-mbg';
+    bg.innerHTML = '<div class="tg-modal" role="dialog" aria-modal="true" aria-labelledby="tgMt"><h3 id="tgMt">' + tgEsc(o.title) + '</h3><p>' + tgEsc(o.body) + '</p>' + (o.fields || '') +
+      '<div class="err" id="tgMerr"></div><div class="row"><button class="tg-btn" data-a="no" type="button">やめる</button><button class="tg-btn pri" data-a="ok" type="button">' + tgEsc(o.ok) + '</button></div></div>';
+    document.body.appendChild(bg);
+    var first = bg.querySelector('input,textarea') || bg.querySelector('[data-a=ok]');
+    first.focus();
+    var close = function (v) { bg.remove(); res(v); };
+    bg.addEventListener('click', function (e) {
+      if (e.target === bg) return close(null);
+      var a = e.target.closest('[data-a]');
+      if (!a) return;
+      if (a.getAttribute('data-a') === 'no') return close(null);
+      var v = o.check ? o.check(bg) : true;
+      if (typeof v === 'string') { bg.querySelector('#tgMerr').textContent = v; return; }
+      close(v);
+    });
+    bg.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(null); });
+  });
+}
+function tgTip() { var t = $('#tgTip'); if (!t) { t = h('div', { id: 'tgTip', role: 'tooltip' }); document.body.appendChild(t); } return t; }
+function tgTipShow(ev, text) {
+  var t = tgTip(); t.textContent = text; t.style.display = 'block';
+  var r = t.getBoundingClientRect(), x = ev.clientX + 14, yy = ev.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+  if (yy + r.height > innerHeight - 8) yy = ev.clientY - r.height - 14;
+  t.style.left = Math.max(8, x) + 'px'; t.style.top = Math.max(8, yy) + 'px';
+}
+function tgTipHide() { var t = $('#tgTip'); if (t) t.style.display = 'none'; }
+
+/* ── 操作 ── */
+function tgFind(id) { return (TG.d.next || []).filter(function (n) { return n.id === id; })[0]; }
+function tgAdopt(id) {
+  var n = tgFind(id);
+  if (!n) return;
+  tgModal({ title: '自分のタスクにしますか', body: '自分のスケジュールに、次の題名と日付でタスクを入れます。直してから入れられます。', ok: 'タスクにする',
+    fields: '<input id="tgMtitle" maxlength="200" aria-label="題名" value="' + tgEsc(n.title) + '"><input id="tgMdate" type="date" aria-label="日付" value="' + tgEsc(n.date) + '" style="margin-top:8px">',
+    check: function (bg) {
+      var t = bg.querySelector('#tgMtitle').value.trim(), dd = bg.querySelector('#tgMdate').value;
+      if (!t) return '題名を書いてください';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dd)) return '日付を選んでください';
+      return { title: t, date: dd };
+    } }).then(function (v) {
+    if (!v) return;
+    toast('タスクを入れています…');
+    call('linksdecide', { id: id, kind: 'adopt', title: v.title, date: v.date, rid: rid() }, { long: true }).then(function (r) {
+      TG.d.decide[r.id] = r.rec; tgRender(); toast('自分のスケジュールにタスクを入れました（' + tgMD(v.date) + '）');
+    }, function (e) { toast('入れられませんでした：' + e.message, true); });
+  });
+}
+function tgSkip(id) {
+  tgModal({ title: '見送る理由', body: '理由を残すと、同じ提案を次に出すかどうかの目安になります。', ok: '見送る',
+    fields: '<textarea id="tgMwhy" maxlength="300" placeholder="例：取引先が冬季休業で、春に回収する"></textarea>',
+    check: function (bg) { var w = bg.querySelector('#tgMwhy').value.trim(); return w ? { why: w } : '理由を書いてください（同じ提案を次に出すかを決めるのに使います）'; } }).then(function (v) {
+    if (!v) return;
+    call('linksdecide', { id: id, kind: 'skip', why: v.why }, { long: true }).then(function (r) {
+      TG.d.decide[r.id] = r.rec; tgRender(); toast('見送りました');
+    }, function (e) { toast('残せませんでした：' + e.message, true); });
+  });
+}
+function tgRunIngest(btn) {
+  btn.disabled = true; btn.textContent = '取り込んでいます…';
+  toast('取り込んでいます（1〜2分かかります）');
+  call('linksrun', {}, { wait: 330000, once: true }).then(function (d) { TG.d = d; TG.t = Date.now(); tgRender(); toast('取り込みました'); },
+    function (e) { btn.disabled = false; btn.textContent = '今すぐ取り込む'; toast('取り込めませんでした：' + e.message, true); });
+}
+function tgRunAi(btn) {
+  btn.disabled = true; btn.textContent = 'カミーユが読んでいます…';
+  call('linksai', {}, { wait: 200000, once: true }).then(function (r) {
+    TG.d.ai = r; tgRender(); toast(r && r.err && !r.a ? '書けませんでした：' + r.err : '見立てを書きました', !!(r && r.err && !r.a));
+  }, function (e) { btn.disabled = false; btn.textContent = 'カミーユに読んでもらう'; toast('書けませんでした：' + e.message, true); });
+}
+(function () {
+  var root = $('#tab-links');
+  if (!root) return;
+  root.addEventListener('click', function (e) {
+    var t = e.target;
+    var v = t.closest('[data-tgv]'); if (v) { TG.view = v.getAttribute('data-tgv'); tgRender(); return; }
+    if (t.closest('#tgRe')) { tgLoad(); return; }
+    var l = t.closest('[data-lens]'); if (l) { TG.lens = l.getAttribute('data-lens'); document.querySelectorAll('#tab-links [data-lens]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lens') === TG.lens)); }); tgDrawMatrix(); tgDrawStrip(); return; }
+    var k = t.closest('[data-key]'); if (k) { TG.sel = { t: 'key', id: k.getAttribute('data-key') }; if (TG.view === 'link') tgDrawMatrix(); tgDetail(); return; }
+    var ds = t.closest('[data-ds]'); if (ds) { TG.sel = { t: 'ds', id: ds.getAttribute('data-ds') }; if (TG.view === 'link') tgDrawMatrix(); tgDetail(); return; }
+    var gl = t.closest('[data-golens]'); if (gl) { TG.lens = gl.getAttribute('data-golens'); TG.sel = null; TG.view = 'link'; tgRender(); return; }
+    var gp = t.closest('[data-gop]'); if (gp) { TG.view = 'prop'; tgRender(); var c = $('#tgP-' + gp.getAttribute('data-gop')); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (t.closest('[data-close]')) { TG.sel = null; if (TG.view === 'link') tgDrawMatrix(); tgDetail(); return; }
+    var ap = t.closest('[data-app]'); if (ap) { TG.app = ap.getAttribute('data-app'); document.querySelectorAll('#tab-links [data-app]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-app') === TG.app)); }); tgDrawList(); return; }
+    var rf = t.closest('[data-rdf]'); if (rf) { TG.rdf = rf.getAttribute('data-rdf'); document.querySelectorAll('#tab-links [data-rdf]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-rdf') === TG.rdf)); }); tgDrawList(); return; }
+    var op = t.closest('[data-open]'); if (op) { TG.sel = { t: 'ds', id: op.getAttribute('data-open') }; TG.lens = ''; TG.view = 'link'; tgRender(); return; }
+    var ad = t.closest('[data-adopt]'); if (ad) { tgAdopt(ad.getAttribute('data-adopt')); return; }
+    var sk = t.closest('[data-skip]'); if (sk) { tgSkip(sk.getAttribute('data-skip')); return; }
+    var run = t.closest('#tgRun'); if (run) { tgRunIngest(run); return; }
+    var ai = t.closest('#tgAi'); if (ai) { tgRunAi(ai); return; }
+    // スマホでは吹き出しを押して出す
+    var tp = t.closest('[data-tip]'); if (tp && e.pointerType !== 'mouse') { tgTipShow(e, tp.getAttribute('data-tip')); return; }
+  });
+  root.addEventListener('input', function (e) { if (e.target.id === 'tgQ') { TG.q = e.target.value; tgDrawList(); } });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && TG.sel) { TG.sel = null; tgDrawMatrix(); tgDetail(); } });
+  root.addEventListener('pointermove', function (e) { var tp = e.target.closest && e.target.closest('[data-tip]'); if (tp) tgTipShow(e, tp.getAttribute('data-tip')); else tgTipHide(); });
+  root.addEventListener('pointerleave', tgTipHide);
+})();
 
 /* ───────── 見回り（v4・2026-10-29）─────────
    盤面はサーバ（Rounds.gs）が組む。開いたら置いてある盤面をすぐ出し、間隔が来たものだけ裏で読み直す（refresh=1）。
@@ -7358,6 +8015,10 @@ function mockRoute(p) {
     case 'tastingdel': db.tastings = db.tastings.filter(function (x) { return x.id !== p.id; }); return ok({ items: db.tastings });
     // 更新ノート（2026-10-26）。アプリ名は架空（本物はサーバの REL が返す）
     // マップ（2026-11-01）。名前はすべて架空（本物はサーバが返す）
+    // つながり帳（v6）。見本は手元の links-mock.json（gs_harness_links.mjs --dump が書く。GitHub にも GAS にも上げない）。無ければ「見本なし」
+    case 'links': case 'linksrun': return fetch('links-mock.json').then(function (r) { if (!r.ok) throw new Error('none'); return r.json(); }).then(function (d) { return ok(d); }, function () { return ng('見本（links-mock.json）がありません'); });
+    case 'linksai': return ok({ at: now, target: '', err: '', a: { find: '（見本）来週は先週より少し少ない見込みです。外れは大きめです。', next: '（見本）仕込みの量を製造と確かめる。' }, e: { find: '（見本）戻っていない樽があります。', next: '（見本）回収を確かめる。' } });
+    case 'linksdecide': return p.kind === 'skip' && !String(p.why || '').trim() ? ng('見送る理由を書いてください') : ok({ id: p.id, rec: { kind: p.kind, at: now, why: p.why || '', title: p.title || '', date: p.date || '' } });
     case 'accessmap':
       return ok({ url: 'https://example.com/map', at: '2026-11-06 12:00', deployAt: '2026-11-06 11:45',
         subs: [{ k: 'a.list', app: 'a', n: '（見本）一覧', open: '?view=list', kind: '画面', d: '（見本）一覧の画面' }, { k: 'a.job', app: 'a', n: '（見本）毎朝の処理', open: '', kind: '自動処理', d: '' }],
